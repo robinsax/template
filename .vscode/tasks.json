@@ -1,0 +1,712 @@
+{
+    "version": "2.0.0",
+    "inputs": [
+        {
+            "id": "migration_msg",
+            "type": "promptString",
+            "description": "Enter a migration message"
+        },
+        {
+            "id": "cloud_env_name",
+            "type": "promptString",
+            "description": "Enter the environment name (e.g. \"dev\")"
+        }
+    ],
+    "tasks": [
+        {
+            "label": "Workspace: Format Terraform",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/dev/format-terraform.sh"],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Workspace: Install Requirements",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/dev/install-reqs.sh"],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Workspace: Configure Local Integrations",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/dev/configure-local-integrations.sh"],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Workspace: Configure Local Ad Platform Connections",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/dev/configure-local-platforms.sh"],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Workspace: Integration Suite Dev",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/integration-suite/integration-suite-dev.sh"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Workspace: Start Backend Docs",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/dev/start-backend-docs.sh"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Workspace: Start App Docs",
+            "type": "shell",
+            "command": "npm",
+            "args": ["run", "docs"],
+            "options": {
+                "cwd": "${workspaceFolder}/app"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Local: Start App",
+            "type": "npm",
+            "script": "dev-serve",
+            "isBackground": true,
+            "options": {
+                "cwd": "${workspaceFolder}/app"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Local: Start API",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/dev/local-start-api.sh"],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "POSTGRES_URI": "postgresql://admin:admin@localhost:5432/main",
+                    "SERVICE_ORIGIN": "http://localhost",
+                    "SERVICE_PORT": "8001",
+                    "LOAD_DOTENVS": "${workspaceFolder}/.env;${workspaceFolder}/.env.platforms",
+                    "ENCRYPTION_KEY": "xn7MwEMY1l7G9dItXwzn5F6NK80WrSuv_n2lSKXDwHc=",
+                    "AUTH_TOKEN_HMAC_KEY": "rjv40P742AP_16-Z2VOR3nJibqVrn9R6qyvEq3fwkBo=",
+                    "DEV_MODE": "true"
+                }
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Local: Start Tasks",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/dev/local-start-tasks.sh"],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "SERVICE_ORIGIN": "http://localhost",
+                    "POSTGRES_URI": "postgresql://admin:admin@localhost:5432/main",
+                    "LOAD_DOTENVS": "${workspaceFolder}/.env;${workspaceFolder}/.env.platforms",
+                    "ENCRYPTION_KEY": "xn7MwEMY1l7G9dItXwzn5F6NK80WrSuv_n2lSKXDwHc=",
+                    "AUTH_TOKEN_HMAC_KEY": "rjv40P742AP_16-Z2VOR3nJibqVrn9R6qyvEq3fwkBo=",
+                    "DEV_MODE": "true"
+                }
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Local: Start Streams",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/dev/local-start-streams.sh"],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "POSTGRES_URI": "postgresql://admin:admin@localhost:5432/main",
+                    "SERVICE_ORIGIN": "http://localhost",
+                    "SERVICE_PORT": "8002",
+                    "LOAD_DOTENVS": "${workspaceFolder}/.env",
+                    "DEV_MODE": "true"
+                }
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Local: Start Dependencies",
+            "type": "shell",
+            "command": "docker-compose",
+            "args": [
+                "-f",
+                "docker-compose.dependencies.yaml",
+                "up"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/infra/local"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Local: Start All",
+            "type": "shell",
+            "dependsOn": [
+                "Local: Start Dependencies",
+                "Local: Start API",
+                "Local: Start Tasks",
+                "Local: Start Streams",
+                "Local: Start App"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "never",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Local Containerized: Start All",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./infra/local/run-local-services.sh"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Local Containerized: Replace API",
+            "type": "shell",
+            "command": "docker-compose",
+            "args": [
+                "-f",
+                "docker-compose.services.yaml",
+                "up",
+                "-d",
+                "--no-deps",
+                "--build",
+                "api"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/infra/local"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Local Containerized: Replace App",
+            "type": "shell",
+            "command": "docker-compose",
+            "args": [
+                "-f",
+                "docker-compose.services.yaml",
+                "up",
+                "-d",
+                "--no-deps",
+                "--build",
+                "app"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/infra/local"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Local Containerized: Replace Streams",
+            "type": "shell",
+            "command": "docker-compose",
+            "args": [
+                "-f",
+                "docker-compose.services.yaml",
+                "up",
+                "-d",
+                "--no-deps",
+                "--build",
+                "streams"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/infra/local"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Local Containerized: Replace Tasks",
+            "type": "shell",
+            "command": "docker-compose",
+            "args": [
+                "-f",
+                "docker-compose.services.yaml",
+                "up",
+                "-d",
+                "--no-deps",
+                "--build",
+                "tasks"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/infra/local"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Local: Run PSQL",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./run-psql-container.sh"],
+            "options": {
+                "cwd": "${workspaceFolder}/scripts/dev/psql"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Local: Drop Schema",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/dev/local-drop-schema.sh"],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "POSTGRES_URI": "postgresql://admin:admin@localhost:5432/main"
+                }
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Local: Make Migration",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/dev/local-make-migration.sh", "${input:migration_msg}"],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "POSTGRES_URI": "postgresql://admin:admin@localhost:5432/main"
+                }
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Local: Migrate to HEAD",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/dev/local-migrate-to-head.sh"],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "POSTGRES_URI": "postgresql://admin:admin@localhost:5432/main"
+                }
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Local Init: Make Dev Admin",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/dev/make-dev-admin.sh"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Local Init: Load Locations",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/dev/load-locations.sh"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Local Init: Run All",
+            "type": "shell",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Local: Drop Schema",
+                "Local: Migrate to HEAD",
+                "Local Init: Make Dev Admin",
+                "Local Init: Load Locations"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Codegen: Update App Definitions",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/dev/codegen-update-app-defs.sh"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Codegen: Update Campaign Brief Definitions",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/dev/codegen-update-campaign-brief-defs.sh"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Codegen: Collect EN Locale",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/dev/codegen-collect-en-locale.sh"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Codegen: All",
+            "type": "shell",
+            "dependsOn": [
+                "Codegen: Update App Definitions",
+                "Codegen: Update Campaign Brief Definitions",
+                "Codegen: Collect EN Locale"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Checks: Terraform Formatting",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/dev/checks-terraform-formatting.sh"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Checks: Lint Backend",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/dev/checks-lint-backend.sh"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Checks: Lint App",
+            "type": "shell",
+            "command": "npm",
+            "args": ["run", "lint"],
+            "options": {
+                "cwd": "${workspaceFolder}/app"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Checks: Test Backend",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/dev/checks-test-backend.sh"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Checks: Test App",
+            "type": "shell",
+            "command": "npm",
+            "args": ["run", "test"],
+            "options": {
+                "cwd": "${workspaceFolder}/app"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Checks: Verify App Build",
+            "type": "shell",
+            "command": "npm",
+            "args": ["run", "verify"],
+            "options": {
+                "cwd": "${workspaceFolder}/app"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Checks: Integration Suite",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/integration-suite/run-integration-suite.sh"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Checks: All",
+            "type": "shell",
+            "dependsOn": [
+                "Checks: Terraform Formatting",
+                "Checks: Lint Backend",
+                "Checks: Lint App",
+                "Checks: Test Backend",
+                "Checks: Test App",
+                "Checks: Verify App Build",
+                "Checks: Integration Suite"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "never",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Cloud: Deploy Environment",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/cloud/deploy-env.sh", "${input:cloud_env_name}"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Cloud: Pull Ad Platform Token",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/cloud/pull-ap-token.sh", "${input:cloud_env_name}"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Cloud: Sideload Ad Platform OAuth Token",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/cloud/sideload-ap-token.sh", "${input:cloud_env_name}"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Cloud: Trigger Channel Orchestration",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/cloud/orchestrate-channel.sh", "${input:cloud_env_name}"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Cloud: Provision Account",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/cloud/provision-account.sh", "${input:cloud_env_name}"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Cloud Init: Provision Environment",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/cloud/provision-env.sh", "${input:cloud_env_name}"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Cloud Init: Create Default Admin",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/cloud/trigger-env-job.sh", "${input:cloud_env_name}", "create-admin-job"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Cloud Init: Load Locations",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/cloud/trigger-env-job.sh", "${input:cloud_env_name}", "location-load-job"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        }
+    ]
+}

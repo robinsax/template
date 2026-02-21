@@ -1,0 +1,28 @@
+# hot_at_max.mql
+# Required template vars:
+#   ${project_id}, ${region}, ${service_name}, ${max_instances},
+#   ${cpu_thr}, ${mem_thr}
+
+fetch cloud_run_revision
+| filter resource.project_id == "${project_id}"
+| filter resource.location == "${region}"
+| filter resource.service_name == "${service_name}"
+| {
+    metric 'run.googleapis.com/container/cpu/utilizations'
+    | align delta(1m)
+    | every(1m)
+    | group_by [resource.service_name], [cpu: mean(value.utilizations)]
+  ;
+    metric 'run.googleapis.com/container/memory/utilizations'
+    | align delta(1m)
+    | every(1m)
+    | group_by [resource.service_name], [mem: mean(value.utilizations)]
+  ;
+    metric 'run.googleapis.com/container/instance_count'
+    | align delta(1m)
+    | every(1m)
+    | group_by [resource.service_name], [inst: max(value.instance_count)]
+  }
+| join
+| value [is_alert_condition: (inst >= ${max_instances} && (cpu >= ${cpu_thr} || mem >= ${mem_thr}))]
+| condition is_alert_condition

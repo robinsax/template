@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block subject %}{{ campaign.name }} - {{ t("rejected by channel") }}{% endblock %}
+
+{% block content %}
+{{ campaign.name }} {{ t("was rejected by one of its channels.") }}
+
+{{ t("Changes will be needed before the campaign can go live.") }}
+
+{{ t("View campaign:") }}
+{{ origin }}/campaigns/{{ campaign_url_id }}/review
+{% endblock %}

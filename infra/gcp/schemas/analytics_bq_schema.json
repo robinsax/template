@@ -1,0 +1,44 @@
+[
+  {
+    "name": "date",
+    "type": "DATE",
+    "mode": "REQUIRED",
+    "description": "The date for the daily metrics"
+  },
+  {
+    "name": "platform_id",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "Platform-specific campaign or ad set ID"
+  },
+  {
+    "name": "spend",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Total spend in currency units"
+  },
+  {
+    "name": "impressions",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "Total impressions"
+  },
+  {
+    "name": "clicks",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "Total clicks"
+  },
+  {
+    "name": "conversions",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "Total conversions"
+  },
+  {
+    "name": "revenue",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Total revenue in currency units"
+  }
+]

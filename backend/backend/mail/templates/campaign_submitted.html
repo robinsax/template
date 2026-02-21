@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block subject %}{{ campaign.name }} {{ t("was submitted for review") }}{% endblock %}
+
+{% block content %}
+{{ campaign.name }} {{ t("was submitted for review by") }} {{ submitter.name }}.
+
+{{ t("View campaign:") }}
+{{ origin }}/campaigns/{{ campaign_url_id }}/review
+{% endblock %}

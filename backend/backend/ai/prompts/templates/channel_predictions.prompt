@@ -1,0 +1,44 @@
+{% extends "base_analyze.prompt" %}
+
+{% block specific_task %}
+<specific_task>
+Generate PREDICTIONS - forecasts about future campaign performance based on current trends and data patterns.
+
+Focus on "what will likely happen" based on observable trends. Predictions should:
+- Forecast future metrics or outcomes based on current trajectory
+- Project end-of-campaign results (total spend, conversions, ROAS, etc.)
+- Identify likely scenarios if current trends continue
+- Warn about potential issues before they occur
+- Highlight opportunities that may emerge
+
+Examples of good predictions:
+- "At current pacing, campaign will end with $1,200 unspent (15% under budget)"
+- "If CTR continues declining at current rate (-2% daily), it will drop below 0.5% by day 10"
+- "Based on improving conversion trends, campaign will likely exceed ROAS target of 2.0x by end date"
+
+{% include "priorities_guidelines.snippet" %}
+</specific_task>
+
+<output_format>
+**CRITICAL: Your response must be ONLY valid JSON. Do not include markdown, explanations, code fences, or any text outside the JSON array.**
+
+Return a JSON array of prediction findings with this exact structure:
+
+[
+  {
+    "priority": "low" | "high",
+    "sentiment": "positive" | "neutral" | "negative",
+    "data": {
+      "description": "Forecast of future performance or outcome (1 sentence)",
+      "rationale": "Data patterns and logic supporting this prediction (1 sentence)",
+      "summary": "Super concise summary of the prediction (a few words)",
+      "supporting_metrics": {
+        "metric_name": numeric_value
+      }
+    }
+  }
+]
+
+Your response must start with [ and end with ]. Nothing else.
+</output_format>
+{% endblock %}

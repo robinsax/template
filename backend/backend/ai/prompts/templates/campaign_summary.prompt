@@ -1,0 +1,27 @@
+{% extends "base.prompt" %}
+
+{% block task_context %}
+<task_context>
+Summarize the strategy of the following marketing campaign in two short sentences or less.
+- This summary will be displayed next to each campaign in a list.
+</task_context>
+
+<output_content_rules>
+- Do not refer to yourself or use first-person language.
+- The `language` field is separate from geographic targeting — do not conflate them.
+- Always refer to languages using their human-readable names (e.g. English, French), never their locale keys (e.g. en_US, fr_FR).
+</output_content_rules>
+
+<info_to_describe>
+{% include "campaign_info.snippet" %}
+<brief_values>
+{{ brief_values }}
+</brief_values>
+<locations_values>
+{{ locations_values }}
+</locations_values>
+<channels_values>
+{{ channels_values }}
+</channels_values>
+</info_to_describe>
+{% endblock %}

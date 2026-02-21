@@ -1,0 +1,34 @@
+name: Setup Python with cached dependencies
+description: Set up Python 3.11 with cached site-packages
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Determine site-packages path
+      id: site
+      shell: bash
+      run: |
+        PATH="$(python -c 'import site; print(site.getsitepackages()[0])')"
+
+        echo "path=$PATH" >> $GITHUB_OUTPUT
+
+    - name: Python site-packages cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.site.outputs.path }}
+        key: ${{ runner.os }}-site-packages-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-site-packages-
+    
+    - name: Install Python dependencies
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        cd backend
+        pip install -r requirements.txt

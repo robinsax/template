@@ -1,0 +1,388 @@
+# Run CI on PRs and merges into trunk branches, except release or rc PRs (trunk to trunk).
+# Run CD on push to trunk branches.
+name: CI/CD
+
+on:
+  push:
+    branches: [dev, staging, main]
+  pull_request:
+    branches: [dev, staging, main]
+  workflow_dispatch:
+
+jobs:
+  # Determine environment.
+  determine-env:
+    name: Determine Environment
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.set-env.outputs.environment }}
+      trunk_to_trunk: ${{ steps.set-env.outputs.trunk_to_trunk }}
+
+    steps:
+      - name: Set environment
+        id: set-env
+        run: |
+          ENVIRONMENT=dev
+          TRUNK_TO_TRUNK=false
+
+          if [[ "${GITHUB_EVENT_NAME}" == pull_request ]]; then
+            # Check if this is a trunk-to-trunk PR
+            SOURCE_BRANCH="${GITHUB_HEAD_REF}"
+            TARGET_BRANCH="${GITHUB_BASE_REF}"
+            
+            if [[ ("$SOURCE_BRANCH" == "dev" || "$SOURCE_BRANCH" == "staging" || "$SOURCE_BRANCH" == "main") && \
+                  ("$TARGET_BRANCH" == "dev" || "$TARGET_BRANCH" == "staging" || "$TARGET_BRANCH" == "main") ]]; then
+              TRUNK_TO_TRUNK=true
+            fi
+
+            if [[ "${GITHUB_BASE_REF}" == main ]]; then
+              ENVIRONMENT=prod
+            elif [[ "${GITHUB_BASE_REF}" == staging ]]; then
+              ENVIRONMENT=staging
+            elif [[ "${GITHUB_BASE_REF}" == dev ]]; then
+              ENVIRONMENT=dev
+            fi
+          else
+            BRANCH="${GITHUB_REF##*/}"
+            if [[ "$BRANCH" == main ]]; then
+              ENVIRONMENT=prod
+            elif [[ "$BRANCH" == staging ]]; then
+              ENVIRONMENT=staging
+            elif [[ "$BRANCH" == dev ]]; then
+              ENVIRONMENT=dev
+            fi
+          fi
+
+          echo "environment=$ENVIRONMENT" >> $GITHUB_OUTPUT
+          echo "trunk_to_trunk=$TRUNK_TO_TRUNK" >> $GITHUB_OUTPUT
+
+  # CI checks.
+  backend-checks:
+    name: Backend Checks
+    runs-on: ubuntu-latest
+    needs:
+      - determine-env
+    if: needs.determine-env.outputs.trunk_to_trunk == 'false'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: ./.github/actions/setup-python-deps
+
+      - name: Lint
+        run: |
+          python -m pylint --rcfile .pylintrc backend/backend
+
+      - name: Test
+        run: |
+          python -m pytest backend/backend
+
+  app-checks:
+    name: App Checks
+    runs-on: ubuntu-latest
+    needs:
+      - determine-env
+    if: needs.determine-env.outputs.trunk_to_trunk == 'false'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Node dependencies
+        run: |
+          cd app
+          npm ci
+
+      - name: Lint
+        run: |
+          cd app
+          npm run lint
+
+      - name: Test
+        run: |
+          cd app
+          npm run test
+
+      - name: Verify build
+        run: |
+          cd app
+          npm run verify
+
+  codegen-check:
+    name: Codegen Check
+    runs-on: ubuntu-latest
+    needs:
+      - determine-env
+    if: needs.determine-env.outputs.trunk_to_trunk == 'false'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: ./.github/actions/setup-python-deps
+
+      - name: Verify codegen is no-op
+        run: |
+          ./scripts/cicd/check-codegen.sh
+
+  migration-check:
+    name: Migration Check
+    runs-on: ubuntu-latest
+    needs:
+      - determine-env
+    if: needs.determine-env.outputs.trunk_to_trunk == 'false'
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: migration_check
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: ./.github/actions/setup-python-deps
+
+      - name: Verify migration contains no changes
+        run: |
+          ./scripts/cicd/check-migration.sh
+
+  terraform-format-check:
+    name: Terraform Formatting Check
+    runs-on: ubuntu-latest
+    needs:
+      - determine-env
+    if: needs.determine-env.outputs.trunk_to_trunk == 'false'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+
+      - name: Terraform Format Check
+        run: |
+          ./scripts/cicd/checks-terraform-formatting.sh
+
+  # Heavy CI checks - only if all other checks pass.
+  terraform-plan-check:
+    name: Terraform Plan Check
+    runs-on: ubuntu-latest
+    needs:
+      - determine-env
+      - terraform-format-check
+      - migration-check
+      - backend-checks
+      - app-checks
+      - codegen-check
+    if: |
+      always() &&
+      (needs.determine-env.outputs.trunk_to_trunk == 'true' ||
+       (needs.terraform-format-check.result == 'success' &&
+        needs.migration-check.result == 'success' &&
+        needs.backend-checks.result == 'success' &&
+        needs.app-checks.result == 'success' &&
+        needs.codegen-check.result == 'success'))
+    environment: ${{ needs.determine-env.outputs.environment }}
+    concurrency:
+      group: ${{ needs.determine-env.outputs.environment }}
+      cancel-in-progress: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+
+      - name: Terraform Init
+        run: |
+          ./scripts/cicd/terraform-init.sh ${{ needs.determine-env.outputs.environment }}
+
+      - name: Terraform Plan
+        run: |
+          ./scripts/cicd/terraform-plan.sh ${{ needs.determine-env.outputs.environment }}
+
+  integration-suite-check:
+    name: Integration Suite Check
+    runs-on: ubuntu-latest
+    needs:
+      - terraform-format-check
+      - migration-check
+      - backend-checks
+      - app-checks
+      - codegen-check
+    if: |
+      needs.determine-env.outputs.trunk_to_trunk == 'false'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Buildx to enable caching between job runs.
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker-container
+
+      - name: Set up Python
+        uses: ./.github/actions/setup-python-deps
+
+      - name: Set up BuildX cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/.buildx-cache
+          key: ${{ runner.os }}-buildx
+          restore-keys: |
+            ${{ runner.os }}-buildx
+
+      - name: Pre-build API
+        shell: bash
+        run: |
+          cp -rf common backend/common
+
+          docker buildx build \
+            --cache-from type=local,src=${{ runner.temp }}/.buildx-cache \
+            --cache-to type=local,mode=max,dest=${{ runner.temp }}/.buildx-cache-new \
+            -t backend/api:latest \
+            --target api \
+            backend
+
+      - name: Save Buildx cache
+        run: |
+          rm -rf ${{ runner.temp }}/.buildx-cache
+          mv ${{ runner.temp }}/.buildx-cache-new ${{ runner.temp }}/.buildx-cache
+
+      - name: Run integration suite
+        run: |
+          ./scripts/integration-suite/run-integration-suite.sh
+
+  # CD run - only on push.
+  terraform-apply:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    needs:
+      - determine-env
+      - integration-suite-check
+      - terraform-plan-check
+    environment: ${{ needs.determine-env.outputs.environment }}
+    concurrency:
+      group: ${{ needs.determine-env.outputs.environment }}
+      cancel-in-progress: false
+
+    # Only run for push events (not PRs).
+    if: |
+      github.event_name == 'push' &&
+      (needs.integration-suite-check.result == 'success' || 
+       needs.integration-suite-check.result == 'skipped')
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Buildx because we push cache layers.
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          install: true
+          driver: docker-container
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+
+      - name: Terraform Init
+        run: |
+          ./scripts/cicd/terraform-init.sh ${{ needs.determine-env.outputs.environment }}
+
+      - name: Terraform Apply
+        run: |
+          ./scripts/cicd/terraform-apply.sh ${{ needs.determine-env.outputs.environment }}
+
+  # CD tagging - only on upper trunks, after deployment run.
+  tag:  
+    name: Tag Deployed Version
+    runs-on: ubuntu-latest
+    permissions: write-all
+    needs: terraform-apply
+
+    # Only tag commits to main and staging.
+    if: |
+      github.ref == 'refs/heads/main' ||
+      github.ref == 'refs/heads/staging'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set major version
+        # Increment major version here.
+        run: echo "MAJOR_VERSION=0" >> $GITHUB_ENV
+
+      - name: Determine next version
+        id: version
+        run: |
+          # Get highest stable tag from main: vMAJOR.MINOR
+          latest=$(
+            git tag --list "v${MAJOR_VERSION}.*" |
+            grep -E "^v${MAJOR_VERSION}\.[0-9]+$" |
+            sort -V | tail -n1
+          )
+
+          # Extract minor version from last main release.
+          if [ -z "$latest" ]; then
+            minor=0
+          else
+            minor=$(echo $latest | sed -E "s/v${MAJOR_VERSION}\.([0-9]+)/\1/")
+          fi
+
+          branch="${GITHUB_REF##*/}"
+          sha=$(git rev-parse --short HEAD)
+
+          if [ "$branch" = "main" ]; then
+            # Tag main as vMAJOR.MINOR.
+            next_minor=$((minor+1))
+            tag="v${MAJOR_VERSION}.${next_minor}"
+          else
+            # Tag staging as vMAJOR.MINOR.rc/<sha>.
+            next_minor=$((minor+1))
+            tag="v${MAJOR_VERSION}.${next_minor}.rc/${sha}"
+          fi
+
+          echo "tag=$tag" >> $GITHUB_OUTPUT
+
+      - name: Create tag
+        uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/${{ steps.version.outputs.tag }}',
+              sha: context.sha
+            })

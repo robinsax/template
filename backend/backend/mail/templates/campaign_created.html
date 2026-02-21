@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block subject %}{{ t("New campaign in") }} {{ business.name }} - {{ campaign.name }}{% endblock %}
+
+{% block content %}
+{{ creator.name }} {{ t("created a new campaign,") }} {{ campaign.name }}{{ t(", in")}} {{ business.name }}.
+
+{{ t("View campaign:") }}
+{{ origin }}/campaigns/{{ campaign_url_id }}
+{% endblock %}

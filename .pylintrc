@@ -1,0 +1,31 @@
+[MASTER]
+ignore=venv,backend/migrations
+init-hook='import sys; sys.path.append("backend")'
+check-quote-consistency=yes
+
+[MESSAGES CONTROL]
+disable=
+    C0114,  # missing-module-docstring
+    C0115,  # missing-class-docstring
+    C0116,  # missing-function-docstring
+    C0302,  # too-many-lines
+    R0903,  # too-few-public-methods
+    W0511,  # fix-me
+    R0801,  # similar
+    R0401,  # cyclic-import
+    R0911,  # too-many-return-statements
+    R0912,  # too-many-branches
+    R0917,  # too-many-positional-arguments
+    R0913,  # too-many-arguments
+    E1136,  # unsubscriptable-object
+
+[FORMAT]
+max-line-length=90
+indent-string='    '
+
+[BASIC]
+argument-naming-style=snake_case
+variable-naming-style=snake_case
+const-naming-style=UPPER_CASE
+class-naming-style=PascalCase
+function-naming-style=snake_case

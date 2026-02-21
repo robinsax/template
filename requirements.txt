@@ -1,0 +1,5 @@
+# Repository script dependencies.
+pylint==3.3.7
+pytest==8.4.1
+pdoc==15.0.4
+pyyaml==6.0.2

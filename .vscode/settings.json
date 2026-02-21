@@ -1,0 +1,36 @@
+{
+    "terminal.integrated.defaultProfile.windows": "Git Bash",
+    "terminal.integrated.env.windows": {
+        "POSTGRES_URI": "postgresql://admin:admin@localhost:5432/main",
+        "LOAD_DOTENVS": "${workspaceFolder}/.env;${workspaceFolder}/.env.platforms",
+        "ENCRYPTION_KEY": "xn7MwEMY1l7G9dItXwzn5F6NK80WrSuv_n2lSKXDwHc=",
+        "AUTH_TOKEN_HMAC_KEY": "rjv40P742AP_16-Z2VOR3nJibqVrn9R6qyvEq3fwkBo=",
+        "SERVICE_ORIGIN": "http://localhost",
+        "DEV_MODE": "true",
+        "PYTHONPATH": "${workspaceFolder}/backend",
+        "PATH": "${workspaceFolder}/.bin;${env:PATH}"
+    },
+    "terminal.integrated.env.osx": {
+        "POSTGRES_URI": "postgresql://admin:admin@localhost:5432/main",
+        "LOAD_DOTENVS": "${workspaceFolder}/.env;${workspaceFolder}/.env.platforms",
+        "ENCRYPTION_KEY": "xn7MwEMY1l7G9dItXwzn5F6NK80WrSuv_n2lSKXDwHc=",
+        "AUTH_TOKEN_HMAC_KEY": "rjv40P742AP_16-Z2VOR3nJibqVrn9R6qyvEq3fwkBo=",
+        "SERVICE_ORIGIN": "http://localhost",
+        "DEV_MODE": "true",
+        "PYTHONPATH": "${workspaceFolder}/backend",
+        "PATH": "${workspaceFolder}/.bin:${env:PATH}"
+    },
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+    ],
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.format.enable": false,
+    "files.exclude": {
+        "**/.git": false
+    },
+    "windsurfPyright.analysis.extraPaths": ["${workspaceFolder}/backend"],
+    "python.terminal.activateEnvironment": false
+}

@@ -1,0 +1,45 @@
+{% extends "base_analyze.prompt" %}
+
+{% block specific_task %}
+<specific_task>
+Generate RECOMMENDATIONS - specific, actionable suggestions to improve campaign performance.
+
+Focus on "what to do about it" based on the data patterns. Recommendations should:
+- Provide concrete, actionable steps the advertiser can take
+- Be specific to this campaign's data and context
+- Address performance issues or optimization opportunities
+- Include clear rationale based on the analytics
+- Explain expected impact if the recommendation is followed
+
+Examples of good recommendations:
+- "Increase daily budget by 20% to maintain current pacing and avoid underspending"
+- "Pause campaign during weekends when CTR drops below 0.5% to reduce wasted spend"
+- "Shift more budget to this channel as ROAS (2.8x) exceeds target of 2.0x"
+
+{% include "priorities_guidelines.snippet" %}
+</specific_task>
+
+<output_format>
+**CRITICAL: Your response must be ONLY valid JSON. Do not include markdown, explanations, code fences, or any text outside the JSON array.**
+
+Return a JSON array of recommendation findings with this exact structure:
+
+[
+  {
+    "priority": "low" | "high",
+    "sentiment": "positive" | "neutral" | "negative",
+    "data": {
+      "description": "Specific, actionable suggestion (1 sentence)",
+      "rationale": "Why this recommendation makes sense based on the data (1 sentence)",
+      "expected_impact": "What improvement you expect if implemented (1 sentence)",
+      "summary": "Super concise summary of the recommendation (a few words)",
+      "supporting_metrics": {
+        "metric_name": numeric_value
+      }
+    }
+  }
+]
+
+Your response must start with [ and end with ]. Nothing else.
+</output_format>
+{% endblock %}

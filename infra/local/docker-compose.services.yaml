@@ -1,0 +1,136 @@
+# Reusable env params.
+x-env-origin: &env-origin
+  SERVICE_ORIGIN: http://localhost
+
+x-env-pg: &env-pg
+  POSTGRES_URI: postgresql://admin:admin@${COMPOSE_PROJECT_NAME}-postgres:${POSTGRES_PORT:-5432}/main
+
+x-env-adapters: &env-adapters
+  # Storage.
+  STORAGE_BACKEND: google
+  GOOGLE_BUCKET_PLATFORM: kedet-local-platform-data
+  GOOGLE_BUCKET_CREATIVE: kedet-local-creative-data
+  # AI.
+  AI_PROVIDER: gemini
+  GEMINI_DEV_API_KEY: ${GEMINI_DEV_API_KEY}
+
+x-env-secrets: &env-secrets
+  # API Keys.
+  # Keys.
+  ENCRYPTION_KEY: xn7MwEMY1l7G9dItXwzn5F6NK80WrSuv_n2lSKXDwHc=
+  AUTH_TOKEN_HMAC_KEY: rjv40P742AP_16-Z2VOR3nJibqVrn9R6qyvEq3fwkBo=
+  GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY}
+  # Ad platforms.
+  GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+  GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+  GOOGLE_ADS_DEV_TOKEN: ${GOOGLE_ADS_DEV_TOKEN}
+  GOOGLE_DV360_USE_MOCK_BACKEND: ${GOOGLE_DV360_USE_MOCK_BACKEND}
+  META_APP_ID: ${META_APP_ID}
+  META_APP_SECRET: ${META_APP_SECRET}
+  META_USE_MOCK_BACKEND: ${META_USE_MOCK_BACKEND}
+  SNAPCHAT_CLIENT_ID: ${SNAPCHAT_CLIENT_ID}
+  SNAPCHAT_CLIENT_SECRET: ${SNAPCHAT_CLIENT_SECRET}
+  SNAPCHAT_USE_MOCK_BACKEND: ${SNAPCHAT_USE_MOCK_BACKEND}
+  TIKTOK_USE_MOCK_BACKEND: ${TIKTOK_USE_MOCK_BACKEND}
+  TIKTOK_APP_ID: ${TIKTOK_APP_ID}
+  TIKTOK_APP_SECRET: ${TIKTOK_APP_SECRET}
+  AMAZON_CLIENT_ID: ${AMAZON_CLIENT_ID}
+  AMAZON_CLIENT_SECRET: ${AMAZON_CLIENT_SECRET}
+  AMAZON_USE_MOCK_BACKEND: ${AMAZON_USE_MOCK_BACKEND}
+  PINTEREST_APP_ID: ${PINTEREST_APP_ID}
+  PINTEREST_APP_SECRET: ${PINTEREST_APP_SECRET}
+  PINTEREST_USE_MOCK_BACKEND: ${PINTEREST_USE_MOCK_BACKEND}
+
+x-env-gcp-sa: &env-gcp-sa
+  GOOGLE_APPLICATION_CREDENTIALS: /creds/gcp-sa.json
+
+# Resuable service template params.
+x-gcp-sa-mount: &gcp-sa-mount
+  ../../common/gcp-sa.json:/creds/gcp-sa.json
+
+# Services.
+services:
+  proxy:
+    extends:
+      file: docker-compose.dependencies.yaml
+      service: proxy
+
+  postgres:
+    extends:
+      file: docker-compose.dependencies.yaml
+      service: postgres
+
+  app:
+    image: kedet/app:latest
+    container_name: ${COMPOSE_PROJECT_NAME}-app
+    build:
+      context: ../../app
+      target: app
+    environment:
+      <<: *env-origin
+      SERVICE_PORT: 8000
+    ports:
+      - 8000:8000
+    networks:
+      - local
+
+  api:
+    image: kedet/api:latest
+    container_name: ${COMPOSE_PROJECT_NAME}-api
+    build:
+      context: ../../backend
+      target: api
+    environment:
+      <<: [*env-origin, *env-pg, *env-adapters, *env-secrets, *env-gcp-sa]
+      SERVICE_PORT: ${API_PORT:-8001}
+      INTEGRATION_TEST_MODE: ${INTEGRATION_TEST_MODE:-false}
+    ports:
+      - ${API_PORT:-8001}:${API_PORT:-8001}
+    volumes: [
+      *gcp-sa-mount,
+      ../../backend/.storage:/app/.storage:rw
+    ]
+    networks:
+      - local
+
+  streams:
+    image: kedet/streams:latest
+    container_name: ${COMPOSE_PROJECT_NAME}-streams
+    build:
+      context: ../../backend
+      target: streams
+    environment:
+      <<: [*env-origin, *env-pg, *env-gcp-sa]
+      SERVICE_PORT: 8002
+    ports:
+      - 8002:8002
+    volumes: [
+      *gcp-sa-mount,
+      ../../backend/.storage:/app/.storage:rw
+    ]
+    networks:
+      - local
+
+  tasks:
+    image: kedet/tasks:latest
+    container_name: ${COMPOSE_PROJECT_NAME}-tasks
+    build:
+      context: ../../backend
+      target: tasks
+    environment:
+      <<: [*env-origin, *env-pg, *env-adapters, *env-secrets, *env-gcp-sa]
+      SERVICE_PORT: 8003
+    volumes: [
+      *gcp-sa-mount,
+      ../../backend/.storage:/app/.storage:rw
+    ]
+    networks:
+      - local
+
+networks:
+  local:
+    driver: bridge
+
+volumes:
+  kedet_db:
+  integration_suite_db:
