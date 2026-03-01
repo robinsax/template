@@ -1,15 +1,15 @@
 /**
 *   User search UI. 
 */
-import React, { useState } from 'react';
-import { VStack, Button } from '@chakra-ui/react';
+import React, { useState } from "react";
+import { VStack, Button } from "@chakra-ui/react";
 
-import { UserModel } from '@/models';
-import { useFetchedState, useI18n } from '@/hooks';
-import { ClickTarget, Icon } from '@/components/common';
+import { UserModel } from "@/models";
+import { useFetchedState, useI18n } from "@/hooks";
+import { ClickTarget, Icon } from "@/components/common";
 
-import { UserPersona } from './personas';
-import { UserInvite, useUserList } from './manager';
+import { UserPersona } from "./personas";
+import { UserInvite, useUserList } from "./manager";
 
 /**
 *   Filterable user search UI.
@@ -43,7 +43,7 @@ export const UserSearch = ({ allowInvite, onSelect }: {
                                 leftIcon={ <Icon name="mail"/> }
                                 onClick={ () => setInviting(true) }
                             >
-                                { t('Invite someone to Kedet') }
+                                { t("Invite someone to Kedet") }
                             </Button>
                         ) }
                     </>
@@ -53,7 +53,7 @@ export const UserSearch = ({ allowInvite, onSelect }: {
                             onClick={ () => setInviting(false) }
                             variant="ghost"
                         >
-                            { t('Cancel') }
+                            { t("Cancel") }
                         </Button>
                     </UserInvite>
                 ) }

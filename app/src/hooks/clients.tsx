@@ -10,15 +10,15 @@
 */
 import React, {
     ReactNode, createContext, useCallback, useContext, useMemo
-} from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+} from "react";
+import { Navigate, useLocation } from "react-router-dom";
 
-import { ClientModel } from '@/models';
-import { SplashScreen, FullAreaSpinner } from '@/components/common';
+import { ClientModel } from "@/models";
+import { SplashScreen, FullAreaSpinner } from "@/components/common";
 
-import { AuthzScopeProvider } from './authz';
-import { useSavedState } from './util';
-import { createFetchedStateContext } from './fetched-state';
+import { AuthzScopeProvider } from "./authz";
+import { useSavedState } from "./util";
+import { createFetchedStateContext } from "./fetched-state";
 
 const {
     Provider: ClientsProviderInner,
@@ -47,7 +47,7 @@ const ActiveClientProviderInner = ({ children, requireActive }: {
     const clients = useClientsOrNull();
 
     const [activeClientId, setActiveClientId] = useSavedState<string | null>(
-        'active-client', null
+        "active-client", null
     );
 
     const setActiveClient = useCallback((client: ClientModel | null) => {
@@ -61,7 +61,7 @@ const ActiveClientProviderInner = ({ children, requireActive }: {
     }, [clients, activeClientId]);
 
     if (requireActive && clients && !activeClient) {
-        return <Navigate to={ '/select-client?dest=' + location.pathname }/>;
+        return <Navigate to={ "/select-client?dest=" + location.pathname }/>;
     }
 
     return (
@@ -112,7 +112,7 @@ export const ClientsProvider = ({ children, requireActive = false }: {
 export const useClients = () => useClientsInner() || [];
 
 /**
-*   Return the active Client, or `null` if there isn't one.
+*   Return the active Client, or `null` if there isn"t one.
 */
 export const useActiveClientOrNull = () => {
     const context = useContext(activeClientContext);
@@ -129,7 +129,7 @@ export const useActiveClientOrNull = () => {
 export const useActiveClient = () => useActiveClientOrNull() as ClientModel;
 
 /**
-*   Returns a function to switch the active Client, or `null` if there isn't one
+*   Returns a function to switch the active Client, or `null` if there isn"t one
 *   being broadcast.
 */
 export const useSwitchClientOrNull = () => {

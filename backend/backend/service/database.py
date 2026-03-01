@@ -1,6 +1,6 @@
-'''
+"""
 Database session provision.
-'''
+"""
 import sys
 from contextlib import contextmanager
 from typing import Optional, Generator, Callable
@@ -8,15 +8,15 @@ from sqlalchemy import Engine, create_engine, event
 from sqlalchemy.orm import Session, sessionmaker
 from google.cloud.sql.connector import Connector, IPTypes
 
-from kedet.config import ConfigError, config
+from backend.config import ConfigError, config
 
 _engine: Optional[Engine] = None
 _SessionLocal: Optional[type[Session]] = None
 
 def _get_session_local():
-    '''
+    """
     Lazy-initialize and return the SQLAlchemy session factory.
-    '''
+    """
     global _SessionLocal # pylint: disable=global-statement
 
     if _SessionLocal is None:
@@ -26,22 +26,22 @@ def _get_session_local():
     return _SessionLocal
 
 def _get_cloudsql_connection_factory() -> Callable:
-    '''
+    """
     Create and return a CloudSQL connection factory callable.
-    '''
+    """
     try:
         project, region, instance, user, db_name = (
-            config.postgres_cloudsql_uri.get().split(':')
+            config.postgres_cloudsql_uri.get().split(":")
         )
     except ValueError:
-        raise ConfigError('Invalid POSTGRES_CLOUDSQL_URI') from None
+        raise ConfigError("Invalid POSTGRES_CLOUDSQL_URI") from None
 
     connector = Connector()
 
     def factory():
         return connector.connect(
-            ':'.join((project, region, instance)),
-            'pg8000',
+            ":".join((project, region, instance)),
+            "pg8000",
             user=user,
             db=db_name,
             ip_type=IPTypes.PRIVATE,
@@ -51,9 +51,9 @@ def _get_cloudsql_connection_factory() -> Callable:
     return factory
 
 def get_engine() -> Engine:
-    '''
+    """
     Return the global SQLAlchemy engine binding.
-    '''
+    """
     global _engine # pylint: disable=global-statement
 
     if _engine is None:
@@ -65,13 +65,13 @@ def get_engine() -> Engine:
             connection_factory = _get_cloudsql_connection_factory()
 
             _engine = create_engine(
-                'postgresql+pg8000://',
+                "postgresql+pg8000://",
                 creator=connection_factory,
                 pool_pre_ping=True,
                 pool_recycle=1800
             )
         else:
-            raise ConfigError('No POSTGRES_URI or POSTGRES_CLOUDSQL_URI')
+            raise ConfigError("No POSTGRES_URI or POSTGRES_CLOUDSQL_URI")
 
         # Enable debug query logging if configured.
         if config.sqlalchemy_echo.get():
@@ -79,16 +79,16 @@ def get_engine() -> Engine:
 
             def show_formatted(*args):
                 print(
-                    sqlparse.format(args[2], reindent=True, keyword_case='lower'),
+                    sqlparse.format(args[2], reindent=True, keyword_case="lower"),
                     file=sys.stderr
                 )
 
-            event.listen(_engine, 'before_cursor_execute', show_formatted)
+            event.listen(_engine, "before_cursor_execute", show_formatted)
 
     return _engine
 
 def get_session() -> Generator[Session, None, None]:
-    '''
+    """
     Return a generator for an SQLAlchemy session. This should be used for API endpoint
     `Depends` clauses.
 
@@ -103,7 +103,7 @@ def get_session() -> Generator[Session, None, None]:
     finally:
         next(session_factory)
     ```
-    '''
+    """
     session = _get_session_local()()
     try:
         yield session
@@ -112,13 +112,13 @@ def get_session() -> Generator[Session, None, None]:
 
 @contextmanager
 def _yield_session() -> Generator[Session, None, None]:
-    '''
+    """
     Yield a session.
-    '''
+    """
     yield from get_session()
 
 def get_session_as_context() -> Session:
-    '''
+    """
     Return a session as a context manager.
 
     Usage:
@@ -126,5 +126,5 @@ def get_session_as_context() -> Session:
     with get_session_as_context() as session:
         # ...
     ```
-    '''
+    """
     return _yield_session()

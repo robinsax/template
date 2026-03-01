@@ -1,9 +1,9 @@
-import React, { useMemo, memo } from 'react';
-import { Box, VStack, Text } from '@chakra-ui/react';
-import * as rc from 'recharts';
+import React, { useMemo, memo } from "react";
+import { Box, VStack, Text } from "@chakra-ui/react";
+import * as rc from "recharts";
 
-import { I18nValueFn, useI18n } from '@/hooks';
-import { ThemeColor, useDarkTheme, useThemeColor } from '@/theme';
+import { I18nValueFn, useI18n } from "@/hooks";
+import { ThemeColor, useDarkTheme, useThemeColor } from "@/theme";
 
 export type ChartValue = {
     value: number,
@@ -47,7 +47,7 @@ export const ValueLimitChart = memo(({
                     <Box
                         height={ lineHeight }
                         position="absolute"
-                        right={ budgetRight + '%' }
+                        right={ budgetRight + "%" }
                         top={ 0 }
                         bottom={ 0 }
                         opacity={ 0.5 }
@@ -57,14 +57,14 @@ export const ValueLimitChart = memo(({
                     { data.map((datum, i) => (
                         <Box
                             key={ i }
-                            borderLeftRadius={ !i ? 'sm' : 'none' }
-                            width={ ((datum.value / maxValue) * 100) + '%' }
+                            borderLeftRadius={ !i ? "sm" : "none" }
+                            width={ ((datum.value / maxValue) * 100) + "%" }
                             height={ lineHeight }
                             display="inline-block"
                             bg={ datum.color }
                             border="2px solid"
                             borderColor={ datum.color }
-                            cursor={ datum.onFocus ? 'pointer' : 'default' }
+                            cursor={ datum.onFocus ? "pointer" : "default" }
                             onClick={ datum.onFocus }
                         />
                     )) }
@@ -72,7 +72,7 @@ export const ValueLimitChart = memo(({
                 <VStack
                     position="absolute"
                     alignItems="flex-end"
-                    right={ budgetRight + '%' }
+                    right={ budgetRight + "%" }
                     bottom={ 0 }
                     spacing={ 0 }
                 >
@@ -97,8 +97,8 @@ export const PieChart = memo(({ width, height, aspect, data }: {
     const t = useI18n();
 
     const darkTheme = useDarkTheme();
-    const lightColor = useThemeColor('lightText');
-    const textColor = useThemeColor('themeText');
+    const lightColor = useThemeColor("lightText");
+    const textColor = useThemeColor("themeText");
 
     const secondaryColor = darkTheme ? textColor: lightColor;
 
@@ -161,7 +161,7 @@ export const PieChart = memo(({ width, height, aspect, data }: {
                                 stroke={ datum.color }
                                 strokeWidth={ 2 }
                                 onClick={ datum.onFocus }
-                                cursor={ datum.onFocus ? 'pointer' : 'default' }
+                                cursor={ datum.onFocus ? "pointer" : "default" }
                             />
                         )) }
                     </rc.Pie>
@@ -192,15 +192,15 @@ export const AccumulationChart = memo(({
     const t = useI18n();
 
     const barColor = useThemeColor(
-        data.length ? data[0].color as ThemeColor : 'selection'
+        data.length ? data[0].color as ThemeColor : "selection"
     );
     const resolvedDesiredTrendColor = useThemeColor(desiredTrendColor);
     const resolvedProjectionColor = useThemeColor(projectionColor);
 
-    const gridColor = useThemeColor('lightBorder');
-    const textColor = useThemeColor('themeText');
-    const lightTextColor = useThemeColor('lightText');
-    const fillColor = useThemeColor('selection');
+    const gridColor = useThemeColor("lightBorder");
+    const textColor = useThemeColor("themeText");
+    const lightTextColor = useThemeColor("lightText");
+    const fillColor = useThemeColor("selection");
 
     const accData = useMemo(() => {
         let acc = 0;
@@ -340,9 +340,9 @@ export const LineChart = memo(({ width, yMax, formatY, height, data, maxTicks }:
 }) => {
     const t = useI18n();
 
-    const gridColor = useThemeColor('lightBorder');
-    const textColor = useThemeColor('themeText');
-    const lightTextColor = useThemeColor('lightText');
+    const gridColor = useThemeColor("lightBorder");
+    const textColor = useThemeColor("themeText");
+    const lightTextColor = useThemeColor("lightText");
 
     const tickInterval = useMemo(() => {
         const tickInterval = maxTicks 
@@ -417,7 +417,7 @@ export const LineChart = memo(({ width, yMax, formatY, height, data, maxTicks }:
                     <LineChartLine
                         key={ i }
                         datum={ data[0][i] }
-                        dataKey={ i + '.value' }
+                        dataKey={ i + ".value" }
                     />
                 ))}
             </rc.ComposedChart>

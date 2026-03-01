@@ -4,53 +4,53 @@
 *
 *   Using an icon set ensures icons are consistent throughout the app.
 */
-import React, { SVGAttributes, useMemo } from 'react';
+import React, { SVGAttributes, useMemo } from "react";
 import {
     MdModeEdit, MdDelete, MdOutlineRefresh, MdOutlineTextFields, MdAccountTree,
     MdDarkMode, MdFastfood, MdSportsFootball, MdTablet, MdComputer, MdDiamond,
     MdOutlinePets, MdAnalytics, MdSmartToy, MdEmail, MdHighQuality, MdRemoveRedEye,
     MdArchive, MdUnarchive, MdAdsClick
-} from 'react-icons/md';
+} from "react-icons/md";
 import {
     FaChevronRight, FaComments, FaExternalLinkSquareAlt, FaGlobeAmericas, FaFilter,
     FaChevronDown, FaChevronLeft, FaCalendarWeek, FaFireAlt, FaTools, FaIndustry,
     FaChevronUp, FaHeart, FaTv, FaPlaneArrival, FaPlaneDeparture, FaCheck, FaCircle,
     FaUpload, FaComment, FaGavel, FaSearch, FaLayerGroup, FaSnapchatSquare, FaInstagram,
     FaFacebook, FaAmazon, FaPaintBrush, FaPencilRuler
-} from 'react-icons/fa';
+} from "react-icons/fa";
 import {
     FaBox, FaPerson, FaShield, FaCropSimple, FaMeta, FaFileImage
-} from 'react-icons/fa6';
-import { HiSwitchHorizontal } from 'react-icons/hi';
+} from "react-icons/fa6";
+import { HiSwitchHorizontal } from "react-icons/hi";
 import {
     IoMdSettings, IoMdAddCircle, IoMdMegaphone, IoMdAppstore, IoMdInformationCircle,
     IoMdHome, IoMdCart, IoMdMale, IoMdFemale, IoMdPhonePortrait, IoMdNotifications,
     IoIosLock, IoLogoPinterest
-} from 'react-icons/io';
+} from "react-icons/io";
 import {
     IoStorefrontSharp, IoPeople, IoMaleFemale, IoPlay, IoPause, IoMenu, IoStop
-} from 'react-icons/io5';
+} from "react-icons/io5";
 import {
     RiAdvertisementFill, RiLogoutBoxFill, RiLoginBoxFill, RiResetLeftFill,
     RiMoneyDollarCircleFill, RiAiGenerate2,
     RiChatAiFill
-} from 'react-icons/ri';
-import { BiSolidDashboard, BiSolidError, BiSolidDuplicate } from 'react-icons/bi';
+} from "react-icons/ri";
+import { BiSolidDashboard, BiSolidError, BiSolidDuplicate } from "react-icons/bi";
 import {
     AiFillLike, AiFillDislike, AiFillTikTok, AiOutlineGoogle, AiFillClockCircle
-} from 'react-icons/ai';
-import { GrTechnology } from 'react-icons/gr';
-import { GiRolledCloth, GiLipstick } from 'react-icons/gi';
-import { BsQuestionLg, BsBarChartLineFill } from 'react-icons/bs';
-import { LuTarget} from 'react-icons/lu';
-import { TbAspectRatioFilled, TbResize, TbBubbleTextFilled } from 'react-icons/tb';
-import { SiGoogleads, SiGoogledisplayandvideo360 } from 'react-icons/si';
-import { FiMinimize2 } from 'react-icons/fi';
-import { TiVideo } from 'react-icons/ti';
-import { PiNewspaperClippingFill } from 'react-icons/pi';
+} from "react-icons/ai";
+import { GrTechnology } from "react-icons/gr";
+import { GiRolledCloth, GiLipstick } from "react-icons/gi";
+import { BsQuestionLg, BsBarChartLineFill } from "react-icons/bs";
+import { LuTarget} from "react-icons/lu";
+import { TbAspectRatioFilled, TbResize, TbBubbleTextFilled } from "react-icons/tb";
+import { SiGoogleads, SiGoogledisplayandvideo360 } from "react-icons/si";
+import { FiMinimize2 } from "react-icons/fi";
+import { TiVideo } from "react-icons/ti";
+import { PiNewspaperClippingFill } from "react-icons/pi";
 
-import { error } from '@/util';
-import { ThemeColor, useThemeColor } from '@/theme';
+import { error } from "@/util";
+import { ThemeColor, useThemeColor } from "@/theme";
 
 // Icons manifest.
 const icons = {
@@ -173,7 +173,7 @@ export type IconName = keyof typeof icons;
 export const safeIconName = (name: string): IconName => {
     if (name in icons) return name as IconName;
 
-    return 'error';
+    return "error";
 };
 
 /**
@@ -186,7 +186,7 @@ export const Icon = ({ name, color, ...props }: {
     color?: ThemeColor
 } & SVGAttributes<SVGSVGElement>) => {
     const Target = useMemo(() => icons[name], [name]);
-    if (!Target) return error('Icon not found: ' + name, []);
+    if (!Target) return error("Icon not found: " + name, []);
 
     const colorValue = color ? useThemeColor(color) : undefined;
 

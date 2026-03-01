@@ -1,14 +1,14 @@
 import React, {
     ReactNode, createContext, useMemo, useState, useContext, useRef
-} from 'react';
+} from "react";
 
-import en_US from '@common/locales/en_US.json';
-import fr_FR from '@common/locales/fr_FR.json';
+import en_US from "@common/locales/en_US.json";
+import fr_FR from "@common/locales/fr_FR.json";
 
-// t('English') t('French')
+// t("English") t("French")
 const locales = {
-    en_US: { messages: en_US, label: 'English' },
-    fr_FR: { messages: fr_FR, label: 'French' }
+    en_US: { messages: en_US, label: "English" },
+    fr_FR: { messages: fr_FR, label: "French" }
 };
 
 export type I18nLocaleKey = keyof typeof locales;
@@ -57,7 +57,7 @@ export type I18nValueFn<P = never> = (
 *   Provider for {@link useI18n}. Handles locale loading and implements `t`.
 */
 export const I18nProvider = ({ children }: { children: ReactNode }) => {
-    const [locale, setLocale] = useState<I18nLocaleKey>('en_US');
+    const [locale, setLocale] = useState<I18nLocaleKey>("en_US");
 
     const i18nWarns = useRef<Record<string, boolean>>({});
 
@@ -73,7 +73,7 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
             }
             else if (!i18nWarns.current[message]) {
                 console.warn( // eslint-disable-line
-                    'missing translation in', locale, ':', message
+                    "missing translation in", locale, ":", message
                 );
 
                 i18nWarns.current[message] = true;
@@ -83,9 +83,9 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
 
             for (const key in vars) {
                 const value = vars[key];
-                message = message.replace(`{${key}}`, value + '');
+                message = message.replace(`{${key}}`, value + "");
 
-                const plurals = new RegExp(`{${key}:(.*?):(.*?)}`, 'g');
+                const plurals = new RegExp(`{${key}:(.*?):(.*?)}`, "g");
                 message = message.replace(plurals, (_, p1, p2) => {
                     return (value as number) == 1 ? p1 : p2;
                 });

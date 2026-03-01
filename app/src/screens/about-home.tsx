@@ -1,8 +1,8 @@
-import React from 'react';
-import { HStack, VStack, Text, Heading } from '@chakra-ui/react';
+import React from "react";
+import { HStack, VStack, Text, Heading } from "@chakra-ui/react";
 
-import { I18nValueFn, useCurrentUserOrNull, useI18n } from '@/hooks';
-import { BlockCard, Brand, SplashScreen, Icon, IconName } from '@/components/common';
+import { I18nValueFn, useCurrentUserOrNull, useI18n } from "@/hooks";
+import { BlockCard, Brand, SplashScreen, Icon, IconName } from "@/components/common";
 
 export const AboutHome = () => {
     const t = useI18n();
@@ -17,7 +17,7 @@ export const AboutHome = () => {
                 </VStack>
                 <VStack width="40rem" alignItems="left" spacing={ 4 }>
                     <Text>
-                        { t('About this project.') }
+                        { t("About this project.") }
                     </Text>
                 </VStack>
             </HStack>

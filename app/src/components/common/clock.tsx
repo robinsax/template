@@ -1,7 +1,7 @@
-import React, { Fragment, useState, useCallback, useEffect } from 'react';
-import { Heading, Text, HStack } from '@chakra-ui/react';
+import React, { Fragment, useState, useCallback, useEffect } from "react";
+import { Heading, Text, HStack } from "@chakra-ui/react";
 
-import { useI18n } from '@/hooks';
+import { useI18n } from "@/hooks";
 
 export const LiveClock = ({ upFrom, downTo }: {
     upFrom?: Date | null,
@@ -43,12 +43,12 @@ export const LiveClock = ({ upFrom, downTo }: {
                     <Heading
                         textAlign="center" width="2rem"
                         color={
-                            (v !== null && v !== undefined) ? 'themeText' : 'lightText'
+                            (v !== null && v !== undefined) ? "themeText" : "lightText"
                         }
                     >
-                        { v ? v.toFixed(0).padStart(2, '0') : '00' }
+                        { v ? v.toFixed(0).padStart(2, "0") : "00" }
                     </Heading>
-                    { i != 3 && <Text color="lightText">{ t(':') }</Text> }
+                    { i != 3 && <Text color="lightText">{ t(":") }</Text> }
                 </Fragment>
             )) }
         </HStack>

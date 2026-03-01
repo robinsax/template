@@ -1,10 +1,10 @@
 import uuid
 
-from kedet.logic import (
+from backend.logic import (
     is_role_more_permissive_than, is_role_at_least_as_permissive_as, scope_contains_scope,
     would_grant_be_valid
 )
-from kedet.model import Role, UserGrant, AuthzScope, UserType
+from backend.model import Role, UserGrant, AuthzScope, UserType
 
 def test_role_permissiveness_checks():
     # Difference.

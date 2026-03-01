@@ -1,38 +1,38 @@
-import eslint from '@eslint/js';
-import tseslint from 'typescript-eslint';
-import stylistic from '@stylistic/eslint-plugin';
+import eslint from "@eslint/js";
+import tseslint from "typescript-eslint";
+import stylistic from "@stylistic/eslint-plugin";
 
 export default tseslint.config(
     eslint.configs.recommended,
     tseslint.configs.recommended,
     {
-        ignores: ['**/docs/**', '**/src/dist/**']
+        ignores: ["**/docs/**", "**/src/dist/**"]
     },
     {
         plugins: {
-            '@stylistic': stylistic
+            "@stylistic": stylistic
         },
         rules: {
-            '@typescript-eslint/no-unused-vars': [
-                'error',
+            "@typescript-eslint/no-unused-vars": [
+                "error",
                 {
-                    argsIgnorePattern: '^_',
-                    varsIgnorePattern: '^h|^_',
-                    caughtErrorsIgnorePattern: '^_',
+                    argsIgnorePattern: "^_",
+                    varsIgnorePattern: "^h|^_",
+                    caughtErrorsIgnorePattern: "^_",
                 }
             ],
-            'max-len': ['error', { code: 89 }],
-            'semi': ['error', 'always'],
-            'no-console': 'error',
-            '@stylistic/member-delimiter-style': [
-                'error',
+            "max-len": ["error", { code: 89 }],
+            "semi": ["error", "always"],
+            "no-console": "error",
+            "@stylistic/member-delimiter-style": [
+                "error",
                 {
                     multiline: {
-                        delimiter: 'comma',
+                        delimiter: "comma",
                         requireLast: false,
                     },
                     singleline: {
-                        delimiter: 'comma',
+                        delimiter: "comma",
                         requireLast: false,
                     },
                 },

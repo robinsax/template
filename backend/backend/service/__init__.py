@@ -1,6 +1,6 @@
-'''
+"""
 Top-level service frameworking.
-'''
+"""
 from .http import (
     Unauthorized, Invalid, AuthWSParams, StreamedUpload, ws_authenticate,
     ws_receive_model, create_app, assert_authz, assert_authz_any, assert_scopeless_authz,

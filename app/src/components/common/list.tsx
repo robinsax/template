@@ -5,11 +5,11 @@
 import React, {
     ReactNode, ComponentType, Fragment, createContext, useMemo, useState, useContext,
     useEffect
-} from 'react';
-import { VStack, Input, Box, Text, Flex, Spinner } from '@chakra-ui/react';
+} from "react";
+import { VStack, Input, Box, Text, Flex, Spinner } from "@chakra-ui/react";
 
-import { I18nFn, I18nValueFn, useI18n } from '@/hooks';
-import { BaseModel } from '@/models';
+import { I18nFn, I18nValueFn, useI18n } from "@/hooks";
+import { BaseModel } from "@/models";
 
 // Spec.
 /**
@@ -26,7 +26,7 @@ export type ListSpec<T extends BaseModel> = {
 
 // Controller.
 /**
-*   List control interface made available through hooks and to the list provider's
+*   List control interface made available through hooks and to the list provider"s
 *   parent.
 */
 export type ListController<T extends BaseModel> = {
@@ -49,7 +49,7 @@ export type ListProviderProps<T extends BaseModel> = {
     */
     onFilterTermChanged?: (filterTerm: string) => void,
     /**
-    *   Invoked with the {@link ListController} when the it's ready.
+    *   Invoked with the {@link ListController} when the it"s ready.
     */
     onReady?: (context: ListController<T>) => void,
     children: ReactNode
@@ -62,7 +62,7 @@ export type ListProps<T extends BaseModel> = {
     maxItems?: number,
     emptyLabel?: I18nValueFn | null,
     emptyView?: ReactNode,
-    emptyLabelAlign?: 'center' | 'left',
+    emptyLabelAlign?: "center" | "left",
     spacing?: number,
     initialOrder?: boolean,
     /**
@@ -123,7 +123,7 @@ export const createListSystem = <T extends BaseModel>({
     const ListProvider = ({
         data, onFilterTermChanged, onReady, children
     }: ListProviderProps<T>) => { 
-        const [filterTerm, setFilterTerm] = useState('');
+        const [filterTerm, setFilterTerm] = useState("");
 
         useEffect(() => {
             if (onFilterTermChanged) onFilterTermChanged(filterTerm);
@@ -158,7 +158,7 @@ export const createListSystem = <T extends BaseModel>({
 
         return (
             <Input
-                placeholder={ label ? label(t) : t('Type to search...') }
+                placeholder={ label ? label(t) : t("Type to search...") }
                 value={ filterTerm }
                 onChange={ e => setFilterTerm(e.target.value) }
             />
@@ -229,7 +229,7 @@ export const createListSystem = <T extends BaseModel>({
                     { slicedData.length < filteredData.length && (
                         <Box width="full" textAlign="center">
                             <Text variant="light">
-                                { t('{count} more...', {
+                                { t("{count} more...", {
                                     count: filteredData.length - slicedData.length
                                 }) }
                             </Text>
@@ -241,16 +241,16 @@ export const createListSystem = <T extends BaseModel>({
                     <Box
                         width="full"
                         py={ 2 }
-                        textAlign={ emptyLabelAlign || 'center' }
+                        textAlign={ emptyLabelAlign || "center" }
                     >
                         <Text variant="light">
                             { filterTerm ? (
-                                t('No results.')
+                                t("No results.")
                             ) : (
                                 finalEmptyLabel ? (
                                     finalEmptyLabel(t)
                                 ) : (
-                                    t('There\'s nothing here yet.')
+                                    t("There\"s nothing here yet.")
                                 )
                             ) }
                         </Text>

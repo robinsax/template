@@ -2,17 +2,17 @@
 *   Data model definitions, the majority of which are code generated from `kedet/backend`
 *   type definitions 
 */
-export * from './backend';
-export * from './schemas';
+export * from "./backend";
+export * from "./schemas";
 
 import {
     State, BusinessModel, ClientModel, OrganizationUserGrantModel, VideoSlotSpecModel,
     UserGrantBusinessModel, UserGrantClientModel, UserGrantModel, ImageSlotSpecModel,
     CampaignValidationError, CampaignValidationWarning, TextSlotSpecModel,
     CTASlotSpecModel, URLSlotSpecModel, OrganizationSummaryModel, cTAs
-} from './backend';
+} from "./backend";
 
-import languages from '@common/languages.json';
+import languages from "@common/languages.json";
 
 export { languages };
 

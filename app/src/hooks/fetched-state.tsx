@@ -4,20 +4,20 @@
 import React, {
     ReactNode, useCallback, useState, createContext, useContext, useMemo, useEffect,
     useRef
-} from 'react';
-import { Alert, useInterval, useToast } from '@chakra-ui/react';
+} from "react";
+import { Alert, useInterval, useToast } from "@chakra-ui/react";
 
-import { UploadModel, Permission } from '@/models';
-import { error } from '@/util';
+import { UploadModel, Permission } from "@/models";
+import { error } from "@/util";
 // Exact to prevent import cycle:
-import { FullAreaSpinner } from '@/components/common/layouts';
+import { FullAreaSpinner } from "@/components/common/layouts";
 
-import { APIClient, APIError, useAPI } from './api';
-import { useAsyncEffect, useIDBCache } from './util';
-import { useAuthControlOrNull, useCurrentUserOrNull } from './auth';
-import { QueryKey, InvalidationScope } from './invalidation';
-import { useLocale, useI18n } from './i18n';
-import { useAuthzCheck } from './authz';
+import { APIClient, APIError, useAPI } from "./api";
+import { useAsyncEffect, useIDBCache } from "./util";
+import { useAuthControlOrNull, useCurrentUserOrNull } from "./auth";
+import { QueryKey, InvalidationScope } from "./invalidation";
+import { useLocale, useI18n } from "./i18n";
+import { useAuthzCheck } from "./authz";
 
 export type FetchFn<T> = (api: APIClient) => Promise<T>;
 
@@ -57,19 +57,19 @@ export const useFetchedState = <T,>(
         } catch (err) {
             const wasAuthExpiryAndCanLogOut = (
                 (err instanceof APIError) &&
-                err.detail == 'invalid_auth' &&
+                err.detail == "invalid_auth" &&
                 authControl
             );
             if (wasAuthExpiryAndCanLogOut) {
                 authControl.resetState();
                 toast({
-                    status: 'warning',
-                    description: t('You\'ve been logged out.')
+                    status: "warning",
+                    description: t("You\"ve been logged out.")
                 });
                 return;
             }
 
-            setError(err instanceof APIError ? err.detail : 'unknown');
+            setError(err instanceof APIError ? err.detail : "unknown");
 
             throw err;
         }
@@ -109,7 +109,7 @@ export const useFetchedUpload = (
 
     const [dataURI, setDataURI] = useState<string | null>(null);
 
-    const getCache = useIDBCache<{ dataURI: string }>('uploads');
+    const getCache = useIDBCache<{ dataURI: string }>("uploads");
 
     useAsyncEffect(async () => {
         if (!upload) {
@@ -130,8 +130,8 @@ export const useFetchedUpload = (
 
             const reader = new FileReader();
             const ready = new Promise<Event>((resolve, reject) => {
-                reader.addEventListener('load', resolve);
-                reader.addEventListener('error', reject);
+                reader.addEventListener("load", resolve);
+                reader.addEventListener("error", reject);
             });
             reader.readAsDataURL(await response.blob());
 
@@ -182,7 +182,7 @@ export const createFetchedStateContext = <T,>(defaultFetch?: FetchFn<T>) => {
         let fetch = useMemo(() => fetchProp ? fetchProp : defaultFetch, [fetchProp]);
         if (!fetch) {
             fetch = error(
-                'no fetch function provided',
+                "no fetch function provided",
                 (async () => []) as unknown as FetchFn<T>
             );
         }
@@ -223,12 +223,12 @@ export const createFetchedStateContext = <T,>(defaultFetch?: FetchFn<T>) => {
                     </context.Provider>
                 ) : (
                     <Alert status="error">
-                        { t('You do not have permission to view this content.') }
+                        { t("You do not have permission to view this content.") }
                     </Alert>
                 )
             ) : fetchError ? (
                 <Alert status="error">
-                    { t('Failed to load some data: err_{case}.', {
+                    { t("Failed to load some data: err_{case}.", {
                         case: fetchError
                     }) }
                 </Alert>

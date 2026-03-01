@@ -1,18 +1,18 @@
 /**
 *   Route-level screen layouts. 
 */
-import React, { ReactNode, UIEvent, useState, useCallback } from 'react';
-import { Box, Flex, HStack, VStack, Spacer, useColorMode } from '@chakra-ui/react';
-import { AppShell } from '@saas-ui/react';
+import React, { ReactNode, UIEvent, useState, useCallback } from "react";
+import { Box, Flex, HStack, VStack, Spacer, useColorMode } from "@chakra-ui/react";
+import { AppShell } from "@saas-ui/react";
 
-import { vignetteGenerator, useHideScrollbars } from '@/theme';
-import { useCurrentUserOrNull, useContinuousTick, useI18n } from '@/hooks';
-import { OwnPersona } from '@/components/users';
+import { vignetteGenerator, useHideScrollbars } from "@/theme";
+import { useCurrentUserOrNull, useContinuousTick, useI18n } from "@/hooks";
+import { OwnPersona } from "@/components/users";
 
-import { AppSidebar } from './sidebar';
-import { LocaleSelect, ThemeToggle } from './settings';
-import { Icon } from './icons';
-import { Brand } from './brand';
+import { AppSidebar } from "./sidebar";
+import { LocaleSelect, ThemeToggle } from "./settings";
+import { Icon } from "./icons";
+import { Brand } from "./brand";
 
 /**
 *   Background vignette UI. Subtly animated if `run` is `true`.
@@ -32,7 +32,7 @@ const Vignettes = ({ run }: { run: boolean }) => {
             zIndex={ -1 }
         >
             <style>
-                { '#vignette { ' + vignetteGenerator(value, colorMode == 'dark') + '}' }
+                { "#vignette { " + vignetteGenerator(value, colorMode == "dark") + "}" }
             </style>
             <Box
                 id="vignette"
@@ -69,10 +69,10 @@ export const SplashScreen = ({ children }: { children: React.ReactNode }) => {
                         position="relative" top="0.5rem"
                     >
                         <a href="/terms" target="_blank">
-                            { t('Terms') }
+                            { t("Terms") }
                         </a>
                         <a href="/privacy" target="_blank">
-                            { t('Privacy') }
+                            { t("Privacy") }
                         </a>
                     </HStack>
                     <Spacer/>
@@ -140,7 +140,7 @@ export const SplashInfoScreen = ({ children }: { children: ReactNode }) => {
                     <Brand/>
                     { children }
                 </VStack>
-                <Icon name={ bottom ? 'up' : 'down' }/>
+                <Icon name={ bottom ? "up" : "down" }/>
             </VStack>
         </SplashScreen>
     );

@@ -1,47 +1,47 @@
 /**
 *   User related forms.
 */
-import React, { useCallback, useMemo, useEffect } from 'react';
+import React, { useCallback, useMemo, useEffect } from "react";
 import {
     Checkbox, FormControl, FormLabel, HStack, Input, Text, useToast
-} from '@chakra-ui/react';
-import { useNavigate } from 'react-router-dom';
+} from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 
-import config from '@/config';
-import { mergeCallbacks } from '@/util';
-import { UserInviteParams, UserModel, UserType, UserUpdateParams } from '@/models';
+import config from "@/config";
+import { mergeCallbacks } from "@/util";
+import { UserInviteParams, UserModel, UserType, UserUpdateParams } from "@/models";
 import {
     LoginCredentials, I18nValueFn, I18nFn, useAuthControl, useAPI, useI18n,
     useCurrentUser, useCurrentUserOrNull, useSupportedLocales,
     useLocale
-} from '@/hooks';
+} from "@/hooks";
 import {
     AccountEditorLayout, Icon, AvatarUpload, FormLayout, ModalButton, useFormSystem
-} from '@/components/common';
+} from "@/components/common";
 
-import { UserPersona } from './personas';
+import { UserPersona } from "./personas";
 
 // Validation errors corresponding to API.
 const passwordValidationErrors: Record<string, I18nValueFn> = {
-    password_too_short: t => t('Password must be at least 10 characters long.'),
+    password_too_short: t => t("Password must be at least 10 characters long."),
     password_no_uppercase: t => (
-        t('Password must contain at least one uppercase letter.')
+        t("Password must contain at least one uppercase letter.")
     ),
     password_no_lowercase: t => (
-        t('Password must contain at least one lowercase letter.')
+        t("Password must contain at least one lowercase letter.")
     ),
-    password_no_digit: t => t('Password must contain at least one digit.'),
-    password_no_special: t => t('Password must contain at least one special character.'),
+    password_no_digit: t => t("Password must contain at least one digit."),
+    password_no_special: t => t("Password must contain at least one special character."),
 };
 
 const nameValidationErrors: Record<string, I18nValueFn> = {
-    invalid_name: t => t('Name is invalid.'),
-    name_too_long: t => t('Name is too long.')
+    invalid_name: t => t("Name is invalid."),
+    name_too_long: t => t("Name is too long.")
 };
 
 const emailValidationErrors: Record<string, I18nValueFn> = {
-    invalid_email: t => t('Email is invalid.'),
-    email_too_long: t => t('Email is too long.')
+    invalid_email: t => t("Email is invalid."),
+    email_too_long: t => t("Email is too long.")
 };
 
 // Fields.
@@ -54,14 +54,14 @@ const UserTypeSelect = ({ value, setValue }: {
     return (
         <HStack width="full" justifyContent="right">
             <Text fontSize="sm">
-                { t('This person is with {owner}.', {
+                { t("This person is with {owner}.", {
                     owner: t(config.platformOwnerName)
                 }) }
             </Text>
             <Checkbox
-                isChecked={ value == 'platform_owner' }
+                isChecked={ value == "platform_owner" }
                 onChange={ e => (
-                    setValue(e.target.checked ? 'platform_owner' : 'client')
+                    setValue(e.target.checked ? "platform_owner" : "client")
                 ) }
             />
         </HStack>
@@ -90,9 +90,9 @@ const useLocaleSelectSpec = () => {
 
     return useMemo(() => {
         return {
-            label: (t: I18nFn) => t('Language'),
-            placeholder: (t: I18nFn) => t('Select language'),
-            type: 'select',
+            label: (t: I18nFn) => t("Language"),
+            placeholder: (t: I18nFn) => t("Select language"),
+            type: "select",
             optional: true,
             default: locale,
             options: locales.map(locale => ({
@@ -114,7 +114,7 @@ const useUserInviteForm = (onInvited: (user: UserModel) => void) => {
     const onSubmit = useCallback(async (values: UserInviteParams) => {
         const params = {
             ...values,
-            type: values.type || 'client'
+            type: values.type || "client"
         };
         const user = await api.users.post(params);
 
@@ -124,22 +124,22 @@ const useUserInviteForm = (onInvited: (user: UserModel) => void) => {
     return useFormSystem<UserInviteParams>({
         fields: {
             name: {
-                label: t => t('Full Name')
+                label: t => t("Full Name")
             },
             email: {
-                label: t => t('Email'),
-                type: 'text'
+                label: t => t("Email"),
+                type: "text"
             },
             locale: localeSelectSpec,
-            type: currentUser.type == 'platform_owner' ? {
-                default: 'client',
+            type: currentUser.type == "platform_owner" ? {
+                default: "client",
                 Component: UserTypeSelect
             } : null
         },
         errors: {
             ...nameValidationErrors,
             ...emailValidationErrors,
-            already_exists: t => t('A user with this email already exists.')
+            already_exists: t => t("A user with this email already exists.")
         },
         onSubmit
     });
@@ -158,16 +158,16 @@ export const useLoginForm = () => {
     return useFormSystem<LoginCredentials>({
         fields: {
             email: {
-                label: t => t('Email')
+                label: t => t("Email")
             },
             password: {
-                label: t => t('Password'),
-                type: 'password'
+                label: t => t("Password"),
+                type: "password"
             }
         },
         errors: {
-            invalid_credentials: t => t('Incorrect email address or password.'),
-            inactive_user: t => t('Your account has been deactivated.')
+            invalid_credentials: t => t("Incorrect email address or password."),
+            inactive_user: t => t("Your account has been deactivated.")
         },
         onSubmit
     });
@@ -194,7 +194,7 @@ const useUserEditForm = (user: UserModel, onDone: () => void) => {
     return useFormSystem<UserUpdateParams>({
         fields: {
             name: {
-                label: t => t('Full Name')
+                label: t => t("Full Name")
             },
             locale: localeSelectSpec,
             avatar_id: {
@@ -215,11 +215,11 @@ export const useJoinForm = () => {
     const navigate = useNavigate();
 
     const inviteToken = useMemo(() => (
-        decodeURIComponent(window.location.search.split('invite=')[1])
+        decodeURIComponent(window.location.search.split("invite=")[1])
     ), []);
 
     useEffect(() => {
-        if (!inviteToken) navigate('/login');
+        if (!inviteToken) navigate("/login");
     }, [inviteToken]);
 
     const onSubmit = useCallback(async ({ password }: { password: string }) => {
@@ -234,12 +234,12 @@ export const useJoinForm = () => {
     return useFormSystem<{ password: string }>({
         fields: {
             password: {
-                label: t => t('Password'),
-                type: 'password'
+                label: t => t("Password"),
+                type: "password"
             }
         },
         errors: {
-            invalid_invite: t => t('This link has expired.'),
+            invalid_invite: t => t("This link has expired."),
             ...passwordValidationErrors
         },
         onSubmit
@@ -263,23 +263,23 @@ export const usePasswordChangeForm = (
     return useFormSystem<{ current?: string, updated: string, confirm?: string }>({
         fields: {
             current: {
-                label: t => t('Current Password'),
-                type: 'password',
+                label: t => t("Current Password"),
+                type: "password",
                 optional: !user
             },
             updated: {
-                label: t => t('New Password'),
-                type: 'password'
+                label: t => t("New Password"),
+                type: "password"
             },
             confirm: {
-                label: t => t('Confirm New Password'),
-                type: 'password',
+                label: t => t("Confirm New Password"),
+                type: "password",
                 optional: !user
             }
         },
         errors: {
-            invalid_reset: t => t('This reset link has expired.'),
-            invalid_password: t => t('Your current password is incorrect.'),
+            invalid_reset: t => t("This reset link has expired."),
+            invalid_password: t => t("Your current password is incorrect."),
             ...passwordValidationErrors
         },
         onSubmit: async ({ current, updated, confirm }, setError) => {
@@ -287,7 +287,7 @@ export const usePasswordChangeForm = (
             if (!eitherUserId) return;
 
             if (user && updated != confirm) {
-                setError(t('Passwords do not match'));
+                setError(t("Passwords do not match"));
                 return;
             }
 
@@ -298,7 +298,7 @@ export const usePasswordChangeForm = (
                 const tokenResp = await api.auth.post({
                     email: null,
                     password: current,
-                    restriction: 'password_reset'
+                    restriction: "password_reset"
                 });
                 eitherResetToken = tokenResp.token;
             }
@@ -319,7 +319,7 @@ export const usePasswordResetForm = (onDone: () => void) => {
     return useFormSystem<{ email: string }>({
         fields: {
             email: {
-                label: t => t('Email')
+                label: t => t("Email")
             }
         },
         onSubmit: async ({ email }) => {
@@ -342,11 +342,11 @@ export const UserInviteForm = ({ onInvited }: {
     } = useUserInviteForm(onInvited);
 
     return (
-        <FormProvider invalidateOnSubmit={ ['users'] }>
+        <FormProvider invalidateOnSubmit={ ["users"] }>
             <FormLayout>
                 <FormError/>
-                <FormFields names={ ['name', 'email', 'locale', 'type'] }/>
-                <FormSubmit label={ t => t('Invite') }/>
+                <FormFields names={ ["name", "email", "locale", "type"] }/>
+                <FormSubmit label={ t => t("Invite") }/>
             </FormLayout>
         </FormProvider>
     );
@@ -368,14 +368,14 @@ export const UserEditForm = ({ user, onDone }: {
     return (
         <FormProvider
             target={ user }
-            invalidateOnSubmit={ ['users', 'clients'] }
+            invalidateOnSubmit={ ["users", "clients"] }
         >
             <AccountEditorLayout
                 FormSubmit={ FormSubmit }
                 FormError={ FormError }
-                AvatarField={ () => <FormFields names={ ['avatar_id'] }/> }
+                AvatarField={ () => <FormFields names={ ["avatar_id"] }/> }
             >
-                <FormFields names={ ['name', 'locale'] }/>
+                <FormFields names={ ["name", "locale"] }/>
                 { currentUser.id == user.id && (
                     <PsuedoPasswordField/>
                 ) }
@@ -400,8 +400,8 @@ export const PasswordChangeForm = ({ onDone, resetToken, userId }: {
         <FormProvider>
             <FormLayout>
                 <FormError/>
-                <FormFields names={ ['current', 'updated', 'confirm'] }/>
-                <FormSubmit label={ t => t('Change Password') }/>
+                <FormFields names={ ["current", "updated", "confirm"] }/>
+                <FormSubmit label={ t => t("Change Password") }/>
             </FormLayout>
         </FormProvider>
     );
@@ -414,15 +414,15 @@ export const PsuedoPasswordField = () => {
 
     const onComplete = useCallback(() => {
         toast({
-            title: t('Password updated.'),
-            status: 'info'
+            title: t("Password updated."),
+            status: "info"
         });
     }, []);
 
     return (
         <FormControl isRequired={ true }>
             <FormLabel>
-                { t('Password') }
+                { t("Password") }
             </FormLabel>
             <HStack width="full">
                 <Input
@@ -434,7 +434,7 @@ export const PsuedoPasswordField = () => {
                     iconName="switch"
                     width="6rem"
                     leftIcon={ <Icon name="switch"/> }
-                    label={ t => t('Change') }
+                    label={ t => t("Change") }
                 >
                     { onClose =>
                         <PasswordChangeForm

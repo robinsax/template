@@ -1,20 +1,20 @@
 /**
 *   Reusable components for model state presentation and control. 
 */
-import React from 'react';
-import { Badge, Tooltip } from '@chakra-ui/react';
+import React from "react";
+import { Badge, Tooltip } from "@chakra-ui/react";
 
-import { ModelState, Permission } from '@/models';
+import { ModelState, Permission } from "@/models";
 import {
     APIClient, QueryKey, I18nValueFn, useInvalidate, useI18n, useAsyncCallback, useAPI,
     useAuthzCheck
-} from '@/hooks';
+} from "@/hooks";
 
-import { ConfirmedButton } from './actions';
+import { ConfirmedButton } from "./actions";
 
 const modelStateTitles: Record<ModelState, I18nValueFn> = {
-    inactive: t => t('Inactive'),
-    active: t => t('Active')
+    inactive: t => t("Inactive"),
+    active: t => t("Active")
 };
 
 /**
@@ -31,8 +31,8 @@ export const StateBadge = ({ state, inactiveOnly }: {
 }) => {
     const t = useI18n();
 
-    return (!inactiveOnly || state == 'inactive') && (
-        <Badge colorScheme={ state == 'inactive' ? 'red' : 'green' }>
+    return (!inactiveOnly || state == "inactive") && (
+        <Badge colorScheme={ state == "inactive" ? "red" : "green" }>
             { stateTitle(state)(t) }
         </Badge>
     );
@@ -72,7 +72,7 @@ export const ActiveStateToggleButton = ({
     const allowed = useAuthzCheck(permission);
 
     const [onActivationChange, activationWorking] = useAsyncCallback(async () => {
-        const state = forProp.state == 'active' ? 'inactive' : 'active';
+        const state = forProp.state == "active" ? "inactive" : "active";
 
         await endpoint(api).state.put({ state });
 
@@ -84,7 +84,7 @@ export const ActiveStateToggleButton = ({
     return (
         <Tooltip
             label={
-                forProp.state == 'active' ? t('Deactivate') : t('Reactivate')
+                forProp.state == "active" ? t("Deactivate") : t("Reactivate")
             }
         >
             <ConfirmedButton
@@ -94,7 +94,7 @@ export const ActiveStateToggleButton = ({
                 disabled={ !allowed }
                 requireEntry={ forProp.name }
                 confirmDetail={ 
-                    forProp.state == 'active' ? deactivateDetails(t) : activateDetails(t)
+                    forProp.state == "active" ? deactivateDetails(t) : activateDetails(t)
                 }
                 onConfirm={ onActivationChange }
             />

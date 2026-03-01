@@ -1,16 +1,16 @@
 /**
 *   Misc. utility hooks.
 */
-import { WheelEvent, useEffect, useMemo, useState, useCallback, useRef } from 'react';
-import { useToast } from '@chakra-ui/react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { marked } from 'marked';
+import { WheelEvent, useEffect, useMemo, useState, useCallback, useRef } from "react";
+import { useToast } from "@chakra-ui/react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { marked } from "marked";
 
-import { AsyncCallback, IDBCache, openIDBCache } from '@/util';
+import { AsyncCallback, IDBCache, openIDBCache } from "@/util";
 
-import { APIError } from './api';
-import { useI18n } from './i18n';
-import { useAuthControlOrNull } from './auth';
+import { APIError } from "./api";
+import { useI18n } from "./i18n";
+import { useAuthControlOrNull } from "./auth";
 
 /**
 *   Async wrapper for effects with error catching.
@@ -46,21 +46,21 @@ export const useAsyncCallback = <T = never>(
         catch (err) {
             const wasAuthExpiryAndCanLogOut = (
                 err instanceof APIError &&
-                err.detail == 'invalid_auth' &&
+                err.detail == "invalid_auth" &&
                 authControl
             );
             if (wasAuthExpiryAndCanLogOut) {
                 authControl.resetState();
                 toast({
-                    status: 'warning',
-                    description: t('You\'ve been logged out.')
+                    status: "warning",
+                    description: t("You\"ve been logged out.")
                 });
                 return;
             }
 
             toast({
-                status: 'error',
-                description: t('An error occurred.')
+                status: "error",
+                description: t("An error occurred.")
             });
             console.error(err); // eslint-disable-line
         }
@@ -103,10 +103,10 @@ export const useQueryIndexState = (key: string, values: string[]) => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
 
-    const index = Math.max(0, values.indexOf(searchParams.get(key) || ''));
+    const index = Math.max(0, values.indexOf(searchParams.get(key) || ""));
 
     const onChange = (index: number) => {
-        navigate('?' + key + '=' + values[index]);
+        navigate("?" + key + "=" + values[index]);
     };
 
     return { index, onChange };
@@ -237,7 +237,7 @@ export const useScrollXGestureListener = (
 */
 export const useScrollTo = () => {
     return useCallback((anchor: string) => {
-        const scrollTarget = document.getElementById('main-scroll-area');
+        const scrollTarget = document.getElementById("main-scroll-area");
         const element = document.getElementById(anchor);
         if (!scrollTarget || !element) return;
 
@@ -254,7 +254,7 @@ export const useScrollTo = () => {
 
             scrollTarget.scrollTo({
                 top: relativeTop - 100,
-                behavior: 'smooth',
+                behavior: "smooth",
             });
         }, 500);
     }, []);

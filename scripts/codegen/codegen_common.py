@@ -5,15 +5,15 @@ from datetime import datetime
 from typing import Union, Optional, TextIO, get_origin, get_args
 from fastapi.responses import StreamingResponse
 
-from kedet.model import Model
-from kedet.service import StreamedUpload
+from backend.model import Model
+from backend.service import StreamedUpload
 
-def open_file(path: str, mode: str = 'r', nl: bool = False) -> TextIO:
-    return open(path, mode, encoding='utf-8', newline='\n' if nl else '')
+def open_file(path: str, mode: str = "r", nl: bool = False) -> TextIO:
+    return open(path, mode, encoding="utf-8", newline="\n" if nl else "")
 
 class TSSymbol:
 
-    def write(self) -> list[Union['TSSymbol', str, int]]:
+    def write(self) -> list[Union["TSSymbol", str, int]]:
         raise NotImplementedError()
 
     def __str__(self):
@@ -29,7 +29,7 @@ class TSSymbol:
             else:
                 result.append(symbol)
 
-        return ''.join(result)
+        return "".join(result)
 
 class TSIndent(TSSymbol):
 
@@ -40,7 +40,7 @@ class TSIndent(TSSymbol):
         return TSIndent(self.level + depth)
 
     def write(self):
-        return ['    ' * self.level]
+        return ["    " * self.level]
 
 class TSJoin(TSSymbol):
 
@@ -63,32 +63,32 @@ class TSType(TSSymbol):
         self.py_type = py_type
 
     def is_generic(self):
-        return '~' in repr(self.py_type)
+        return "~" in repr(self.py_type)
 
     def write(self):
         if self.py_type is None:
-            return ['void']
+            return ["void"]
 
         if self.py_type is str or self.py_type is uuid.UUID:
-            return ['string']
+            return ["string"]
 
         if self.py_type is int or self.py_type is float:
-            return ['number']
+            return ["number"]
 
         if self.py_type is bool:
-            return ['boolean']
+            return ["boolean"]
 
         if self.py_type is dict:
-            return ['Record<string, unknown>']
+            return ["Record<string, unknown>"]
 
         if self.py_type is datetime:
-            return ['Date']
+            return ["Date"]
 
         if self.py_type is StreamedUpload:
-            return ['File']
+            return ["File"]
 
         if self.py_type is StreamingResponse:
-            return ['Response']
+            return ["Response"]
 
         origin = get_origin(self.py_type)
         if origin is Union:
@@ -99,45 +99,45 @@ class TSType(TSSymbol):
                 args = [arg for arg in args if arg is not type(None)]
 
             return [
-                '(',
-                TSJoin([TSType(arg) for arg in args], ' | '),
-                ' | null' if optional else '',
-                ')'
+                "(",
+                TSJoin([TSType(arg) for arg in args], " | "),
+                " | null" if optional else "",
+                ")"
             ]
 
         if origin is tuple:
             args = []
             for arg in get_args(self.py_type):
                 args.append(TSType(arg))
-            return ['[', TSJoin(args, ', '), ']']
+            return ["[", TSJoin(args, ", "), "]"]
 
         if origin is list:
-            return [TSType(get_args(self.py_type)[0]), '[]']
+            return [TSType(get_args(self.py_type)[0]), "[]"]
 
         if origin is dict:
             args = get_args(self.py_type)
-            ts_val = ['Record<', TSType(args[0]), ', ', TSType(args[1]), '>']
+            ts_val = ["Record<", TSType(args[0]), ", ", TSType(args[1]), ">"]
             if args[0] is not str:
-                ts_val = ['Partial<', *ts_val, '>']
+                ts_val = ["Partial<", *ts_val, ">"]
 
             return ts_val
 
         if self.is_generic():
-            return ['T']
+            return ["T"]
 
         if not inspect.isclass(self.py_type):
             raise ValueError(repr(self.py_type))
 
         if issubclass(self.py_type, Model):
             name = self.py_type.__name__
-            if '[' in name:
-                name = name.replace('[', '<').replace(']', '>')
+            if "[" in name:
+                name = name.replace("[", "<").replace("]", ">")
             return [name]
 
         if issubclass(self.py_type, Enum):
             return [self.py_type.__name__]
 
-        return ['unknown']
+        return ["unknown"]
 
 class TSCode(TSSymbol):
 
@@ -153,7 +153,7 @@ class TSString(TSSymbol):
         self.value = value
 
     def write(self):
-        return ["'", self.value, "'"]
+        return [""", self.value, """]
 
 class TSPromise(TSSymbol):
 
@@ -162,9 +162,9 @@ class TSPromise(TSSymbol):
 
     def write(self):
         if self.py_type:
-            return ['Promise<', TSType(self.py_type), '>']
+            return ["Promise<", TSType(self.py_type), ">"]
 
-        return ['Promise<void>']
+        return ["Promise<void>"]
 
 class TSValueSet(TSSymbol):
 
@@ -174,12 +174,12 @@ class TSValueSet(TSSymbol):
         self.line_break = line_break
 
     def write(self):
-        lb = '\n' if self.line_break else ''
-        if self.def_type == 'array':
-            return ['[', lb, TSJoin(self.values, ', '), lb, ']']
+        lb = "\n" if self.line_break else ""
+        if self.def_type == "array":
+            return ["[", lb, TSJoin(self.values, ", "), lb, "]"]
 
-        if self.def_type == 'union':
-            return ['(', lb, TSJoin(self.values, ' | '), lb, ')']
+        if self.def_type == "union":
+            return ["(", lb, TSJoin(self.values, " | "), lb, ")"]
 
         raise ValueError(self.def_type)
 
@@ -190,10 +190,10 @@ class TSObject(TSSymbol):
         self.indent = TSIndent(indent_level)
 
     def add(self, key: str, value: TSSymbol):
-        self.content.append(TSJoin([self.indent + 1, key, ': ', value], ''))
+        self.content.append(TSJoin([self.indent + 1, key, ": ", value], ""))
 
     def write(self):
-        return ['{\n', TSJoin(self.content, ',\n'), self.indent, '\n', self.indent, '}']
+        return ["{\n", TSJoin(self.content, ",\n"), self.indent, "\n", self.indent, "}"]
 
 class TSObjectType(TSSymbol):
 
@@ -228,14 +228,14 @@ class TSFunction(TSSymbol):
         for param_name, param_type in self.params:
             if not isinstance(param_type, str):
                 param_type = TSType(param_type)
-            params.append(TSJoin([param_name, param_type], ': '))
+            params.append(TSJoin([param_name, param_type], ": "))
 
-        result = ['(', TSJoin(params, ', '), ')']
+        result = ["(", TSJoin(params, ", "), ")"]
         if self.return_type:
             if not isinstance(self.return_type, TSSymbol):
                 self.return_type = TSType(self.return_type)
-            result.extend([': ', self.return_type])
-        result.extend([' => (', self.body, ')'])
+            result.extend([": ", self.return_type])
+        result.extend([" => (", self.body, ")"])
 
         return result
 
@@ -248,8 +248,8 @@ class TSTypeDef(TSSymbol):
     def write(self):
         generic = []
         if isinstance(self.def_type, TSObjectType) and self.def_type.generic:
-            generic = ['<T>']
-        return ['export type ', self.name, *generic, ' = ', self.def_type, ';']
+            generic = ["<T>"]
+        return ["export type ", self.name, *generic, " = ", self.def_type, ";"]
 
 class TSConstDef(TSSymbol):
 
@@ -264,13 +264,13 @@ class TSConstDef(TSSymbol):
         self.def_type = def_type
 
     def write(self):
-        result = ['export const ', self.name]
+        result = ["export const ", self.name]
         if self.def_type:
             if isinstance(self.def_type, TSSymbol):
-                result.extend([': ', self.def_type])
+                result.extend([": ", self.def_type])
             else:
-                result.extend([': ', TSType(self.def_type)])
-        result.extend([' = ', self.value, ';'])
+                result.extend([": ", TSType(self.def_type)])
+        result.extend([" = ", self.value, ";"])
 
         return result
 
@@ -282,27 +282,27 @@ class TSEnumDefs(TSSymbol):
 
     def write(self):
         const_name = self.name[0].lower() + self.name[1:]
-        if const_name.endswith('y'):
-            const_name = const_name[:-1] + 'ies'
-        elif const_name.endswith('s'):
-            const_name = const_name + 'es'
+        if const_name.endswith("y"):
+            const_name = const_name[:-1] + "ies"
+        elif const_name.endswith("s"):
+            const_name = const_name + "es"
         else:
-            const_name += 's'
+            const_name += "s"
 
         return [
             TSTypeDef(
                 self.name,
                 TSValueSet(
                     [TSString(e.value) for e in self.enum_type],
-                    'union'
+                    "union"
                 )
             ),
-            '\n\n',
+            "\n\n",
             TSConstDef(
                 const_name,
                 TSValueSet(
                     [TSString(e.value) for e in self.enum_type],
-                    'array'
+                    "array"
                 ),
                 TSType(list[self.enum_type])
             )
@@ -319,7 +319,7 @@ class TSImport(TSSymbol):
 
     def write(self):
         types = [t if isinstance(t, str) else TSType(t) for t in self.types]
-        return ['import { ', TSJoin(types, ', '), ' } from \'', self.module, '\';']
+        return ["import { ", TSJoin(types, ", "), " } from \"", self.module, "\";"]
 
 class TSScope(TSSymbol):
 
@@ -334,22 +334,22 @@ class TSScope(TSSymbol):
         for symbol in self.content:
             result.append(symbol)
             if symbol == self.content[-1]:
-                result.append('\n')
+                result.append("\n")
             else:
-                result.append('\n\n')
+                result.append("\n\n")
 
         return result
 
 def ts_obj_key(name: str, as_type: bool = False):
     if as_type:
         name = name.capitalize()
-    for character in ('-', '_'):
+    for character in ("-", "_"):
         if character in name:
             name = name.split(character)
             for i, part in enumerate(name):
                 if i > 0 or as_type:
                     name[i] = part.capitalize()
-            name = ''.join(name)
+            name = "".join(name)
 
     return name
 

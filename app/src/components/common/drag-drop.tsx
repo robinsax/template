@@ -4,8 +4,8 @@
 import React, {
     ReactNode, createContext, useCallback, useContext, 
     useEffect, useMemo, useRef, forwardRef, useState
-} from 'react';
-import { Box, ChakraProps, Portal } from '@chakra-ui/react';
+} from "react";
+import { Box, ChakraProps, Portal } from "@chakra-ui/react";
 
 /**
 *   Handler for drop-related events.
@@ -71,7 +71,7 @@ export const createDragDropSystem = <T,>() => {
             y: number
         } | null>(null);
 
-        const nextId = useCallback(() => (idRef.current++) + '', []);
+        const nextId = useCallback(() => (idRef.current++) + "", []);
 
         const registerDrop = useCallback((
             element: HTMLElement, handler: DropHandlers<T>
@@ -192,8 +192,8 @@ export const createDragDropSystem = <T,>() => {
             currentOverRef.current = null;
             setDragPreview(null);
 
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
+            document.removeEventListener("mousemove", handleMouseMove);
+            document.removeEventListener("mouseup", handleMouseUp);
         }, [getDropZoneAtPoint, handleMouseMove]);
 
         const startDrag = useCallback((
@@ -223,8 +223,8 @@ export const createDragDropSystem = <T,>() => {
                 dragHandler.onDrag();
             }
 
-            document.addEventListener('mousemove', handleMouseMove);
-            document.addEventListener('mouseup', handleMouseUp);
+            document.addEventListener("mousemove", handleMouseMove);
+            document.addEventListener("mouseup", handleMouseUp);
         }, [handleMouseMove, handleMouseUp]);
 
         return (
@@ -286,9 +286,9 @@ export const createDragDropSystem = <T,>() => {
                 onMouseDown={ handleMouseDown }
                 style={{
                     transform: isDragging 
-                        ? `rotate(3deg) ${extraTransform || ''}` 
-                        : extraTransform || '',
-                    cursor: isDragging ? 'grabbing' : 'grab'
+                        ? `rotate(3deg) ${extraTransform || ""}` 
+                        : extraTransform || "",
+                    cursor: isDragging ? "grabbing" : "grab"
                 }}
                 userSelect="none"
                 { ...props }
@@ -327,7 +327,7 @@ export const createDragDropSystem = <T,>() => {
         const combinedRef = useCallback((node: HTMLDivElement | null) => {
             elementRef.current = node;
             if (forwardedRef) {
-                if (typeof forwardedRef === 'function') {
+                if (typeof forwardedRef === "function") {
                     forwardedRef(node);
                 } else {
                     forwardedRef.current = node;

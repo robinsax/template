@@ -4,17 +4,17 @@
 import React, {
     ChangeEvent, ReactNode, DragEvent, createContext, useContext, useMemo, useRef,
     useState, useCallback
-} from 'react';
-import { Input, useToast } from '@chakra-ui/react';
+} from "react";
+import { Input, useToast } from "@chakra-ui/react";
 
-import { useGrowOnHover } from '@/theme';
-import { UploadModel, Permission } from '@/models';
+import { useGrowOnHover } from "@/theme";
+import { UploadModel, Permission } from "@/models";
 import {
     APICallOptions, useAsyncCallback, useFetchedUpload, useAuthzCheck, useI18n
-} from '@/hooks';
+} from "@/hooks";
 
-import { useEnableStateCheck } from './actions';
-import { ClickTarget } from './layouts';
+import { useEnableStateCheck } from "./actions";
+import { ClickTarget } from "./layouts";
 
 export type UploadController = {
     multiple: boolean,
@@ -66,8 +66,8 @@ export const UploadArea = ({
     const [upload, working] = useAsyncCallback(async (file: File) => {
         if (!file.type.startsWith(mimetype)) {
             toast({
-                title: t('Invalid file type.'),
-                status: 'error'
+                title: t("Invalid file type."),
+                status: "error"
             });
             return;
         }
@@ -77,7 +77,7 @@ export const UploadArea = ({
             upload = await endpoint.post(file, { onProgress });
         }
         catch (err) {
-            if (input.current) input.current.value = '';
+            if (input.current) input.current.value = "";
             throw err;
         }
 
@@ -101,7 +101,7 @@ export const UploadArea = ({
             if (!allowMultiple) break;
         }
 
-        if (input.current) input.current.value = '';
+        if (input.current) input.current.value = "";
     }, [upload, mimetype, allowMultiple]);
 
     return (
@@ -112,7 +112,7 @@ export const UploadArea = ({
                 position="fixed" top="-100px"
                 width="1px" height="1px" opacity="0"
                 type="file"
-                accept={ mimetype + '*' }
+                accept={ mimetype + "*" }
                 onChange={ onChange }
                 multiple={ allowMultiple }
             />
@@ -129,7 +129,7 @@ export const UploadArea = ({
 };
 
 /**
-*   Return the upload controller above the caller's mount point.
+*   Return the upload controller above the caller"s mount point.
 *
 *   Must only be used within an {@link UploadArea}.
 */

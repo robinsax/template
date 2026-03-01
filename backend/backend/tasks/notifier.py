@@ -1,23 +1,23 @@
-'''
+"""
 Email notification sender.
-'''
+"""
 import traceback
 from typing import Optional
 from logging import getLogger
 from sqlalchemy.orm import Session
 
-from kedet.model import Notification, NotificationEmailStatus
-from kedet.mail import Mailer, get_mailer
-from kedet.service import task
+from backend.model import Notification, NotificationEmailStatus
+from backend.mail import Mailer, get_mailer
+from backend.service import task
 
 logger = getLogger(__name__)
 
 @task(interval_seconds=30)
 def send_notification_emails(session: Session, mailer: Optional[Mailer] = None):
-    '''
+    """
     Attempt to send all pending email notifications. Marks any notifications for which
     there is no email as "skipped".
-    '''
+    """
     mailer = mailer or get_mailer()
     notifications = Notification.get_all_with_email_pending(session)
 
@@ -26,8 +26,8 @@ def send_notification_emails(session: Session, mailer: Optional[Mailer] = None):
             sent = mailer.maybe_send_for_notification(session, notification)
         except Exception as err: # pylint: disable=broad-except
             logger.error(
-                'notif send err %s: %s: %s',
-                notification.id, str(err), ''.join(traceback.format_tb(err.__traceback__))
+                "notif send err %s: %s: %s",
+                notification.id, str(err), "".join(traceback.format_tb(err.__traceback__))
             )
 
             notification.email_status = NotificationEmailStatus.ERROR

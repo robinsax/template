@@ -1,6 +1,6 @@
-'''
+"""
 Known error types for integration suite runs.
-'''
+"""
 
 class IntegrationSuiteError(Exception):
     pass

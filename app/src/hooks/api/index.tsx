@@ -1,12 +1,12 @@
 /**
 *   API client hook and provider. 
 */
-import React, { createContext, useContext, useMemo } from 'react';
+import React, { createContext, useContext, useMemo } from "react";
 
-import { binding } from './binding';
-import { APIClientBase, createAPIClientBase } from './base';
+import { binding } from "./binding";
+import { APIClientBase, createAPIClientBase } from "./base";
 
-export * from './base';
+export * from "./base";
 
 /**
 *   The code generated endpoints bindings of the API.

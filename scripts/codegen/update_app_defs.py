@@ -8,17 +8,17 @@ from fastapi.responses import StreamingResponse
 from fastapi.routing import APIRoute
 
 from kedet import model, api
-from kedet.model import Model, PERMISSIONS_MATRIX, ROLE_SCOPES, ROLE_USER_TYPES
-from kedet.service import StreamedUpload
-from kedet.api import app as api_app
+from backend.model import Model, PERMISSIONS_MATRIX, ROLE_SCOPES, ROLE_USER_TYPES
+from backend.service import StreamedUpload
+from backend.api import app as api_app
 
-sys.path.insert(0, '.')
+sys.path.insert(0, ".")
 from codegen_common import * # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-position, wrong-import-order
 
-HEADER = '''
+HEADER = """
 /** This file is auto-generated. Do not modify it. */
 /* eslint-disable max-len */
-'''.strip()
+""".strip()
 
 def write_models_ts(src_modules: list[ModuleType]):
     ts_scope = TSScope()
@@ -54,14 +54,14 @@ def write_models_ts(src_modules: list[ModuleType]):
     for key, value in PERMISSIONS_MATRIX.items():
         ts_entry = TSObject(1)
         for permission in value:
-            ts_entry.add(permission.value, TSCode('true'))
+            ts_entry.add(permission.value, TSCode("true"))
         ts_perms_mat.add(key.value, ts_entry)
 
     ts_scope.add(
         TSConstDef(
-            'permissionsMatrix',
+            "permissionsMatrix",
             ts_perms_mat,
-            TSCode('Record<Role, Partial<Record<Permission, boolean>>>')
+            TSCode("Record<Role, Partial<Record<Permission, boolean>>>")
         )
     )
 
@@ -69,15 +69,15 @@ def write_models_ts(src_modules: list[ModuleType]):
     for key, value in ROLE_SCOPES.items():
         ts_entry = TSValueSet(
             [TSString(scope.value) for scope in value],
-            'array'
+            "array"
         )
         ts_role_scopes.add(key.value, ts_entry)
 
     ts_scope.add(
         TSConstDef(
-            'roleScopes',
+            "roleScopes",
             ts_role_scopes,
-            TSCode('Record<Role, AuthzScopeType[]>')
+            TSCode("Record<Role, AuthzScopeType[]>")
         )
     )
 
@@ -87,16 +87,16 @@ def write_models_ts(src_modules: list[ModuleType]):
 
     ts_scope.add(
         TSConstDef(
-            'roleUserTypes',
+            "roleUserTypes",
             ts_role_user_types,
-            TSCode('Record<Role, UserType>')
+            TSCode("Record<Role, UserType>")
         )
     )
 
     return str(ts_scope)
 
 def write_endpoints_ts(app: FastAPI): # pylint: disable=too-many-statements
-    ts_models_import = TSImport('@/models', [])
+    ts_models_import = TSImport("@/models", [])
 
     def add_import(to_add):
         if to_add in (str, StreamedUpload, StreamingResponse):
@@ -111,7 +111,7 @@ def write_endpoints_ts(app: FastAPI): # pylint: disable=too-many-statements
 
     tree = {}
     def add_endpoint(path: str, method: str, param_type: type, return_type: type):
-        parts = path.split('/')
+        parts = path.split("/")
         parts.pop(0)
 
         cur = tree
@@ -143,7 +143,7 @@ def write_endpoints_ts(app: FastAPI): # pylint: disable=too-many-statements
             if not is_relevant:
                 continue
 
-            if param_key == 'return':
+            if param_key == "return":
                 return_type = check_type
             else:
                 param_type = check_type
@@ -165,17 +165,17 @@ def write_endpoints_ts(app: FastAPI): # pylint: disable=too-many-statements
             ts_object = TSObject(indent)
 
             for key, value in node.items():
-                if key[0] == '{':
-                    name_only = key[1:-1].split(':')[0]
+                if key[0] == "{":
+                    name_only = key[1:-1].split(":")[0]
 
-                    item_name = '_'.join(name_only.split('_')[1:])
+                    item_name = "_".join(name_only.split("_")[1:])
 
                     ts_object.add(
                         ts_obj_key(item_name),
                         TSFunction(
                             [(name_only, str)],
                             None,
-                            TSJoin(['(', write(value, indent + 1), ')'], ''),
+                            TSJoin(["(", write(value, indent + 1), ")"], ""),
                         )
                     )
                 else:
@@ -185,18 +185,18 @@ def write_endpoints_ts(app: FastAPI): # pylint: disable=too-many-statements
 
         path, method, param_type, return_type = node
 
-        path_parts = path.split('/')
+        path_parts = path.split("/")
         detemplated_parts = []
         for part in path_parts:
-            if part and part[0] == '{':
-                detemplated_parts.append('${' + part[1:-1].split(':')[0] + '}')
+            if part and part[0] == "{":
+                detemplated_parts.append("${" + part[1:-1].split(":")[0] + "}")
             else:
                 detemplated_parts.append(part)
 
         params = []
         if param_type:
-            params.append(('body', param_type))
-        params.append(('options?', 'APICallOptions'))
+            params.append(("body", param_type))
+        params.append(("options?", "APICallOptions"))
 
         raw_resp = return_type is StreamingResponse
 
@@ -204,24 +204,24 @@ def write_endpoints_ts(app: FastAPI): # pylint: disable=too-many-statements
             params,
             TSPromise(return_type),
             TSCode(
-                'api.call({ ' + \
-                    'path: `' + '/'.join(detemplated_parts) + '`, ' + \
-                    'method: \'' + method + '\'' + \
-                    (', body ' if param_type else ' ') + \
-                '}, ' + \
-                ('{ ...options, rawResp: true }' if raw_resp else 'options') + \
-                ')'
+                "api.call({ " + \
+                    "path: `" + "/".join(detemplated_parts) + "`, " + \
+                    "method: \"" + method + "\"" + \
+                    (", body " if param_type else " ") + \
+                "}, " + \
+                ("{ ...options, rawResp: true }" if raw_resp else "options") + \
+                ")"
             )
         )
 
     ts_scope = TSScope()
     ts_scope.add(ts_models_import)
-    ts_scope.add(TSImport('./base', ['APIClientBase', 'APICallOptions']))
+    ts_scope.add(TSImport("./base", ["APIClientBase", "APICallOptions"]))
     ts_scope.add(
         TSConstDef(
-            'binding',
+            "binding",
             TSFunction(
-                [('api', 'APIClientBase')],
+                [("api", "APIClientBase")],
                 None,
                 write(tree, 0)
             )
@@ -231,15 +231,15 @@ def write_endpoints_ts(app: FastAPI): # pylint: disable=too-many-statements
     return str(ts_scope)
 
 def update_models():
-    with open_file('./app/kedet/models/backend.ts', 'w') as fh:
+    with open_file("./app/kedet/models/backend.ts", "w") as fh:
         fh.write(HEADER)
-        fh.write('\n')
+        fh.write("\n")
         fh.write(write_models_ts([model, api]))
 
-    with open_file('./app/kedet/hooks/api/binding.ts', 'w') as fh:
+    with open_file("./app/kedet/hooks/api/binding.ts", "w") as fh:
         fh.write(HEADER)
-        fh.write('\n')
+        fh.write("\n")
         fh.write(write_endpoints_ts(api_app))
 
 update_models()
-print('Done.')
+print("Done.")

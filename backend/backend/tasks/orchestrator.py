@@ -1,27 +1,27 @@
-'''
+"""
 Background tasks implementing campaign orchestration.
-'''
+"""
 import logging
 from datetime import timedelta, datetime
 from sqlalchemy import DateTime, cast, and_
 from sqlalchemy.orm import Session
 
-from kedet.channels import orchestration_call_context
-from kedet.model import (
+from backend.channels import orchestration_call_context
+from backend.model import (
     Campaign, CampaignStatus, CampaignChannelStatus, CampaignChannelOrchestrationRunType,
     CampaignChannel, Notification, NotificationType, CampaignChannelReviewDecision,
     Audit, CampaignAuditEvent, current_datetime
 )
-from kedet.service import task, task_batch_query
+from backend.service import task, task_batch_query
 
 logger = logging.getLogger(__name__)
 
 def publish_campaign_channel(
     session: Session, channel: CampaignChannel, *, allow_invalid: bool = False
 ):
-    '''
+    """
     Publish a single campaign channel.
-    '''
+    """
     call_context = orchestration_call_context(
         session, channel, CampaignChannelOrchestrationRunType.PUBLISH
     )
@@ -32,7 +32,7 @@ def publish_campaign_channel(
         if not channel.validation.valid and not allow_invalid:
             # Sanity check that channel is valid before attempting publish.
             logger.warning(
-                'Channel %s is not valid, skipping publish', channel.id
+                "Channel %s is not valid, skipping publish", channel.id
             )
             return
 
@@ -45,9 +45,9 @@ def publish_campaign_channel(
         channel.needs_publish = False
 
 def poll_campaign_channel_reviews(session: Session, channel: CampaignChannel):
-    '''
+    """
     Poll reviews for a single campaign channel.
-    '''
+    """
     call_context = orchestration_call_context(
         session, channel, CampaignChannelOrchestrationRunType.POLL_REVIEW
     )
@@ -84,8 +84,8 @@ def poll_campaign_channel_reviews(session: Session, channel: CampaignChannel):
                     session, NotificationType.CAMPAIGN_CHANNEL_APPROVED, users,
                     target=campaign,
                     cosmetic_metadata={
-                        'campaign_name': campaign.name,
-                        'channel': channel.channel.label
+                        "campaign_name": campaign.name,
+                        "channel": channel.channel.label
                     }
                 )
 
@@ -98,8 +98,8 @@ def poll_campaign_channel_reviews(session: Session, channel: CampaignChannel):
                     session, NotificationType.CAMPAIGN_CHANNEL_REJECTED, users,
                     target=campaign,
                     cosmetic_metadata={
-                        'campaign_name': campaign.name,
-                        'channel': channel.channel.label
+                        "campaign_name": campaign.name,
+                        "channel": channel.channel.label
                     }
                 )
 
@@ -108,11 +108,11 @@ def poll_campaign_channel_reviews(session: Session, channel: CampaignChannel):
 
 @task(interval_seconds=30)
 def publish_campaigns(session: Session):
-    '''
+    """
     Recurring task to publish campaign channels.
 
     Discovers campaign channels with *needs publish* set.
-    '''
+    """
     batches = task_batch_query(
         session, CampaignChannel,
         CampaignChannel.needs_publish.is_(True)
@@ -123,14 +123,14 @@ def publish_campaigns(session: Session):
 
 @task(interval_seconds=60 * 60)
 def poll_campaign_reviews(session: Session):
-    '''
+    """
     Recurring task to pull campaign review status on ad channels.
 
     Discovers campaign channels with *published* status.
 
     When campaigns are discovered to be fully approved, they are automatically
     un-paused and a publish run is queued.
-    '''
+    """
     batches = task_batch_query(
         session, CampaignChannel,
         CampaignChannel.status_column() == CampaignChannelStatus.PUBLISHED
@@ -141,13 +141,13 @@ def poll_campaign_reviews(session: Session):
 
 @task(interval_seconds=60 * 60)
 def campaign_status_updater(session: Session):
-    '''
+    """
     Recurring task to update campaign statuses based on timing:
     - To *live* once their start date is hit and all ads channels are fully approved.
     - To *completed* once their end date is hit.
 
     Additionally marks campaigns that ended over a week ago as *archived*.
-    '''
+    """
     # Updates from published to live.
     batches = task_batch_query(
         session, Campaign,
@@ -174,15 +174,15 @@ def campaign_status_updater(session: Session):
 
     # Updates from live to completed.
     def end_date_query(status: CampaignStatus, thresh: datetime):
-        '''
+        """
         Get the query for campaigns that are in the given `status` and have an end date
         before the given `thresh`.
-        '''
+        """
         return and_(
             Campaign.status_column() == status,
-            Campaign.brief_column()['end_date'].is_not(None),
+            Campaign.brief_column()["end_date"].is_not(None),
             cast(
-                Campaign.brief_column()['end_date'].astext, DateTime(timezone=True)
+                Campaign.brief_column()["end_date"].astext, DateTime(timezone=True)
             ) < thresh
         )
 

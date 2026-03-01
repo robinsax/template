@@ -1,13 +1,13 @@
-import React, { useCallback } from 'react';
-import { HStack, Heading, VStack, Spacer, Text, Switch } from '@chakra-ui/react';
+import React, { useCallback } from "react";
+import { HStack, Heading, VStack, Spacer, Text, Switch } from "@chakra-ui/react";
 
-import { I18nValueFn, useCurrentUser, useI18n } from '@/hooks';
+import { I18nValueFn, useCurrentUser, useI18n } from "@/hooks";
 import {
     NotificationsList, useNotificationsShowAll, useDismissNotifications, useNotifications
-} from '@/components/users';
+} from "@/components/users";
 import {
     BlockCard, ActionIcon, IconName, Icon
-} from '@/components/common';
+} from "@/components/common";
 
 const SectionHeading = ({ heading, detail, iconName }: {
     iconName: IconName,
@@ -48,8 +48,8 @@ const Notifications = () => {
         <VStack alignItems="left" width="20rem" spacing={ 2 }>
             <SectionHeading
                 iconName="notifications"
-                heading={ t => t('Your Notifications') }
-                detail={ t => t('Recent notifications.') }
+                heading={ t => t("Your Notifications") }
+                detail={ t => t("Recent notifications.") }
             />
             <BlockCard width="20rem" height="auto">
                 <HStack width="full" mb={ 4 }>
@@ -58,12 +58,12 @@ const Notifications = () => {
                         onChange={ (e) => setAll(e.target.checked) }
                     />
                     <Text fontSize="xs" my={ 2 }>
-                        { t('Show seen') }
+                        { t("Show seen") }
                     </Text>
                     <Spacer/>
                     { !all && notifications && notifications.length > 0 && (
                         <ActionIcon
-                            tooltip={ t => t('Dismiss all') }
+                            tooltip={ t => t("Dismiss all") }
                             tooltipPlacement="right"
                             iconName="delete"
                             permission={ null }
@@ -85,8 +85,8 @@ export const Dashboard = () => {
     return (
         <VStack width="full" alignItems="left" spacing={ 12 }>
             <Heading>
-                { t('Welcome back, {name}!', {
-                    name: user.name.split(' ')[0]
+                { t("Welcome back, {name}!", {
+                    name: user.name.split(" ")[0]
                 })}
             </Heading>
             <HStack width="full" alignItems="flex-start">

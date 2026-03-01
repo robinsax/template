@@ -1,7 +1,7 @@
 import random
 from datetime import datetime, timedelta
 
-from kedet.model import CampaignChannel
+from backend.model import CampaignChannel
 
 from .base import AnalyticsBackend, DailyMetricsModel, RawAnalyticsModel
 
@@ -9,7 +9,7 @@ class DummyAnalyticsBackend(AnalyticsBackend):
     def get_channel_metrics( # pylint: disable=too-many-locals, too-many-statements
         self, channel: CampaignChannel, ids: list[str]
     ) -> list[DailyMetricsModel]:
-        '''
+        """
         Generate realistic dummy analytics data for testing.
 
         Creates sample data with:
@@ -19,7 +19,7 @@ class DummyAnalyticsBackend(AnalyticsBackend):
         - Random variance and occasional anomalies
         - Realistic metric relationships (CTR, CPC, CPA correlations)
         - Channel-specific performance characteristics
-        '''
+        """
         metrics = []
 
         brief = channel.campaign.brief
@@ -39,13 +39,13 @@ class DummyAnalyticsBackend(AnalyticsBackend):
         random.seed(channel_seed)
 
         # Each channel has different baseline performance
-        channel_performance_tier = random.choice(['high', 'medium', 'low'])
+        channel_performance_tier = random.choice(["high", "medium", "low"])
 
-        if channel_performance_tier == 'high':
+        if channel_performance_tier == "high":
             base_ctr = random.uniform(0.020, 0.030)  # 2-3% CTR
             base_cpc = random.uniform(0.60, 0.90)    # $0.60-0.90 CPC
             base_cvr = random.uniform(0.10, 0.15)    # 10-15% CVR
-        elif channel_performance_tier == 'medium':
+        elif channel_performance_tier == "medium":
             base_ctr = random.uniform(0.012, 0.020)  # 1.2-2% CTR
             base_cpc = random.uniform(0.80, 1.20)    # $0.80-1.20 CPC
             base_cvr = random.uniform(0.06, 0.10)    # 6-10% CVR

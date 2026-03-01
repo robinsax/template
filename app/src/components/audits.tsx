@@ -4,28 +4,28 @@
 *   The targets implemented in this module must match those provided by the standalone
 *   audit endpoint of the clients API. 
 */
-import React, { ComponentType, useMemo } from 'react';
-import { ChakraProps, Text, VStack, HStack, Heading, Spacer } from '@chakra-ui/react';
-import { formatDistanceToNow } from 'date-fns';
+import React, { ComponentType, useMemo } from "react";
+import { ChakraProps, Text, VStack, HStack, Heading, Spacer } from "@chakra-ui/react";
+import { formatDistanceToNow } from "date-fns";
 
-import { error, idToUrlForm } from '@/util';
+import { error, idToUrlForm } from "@/util";
 import {
     AuditStandaloneModel, OrganizationSummaryModel, CampaignSummaryModel,
     BasicAuditEvent, CampaignAuditEvent
-} from '@/models';
-import { I18nFn, I18nValueFn, useI18n } from '@/hooks';
-import { BlockCard, ClickTargetLink } from '@/components/common';
-import { OrganizationPersona } from '@/components/organizations';
-import { CampaignAISummary, campaignAuditUpdateLabels } from '@/components/campaigns';
+} from "@/models";
+import { I18nFn, I18nValueFn, useI18n } from "@/hooks";
+import { BlockCard, ClickTargetLink } from "@/components/common";
+import { OrganizationPersona } from "@/components/organizations";
+import { CampaignAISummary, campaignAuditUpdateLabels } from "@/components/campaigns";
 
-import { UserPersona } from './users';
+import { UserPersona } from "./users";
 
 // Target implementations.
 const BusinessAuditTarget = ({ summary }: { summary: OrganizationSummaryModel }) => {
     return (
         <OrganizationPersona
             for={ summary } size="sm"
-            secondaryLabel={ t => t('Business')}
+            secondaryLabel={ t => t("Business")}
         />
     );
 };
@@ -34,7 +34,7 @@ const CampaignsAuditTarget = ({ summary }: { summary: CampaignSummaryModel }) =>
     return (
         <HStack>
             <ClickTargetLink
-                href={ '/campaigns/' + idToUrlForm(summary.id) }
+                href={ "/campaigns/" + idToUrlForm(summary.id) }
                 py={ 2 } px={ 1 } mb={ 1 }
             >
                 <Heading size="md">{ summary.name }</Heading>
@@ -54,15 +54,15 @@ const targetRenderers: Record<string, ComponentType<{ summary: any }>> = {
 
 // Event descriptions.
 const basicAuditEventDescriptions: Record<BasicAuditEvent, I18nValueFn> = {
-    create: t => t('created'),
-    update: t => t('updated'),
-    delete: t => t('deleted')
+    create: t => t("created"),
+    update: t => t("updated"),
+    delete: t => t("deleted")
 };
 
 const eventDescriptions: Record<string, (t: I18nFn, event: string) => string> = {
     campaigns: (t, event) => (
-        t('updated') + ' ' + (
-            !(event in campaignAuditUpdateLabels) ? '' :
+        t("updated") + " " + (
+            !(event in campaignAuditUpdateLabels) ? "" :
                 // @ts-expect-error ts(2722)
                 campaignAuditUpdateLabels[event as CampaignAuditEvent](t)
         )
@@ -82,7 +82,7 @@ export const StandaloneAuditCard = ({ model, ...props }: {
         model.target_type in targetRenderers ?
             targetRenderers[model.target_type]
         :
-            error('Unknown target type: ' + model.target_type, null)
+            error("Unknown target type: " + model.target_type, null)
     ), [model.target_type]);
 
     const eventDescription = useMemo(() => (

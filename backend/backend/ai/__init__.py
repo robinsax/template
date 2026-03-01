@@ -1,6 +1,6 @@
-'''
+"""
 Generative AI integration package.
-'''
+"""
 from .providers import (
     AIProvider, AIChatMessage, AIChatSession, AIChatResponseStream, AIChatResponseChunk,
     GoogleGeminiDevAIProvider, GoogleVertexAIProvider, get_ai_provider,

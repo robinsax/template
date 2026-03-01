@@ -1,20 +1,20 @@
 /**
 *   Theme definition with related providers and hooks.
 */
-import React, { ReactNode, useMemo } from 'react';
+import React, { ReactNode, useMemo } from "react";
 import {
     Box, ColorModeScript, StyleFunctionProps, extendTheme, useColorMode
-} from '@chakra-ui/react';
-import { SaasProvider } from '@saas-ui/react';
-import { theme as saasTheme } from '@saas-ui/theme';
-import { TinyColor } from '@ctrl/tinycolor';
+} from "@chakra-ui/react";
+import { SaasProvider } from "@saas-ui/react";
+import { theme as saasTheme } from "@saas-ui/theme";
+import { TinyColor } from "@ctrl/tinycolor";
 
 // Specific to prevent circular import.
-import { Icon } from './components/common/icons';
+import { Icon } from "./components/common/icons";
 
-import '@fontsource/lexend';
-import '@fontsource/manrope';
-import '@fontsource/ibm-plex-mono';
+import "@fontsource/lexend";
+import "@fontsource/manrope";
+import "@fontsource/ibm-plex-mono";
 
 /**
 *   Generator for the vignette gradients. Pass the current time as `t` to animate.
@@ -43,18 +43,18 @@ export const vignetteGenerator = (t: number, dark: boolean) => {
     ];
 
     return [
-        'background-image: ' + gradients.join(', '),
-        'opacity: ' + (dark ? 0.2 : 0.7),
-        ''
-    ].join(';');
+        "background-image: " + gradients.join(", "),
+        "opacity: " + (dark ? 0.2 : 0.7),
+        ""
+    ].join(";");
 };
 
 // Chakra theme.
-const force = (value: string) => value + ' !important';
+const force = (value: string) => value + " !important";
 
-const backdropFilter = 'blur(10px) saturate(50%)';
-const boxShadow = '0px 0px 5px 2px #0000000d';
-const primaryColor = '#D3B6A980';
+const backdropFilter = "blur(10px) saturate(50%)";
+const boxShadow = "0px 0px 5px 2px #0000000d";
+const primaryColor = "#D3B6A980";
 
 const semanticTokens = {
     colors: {
@@ -63,113 +63,113 @@ const semanticTokens = {
             default: primaryColor,
         },
         selectionOpaque: {
-            default: '#D3B6A9ff',
+            default: "#D3B6A9ff",
         },
         lightSelection: {
-            default: '#d3b6a947'
+            default: "#d3b6a947"
         },
         error: {
-            default: '#fb8e7280'
+            default: "#fb8e7280"
         },
         errorOpaque: {
-            default: '#fb8e72ff',
+            default: "#fb8e72ff",
         },
         success: {
-            default: '#4bc8a780'
+            default: "#4bc8a780"
         },
         successOpaque: {
-            default: '#4bc8a7ff',
+            default: "#4bc8a7ff",
         },
         // Text colors.
         themeText: {
-            default: '#10131E',
-            _dark: '#FCFCFC'
+            default: "#10131E",
+            _dark: "#FCFCFC"
         },
         themeTextSofter: {
-            default: '#1c1c1ce6',
-            _dark: '#e0e0e0e3'
+            default: "#1c1c1ce6",
+            _dark: "#e0e0e0e3"
         },
         lightText: {
-            default: '#939499'
+            default: "#939499"
         },
         // Border colors.
         lightBorder: {
-            default: '#0000001a',
-            _dark: '#ffffff1a'
+            default: "#0000001a",
+            _dark: "#ffffff1a"
         },
         dndTarget: {
-            default: '#FFDE80',
+            default: "#FFDE80",
         },
         // Map colors.
         mapSelection: {
-            default: '#239CF3',
+            default: "#239CF3",
         },
         mapLand: {
-            default: '#e5e7ed',
-            _dark: '#7d7f83'
+            default: "#e5e7ed",
+            _dark: "#7d7f83"
         },
         mapFeature: {
-            default: '#dddfe5',
-            _dark: '#cccccc'
+            default: "#dddfe5",
+            _dark: "#cccccc"
         },
         mapPanelBg: {
-            default: '#f1f3f8',
-            _dark: '#1c1e20'
+            default: "#f1f3f8",
+            _dark: "#1c1e20"
         },
         // Background colors.
         offsetBg: {
-            default: 'gray.200',
-            _dark: 'gray.900'
+            default: "gray.200",
+            _dark: "gray.900"
         },
         offsetBgSofter: {
-            default: 'gray.300',
-            _dark: 'gray.700'
+            default: "gray.300",
+            _dark: "gray.700"
         },
         warningBg: {
-            default: '#FFDE80cc'
+            default: "#FFDE80cc"
         },
         panelBg: {
-            default: '#ffffff80',
-            _dark: '#00000033'
+            default: "#ffffff80",
+            _dark: "#00000033"
         },
         panelBgVariantA: {
-            default: '#ffffff4d',
-            _dark: '#00000066',
+            default: "#ffffff4d",
+            _dark: "#00000066",
         },
         panelBgVariantB: {
-            default: '#ffffffb3',
-            _dark: '#ffffff1a',
+            default: "#ffffffb3",
+            _dark: "#ffffff1a",
         },
         insetPanelBg: {
-            default: '#0000001a',
-            _dark: '#00000033',
+            default: "#0000001a",
+            _dark: "#00000033",
         },
         insetPanelBgVariantA: {
-            default: '#0000000d',
-            _dark: '#0000001a',
+            default: "#0000000d",
+            _dark: "#0000001a",
         },
         insetPanelBgVariantB: {
-            default: '#00000033',
-            _dark: '#0000004d',
+            default: "#00000033",
+            _dark: "#0000004d",
         }
     },
     shadows: {
-        raise: '0px 0px 5px 2px #0000000d',
-        selection: '0px 0px 5px 2px #D3B6A91a'
+        raise: "0px 0px 5px 2px #0000000d",
+        selection: "0px 0px 5px 2px #D3B6A91a"
     }
 };
 
 const defaultInputVariant = {
-    bg: 'insetPanelBgVariantA',
-    border: force('1px solid #9898981a')
+    bg: "insetPanelBgVariantA",
+    border: force("1px solid #9898981a")
 };
 
 const panelBaseStyles = (
     props: StyleFunctionProps,
-    lightVariant: keyof typeof semanticTokens.colors = 'panelBg'
+    lightVariant: keyof typeof semanticTokens.colors = "panelBg"
 ) => ({
     bg: (
-        props.colorMode == 'dark' ?
+        props.colorMode == "dark" ?
             semanticTokens.colors.panelBg._dark : lightVariant
     ),
     backdropFilter
@@ -199,73 +199,73 @@ const theme = extendTheme(saasTheme, {
     },
     semanticTokens,
     fonts: {
-        heading: 'Lexend, sans-serif',
-        body: 'Manrope, sans-serif',
-        mono: 'IBM Plex Mono, monospace'
+        heading: "Lexend, sans-serif",
+        body: "Manrope, sans-serif",
+        mono: "IBM Plex Mono, monospace"
     },
     colors: {
         primary: makeColorWeights(primaryColor),
-        red: makeColorWeights('#FB8E72', 50),
-        green: makeColorWeights('#4BC8A7', 10),
-        blue: makeColorWeights('#239CF3'),
-        yellow: makeColorWeights('#FFDE80', 50)
+        red: makeColorWeights("#FB8E72", 50),
+        green: makeColorWeights("#4BC8A7", 10),
+        blue: makeColorWeights("#239CF3"),
+        yellow: makeColorWeights("#FFDE80", 50)
     },
     styles: {
         global: {
             // Remove default Chakra outlines.
-            '*:focus, [aria-expanded="true"]': {
-                boxShadow: force('none'),
-                outline: force('none'),
+            "*:focus, [aria-expanded="true"]": {
+                boxShadow: force("none"),
+                outline: force("none"),
             },
-            'body': {
-                overflowY: force('hidden')
+            "body": {
+                overflowY: force("hidden")
             },
             // Global scroll policy.
-            '.saas-app-shell__main': {
-                minWidth: force('950px')
+            ".saas-app-shell__main": {
+                minWidth: force("950px")
             },
             // Prevent autofill styles.
-            'input:-webkit-autofill, input:-webkit-autofill:focus': {
-                color: force('black')
+            "input:-webkit-autofill, input:-webkit-autofill:focus": {
+                color: force("black")
             },
-            '[data-theme="dark"] input:-webkit-autofill, [data-theme="dark"] input:-webkit-autofill:focus': { // eslint-disable-line
-                color: force('white')
+            "[data-theme="dark"] input:-webkit-autofill, [data-theme="dark"] input:-webkit-autofill:focus": { // eslint-disable-line
+                color: force("white")
             },
             // Override default hover effects.
-            '&[data-active]': {
+            "&[data-active]": {
                 backgroundColor: force(semanticTokens.colors.insetPanelBg.default)
             },
-            '[data-theme="dark"] &[data-active]': {
+            "[data-theme="dark"] &[data-active]": {
                 backgroundColor: force(semanticTokens.colors.insetPanelBg._dark)
             },
-            '.sui-nav-item__link:hover': {
+            ".sui-nav-item__link:hover": {
                 backgroundColor: force(
                     semanticTokens.colors.insetPanelBgVariantA.default
                 )
             },
-            '[data-theme="dark"] .sui-nav-item__link:hover': {
+            "[data-theme="dark"] .sui-nav-item__link:hover": {
                 backgroundColor: force(
                     semanticTokens.colors.insetPanelBgVariantA._dark
                 )
             },
             // Override menu styles (SaaSUI <select>).
-            '.chakra-menu__menu-list': {
+            ".chakra-menu__menu-list": {
                 backgroundColor: force(
                     semanticTokens.colors.panelBg.default
                 ),
                 backdropFilter
             },
-            '.chakra-menu__menuitem-option': {
+            ".chakra-menu__menuitem-option": {
                 backgroundColor: force(
                     semanticTokens.colors.insetPanelBgVariantA.default
                 ),
                 backdropFilter
             },
-            ['.chakra-menu__menuitem-option:hover,' +
-            '.chakra-menu__menuitem-option[aria-checked="true"]']: {
-                backgroundColor: force('transparent')
+            [".chakra-menu__menuitem-option:hover," +
+            ".chakra-menu__menuitem-option[aria-checked="true"]"]: {
+                backgroundColor: force("transparent")
             },
-            '[data-theme="dark"] .chakra-menu__menu-list': {
+            "[data-theme="dark"] .chakra-menu__menu-list": {
                 backgroundColor: force(
                     semanticTokens.colors.panelBg._dark
                 ),
@@ -277,7 +277,7 @@ const theme = extendTheme(saasTheme, {
         Alert: {
             baseStyle: {
                 container: {
-                    fontSize: 'sm',
+                    fontSize: "sm",
                     backgroundOpacity: 0.5
                 }
             }
@@ -287,15 +287,15 @@ const theme = extendTheme(saasTheme, {
                 const { colorScheme, colorMode } = props;
 
                 return {
-                    bg: colorScheme + (colorMode == 'dark' ? '.500' : '.200'),
-                    color: colorScheme + (colorMode == 'dark' ? '.50' : '.600')
+                    bg: colorScheme + (colorMode == "dark" ? ".500" : ".200"),
+                    color: colorScheme + (colorMode == "dark" ? ".50" : ".600")
                 };
             }
         },
         Switch: {
             baseStyle: {
                 track: {
-                    bg: 'insetPanelBg',
+                    bg: "insetPanelBg",
                     backdropFilter
                 }
             }
@@ -303,51 +303,51 @@ const theme = extendTheme(saasTheme, {
         Text: {
             variants: {
                 light: {
-                    color: 'lightText',
-                    fontSize: 'xs'
+                    color: "lightText",
+                    fontSize: "xs"
                 }
             }
         },
         Button: {
             baseStyle: {
-                transition: 'all 0.1s ease-in-out',
+                transition: "all 0.1s ease-in-out",
                 _hover: {
-                    transform: 'scale(1.02)'
+                    transform: "scale(1.02)"
                 }
             },
             variants: {
                 solid: {
-                    bg: 'selection',
+                    bg: "selection",
                     backdropFilter,
                     _hover: {
-                        bg: 'selection'
+                        bg: "selection"
                     }
                 },
                 primary: {
-                    bg: 'offsetBg',
-                    color: 'themeText',
+                    bg: "offsetBg",
+                    color: "themeText",
                     backdropFilter,
                     _hover: {
-                        bg: 'selection'
+                        bg: "selection"
                     }
                 },
                 cta: {
-                    bg: 'panelBg',
-                    color: 'themeText',
-                    fontSize: 'lg',
+                    bg: "panelBg",
+                    color: "themeText",
+                    fontSize: "lg",
                     p: 3,
-                    height: 'auto',
+                    height: "auto",
                     backdropFilter,
                     _hover: {
-                        bg: 'selection'
+                        bg: "selection"
                     },
-                    boxShadow: 'raise'
+                    boxShadow: "raise"
                 }
             }
         },
         Divider: {
             baseStyle: {
-                borderColor: 'lightBorder'
+                borderColor: "lightBorder"
             }
         },
         Input: {
@@ -357,7 +357,7 @@ const theme = extendTheme(saasTheme, {
                 },
                 flushed: {
                     field: {
-                        borderColor: 'lightText'
+                        borderColor: "lightText"
                     }
                 }
             }
@@ -378,21 +378,21 @@ const theme = extendTheme(saasTheme, {
             baseStyle: (props: StyleFunctionProps) => ({
                 container: {
                     ...panelBaseStyles(props),
-                    borderStyle: 'solid',
+                    borderStyle: "solid",
                     borderWidth: 1,
-                    borderColor: 'lightBorder'
+                    borderColor: "lightBorder"
                 }
             })
         },
         Modal: {
             baseStyle: (props: StyleFunctionProps) => ({
-                dialog: panelBaseStyles(props, 'panelBgVariantB')
+                dialog: panelBaseStyles(props, "panelBgVariantB")
             })
         },
         Tooltip: {
             baseStyle: (props: StyleFunctionProps) => ({
                 ...panelBaseStyles(props),
-                borderRadius: 'md',
+                borderRadius: "md",
                 zIndex: 5000
             })
         },
@@ -400,16 +400,16 @@ const theme = extendTheme(saasTheme, {
             baseStyle: (props: StyleFunctionProps) => ({
                 content: {
                     ...panelBaseStyles(props),
-                    borderColor: 'lightBorder',
+                    borderColor: "lightBorder",
                     boxShadow: force(boxShadow),
-                    bg: props.colorMode == 'dark' ?
-                        '#1d1d1dbf' : '#ffffffb3'
+                    bg: props.colorMode == "dark" ?
+                        "#1d1d1dbf" : "#ffffffb3"
                 },
                 arrow: {
-                    backgroundColor: props.colorMode == 'dark' ?
-                        '#1d1d1dbf !important'
+                    backgroundColor: props.colorMode == "dark" ?
+                        "#1d1d1dbf !important"
                     :
-                        '#ffffffb3 !important'
+                        "#ffffffb3 !important"
                 }
             })
         }
@@ -418,13 +418,13 @@ const theme = extendTheme(saasTheme, {
 
 // Compute toast backgrounds.
 const errorToastBg = (
-    makeColorWeights(semanticTokens.colors.error.default, 50)[200] + 'd0'
+    makeColorWeights(semanticTokens.colors.error.default, 50)[200] + "d0"
 );
 const successToastBg = (
-    makeColorWeights(semanticTokens.colors.success.default, 20)[200] + 'd0'
+    makeColorWeights(semanticTokens.colors.success.default, 20)[200] + "d0"
 );
 const warningToastBg = (
-    makeColorWeights(semanticTokens.colors.dndTarget.default, 20)[200] + 'd0'
+    makeColorWeights(semanticTokens.colors.dndTarget.default, 20)[200] + "d0"
 );
 
 /**
@@ -441,7 +441,7 @@ export const ThemedRoot = ({ children }: { children: ReactNode }) => {
                             <Icon name="info" size="1rem"/>
                         </Box>
                     ),
-                    position: 'top',
+                    position: "top",
                     duration: 5000,
                     isClosable: true
                 }
@@ -493,7 +493,7 @@ export const usePanelStylesFix = (lowOpacity?: boolean) => {
     const { colorMode } = useColorMode();
 
     const convertValue = (value: string) => {
-        if (lowOpacity) return value.replace(/, [0-9.]+?\)/, ', 0.35)');
+        if (lowOpacity) return value.replace(/, [0-9.]+?\)/, ", 0.35)");
         return value;
     };
 
@@ -501,11 +501,11 @@ export const usePanelStylesFix = (lowOpacity?: boolean) => {
         return {
             sx: {
                 background: convertValue(
-                    colorMode == 'dark' ?
+                    colorMode == "dark" ?
                         semanticTokens.colors.panelBg._dark
                     :
                         semanticTokens.colors.panelBg.default
-                ) + ' !important'
+                ) + " !important"
             },
             backdropFilter
         };
@@ -525,8 +525,8 @@ export const useThemeColor = (themeKey: ThemeColor) => {
 
     return useMemo(() => {
         return (
-            colorMode == 'dark' ?
-                '_dark' in semanticTokens.colors[themeKey] ?
+            colorMode == "dark" ?
+                "_dark" in semanticTokens.colors[themeKey] ?
                     semanticTokens.colors[themeKey]._dark
                 :
                     semanticTokens.colors[themeKey].default
@@ -542,10 +542,10 @@ export const useThemeColor = (themeKey: ThemeColor) => {
 export const useGrowOnHover = () => {
     return useMemo(() => {
         return {
-            transition: 'all 0.1s ease-in-out',
+            transition: "all 0.1s ease-in-out",
             _hover: {
-                transform: 'scale(1.03) translateZ(0)',
-                willChange: 'transform'
+                transform: "scale(1.03) translateZ(0)",
+                willChange: "transform"
             }
         };
     }, []);
@@ -554,8 +554,8 @@ export const useGrowOnHover = () => {
 export const useMediaBg = (size: number) => {
     const { colorMode } = useColorMode();
 
-    const a = useThemeColor('panelBg');
-    const b = colorMode == 'dark' ? '#2d2d2d' : '#D3B6A9';
+    const a = useThemeColor("panelBg");
+    const b = colorMode == "dark" ? "#2d2d2d" : "#D3B6A9";
 
     return useMemo(() => {
         // eslint-disable-next-line max-len
@@ -572,16 +572,16 @@ export const useBoxShadow = () => {
 export const useDarkTheme = () => {
     const { colorMode } = useColorMode();
 
-    return colorMode == 'dark';
+    return colorMode == "dark";
 };
 
 export const useHideScrollbars = () => {
     return useMemo(() => {
         return {
             sx: {
-                '&::-webkit-scrollbar': { display: 'none' },
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
+                "&::-webkit-scrollbar": { display: "none" },
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
             }
         };
     }, []);

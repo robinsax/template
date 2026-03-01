@@ -1,11 +1,11 @@
 /**
 *   Non-component-tree utilities. 
 */
-import { parse as uuidParse, stringify as uuidStringify } from 'uuid';
-import { format } from 'date-fns';
+import { parse as uuidParse, stringify as uuidStringify } from "uuid";
+import { format } from "date-fns";
 
-import config from '@/config';
-import { AnyUserGrantModel, AuthzScope, UserModel, permissionsMatrix } from '@/models';
+import config from "@/config";
+import { AnyUserGrantModel, AuthzScope, UserModel, permissionsMatrix } from "@/models";
 
 // Misc.
 /**
@@ -46,7 +46,7 @@ const BASE_SIZE = BigInt(BASE_62.length);
 const base62Encode = (num: bigint): string => {
     if (num === BigInt(0)) return BASE_62[0];
 
-    let str = '';
+    let str = "";
     while (num > BigInt(0)) {
         const rem = num % BASE_SIZE;
         num = num / BASE_SIZE;
@@ -128,26 +128,26 @@ export const formatCurrencyCAD = (value: number, opts?: {
     noCents?: boolean
 }) => {
     let str = value.toLocaleString();
-    if (str.includes('.')) {
-        const parts = str.split('.');
+    if (str.includes(".")) {
+        const parts = str.split(".");
         if (parts[1].length > 2) {
             parts[1] = parts[1].slice(0, 2);
         }
         if (parts[1].length < 2) {
-            parts[1] = parts[1] + '0';
+            parts[1] = parts[1] + "0";
         }
-        str = parts[0] + '.' + parts[1];
+        str = parts[0] + "." + parts[1];
     }
     else if (opts?.forceCents) {
-        str += '.00';
+        str += ".00";
     }
 
     if (opts?.noCents) {
-        str = str.split('.')[0];
+        str = str.split(".")[0];
     }
 
-    if (opts?.symbol) str = '$' + str;
-    if (opts?.denomination) str += ' CAD';
+    if (opts?.symbol) str = "$" + str;
+    if (opts?.denomination) str += " CAD";
 
     return str;
 };
@@ -156,7 +156,7 @@ export const formatCurrencyCAD = (value: number, opts?: {
 *   Return a formatted string representing a size in bytes.
 */
 export const formatByteSize = (size: number) => {
-    const units = ['B', 'KB', 'MB', 'GB'];
+    const units = ["B", "KB", "MB", "GB"];
 
     let unitIndex = 0;
     while (size >= 1024 && unitIndex < units.length - 1) {
@@ -164,7 +164,7 @@ export const formatByteSize = (size: number) => {
         unitIndex++;
     }
 
-    return size.toFixed(1) + ' ' + units[unitIndex];
+    return size.toFixed(1) + " " + units[unitIndex];
 };
 
 // Memo because checking fractions is expensive.
@@ -203,10 +203,10 @@ export const formatAspectRatio = (
 
     if (bestError < errorTolerance) {
         const divisor = gcd(bestNumerator, bestDenominator);
-        const rounded = bestNumerator / divisor + ':' + bestDenominator / divisor;
+        const rounded = bestNumerator / divisor + ":" + bestDenominator / divisor;
 
         return _aspectRatioMemo[aspectRatio] = (
-            bestError == 0 ? rounded : '~' + rounded
+            bestError == 0 ? rounded : "~" + rounded
         );
     }
     else {
@@ -220,16 +220,16 @@ export const formatAspectRatio = (
 export const smartDateFormat = (date: Date, truncateLongMonths: boolean = false) => {
     const now = new Date();
 
-    let month = format(date, 'MMMM');
+    let month = format(date, "MMMM");
     if (truncateLongMonths && month.length > 5) {
         month = month.slice(0, 3);
     }
 
     if (date.getFullYear() == now.getFullYear()) {
-        return month + ' ' + format(date, 'do');
+        return month + " " + format(date, "do");
     }
 
-    return month + ' ' + format(date, 'do, yyyy');
+    return month + " " + format(date, "do, yyyy");
 };
 
 // Error handling.
@@ -256,7 +256,7 @@ export const error = <T = unknown>(message: string, rv: T = null as unknown as T
 *   "Contains" semantics are equivalent to `kedet/backend`.
 */
 export const grantContainsScope = (grant: AnyUserGrantModel, scope: AuthzScope) => {
-    if (grant.scope_type == 'global') {
+    if (grant.scope_type == "global") {
         return true;
     }
 
@@ -299,7 +299,7 @@ export const isUserWithinManageScopeOf = (
     for (const grant of managingUser.grants) {
         if (!grantContainsScope(grant, requiredScope)) continue;
 
-        if (!('manage_iam' in permissionsMatrix[grant.role])) continue;
+        if (!("manage_iam" in permissionsMatrix[grant.role])) continue;
 
         return true;
     }
@@ -331,7 +331,7 @@ export const openIDBCache = async <T,>(name: string): Promise<IDBCache<T>> => {
     });
 
     const get = async (key: string) => {
-        const tx = db.transaction(name, 'readonly');
+        const tx = db.transaction(name, "readonly");
         const store = tx.objectStore(name);
         const request = store.get(key);
 
@@ -342,7 +342,7 @@ export const openIDBCache = async <T,>(name: string): Promise<IDBCache<T>> => {
     };
 
     const put = async (key: string, value: T) => {
-        const tx = db.transaction(name, 'readwrite');
+        const tx = db.transaction(name, "readwrite");
         const store = tx.objectStore(name);
         const request = store.put(value, key);
 

@@ -1,20 +1,20 @@
 /**
 *   Calendar and date picker components.
 */
-import React, { ReactNode, useMemo, useState, useCallback } from 'react';
+import React, { ReactNode, useMemo, useState, useCallback } from "react";
 import {
     Popover, PopoverTrigger, PopoverContent, Button, Box, Grid, Text, Flex, Divider,
     VStack
-} from '@chakra-ui/react';
+} from "@chakra-ui/react";
 import {
     format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, addMonths,
     isSameDay, isSameMonth,
     isWithinInterval
-} from 'date-fns';
+} from "date-fns";
 
-import { useI18n } from '@/hooks';
+import { useI18n } from "@/hooks";
 
-import { Icon } from './icons';
+import { Icon } from "./icons";
 
 // Calendar.
 type CalendarDay = {
@@ -137,7 +137,7 @@ export const Calendar = ({ range, value, minimal, setValue }: {
       <VStack width="full" spacing={ minimal ? 0 : 2 }>
         <Flex
             width="full"
-            justifyContent={ minimal ? 'center' : 'space-between' }
+            justifyContent={ minimal ? "center" : "space-between" }
             mb={ minimal ? 0 : 2 }
         >
             { !minimal && (
@@ -149,8 +149,8 @@ export const Calendar = ({ range, value, minimal, setValue }: {
                     <Icon name="left"/>
                 </Button>
             ) }
-            <Text fontSize={ minimal ? 'xs' : 'md' }>
-                { format(month, 'MMMM yyyy') }
+            <Text fontSize={ minimal ? "xs" : "md" }>
+                { format(month, "MMMM yyyy") }
             </Text>
             { !minimal && (
                 <Button
@@ -173,13 +173,13 @@ export const Calendar = ({ range, value, minimal, setValue }: {
                     textAlign="center"
                     mb={1}
                 >
-                    <Text>{ t('Su') }</Text>
-                    <Text>{ t('Mo') }</Text>
-                    <Text>{ t('Tu') }</Text>
-                    <Text>{ t('We') }</Text>
-                    <Text>{ t('Th') }</Text>
-                    <Text>{ t('Fr') }</Text>
-                    <Text>{ t('Sa') }</Text>
+                    <Text>{ t("Su") }</Text>
+                    <Text>{ t("Mo") }</Text>
+                    <Text>{ t("Tu") }</Text>
+                    <Text>{ t("We") }</Text>
+                    <Text>{ t("Th") }</Text>
+                    <Text>{ t("Fr") }</Text>
+                    <Text>{ t("Sa") }</Text>
                 </Grid>
             </>
         )}
@@ -191,26 +191,26 @@ export const Calendar = ({ range, value, minimal, setValue }: {
                             key={day.date}
                             p={2}
                             bg={
-                                (day.leftBoundary || day.rightBoundary) ? 'selection' :
-                                (day.isToday || day.selected) ? 'lightSelection' :
-                                'transparent'
+                                (day.leftBoundary || day.rightBoundary) ? "selection" :
+                                (day.isToday || day.selected) ? "lightSelection" :
+                                "transparent"
                             }
                             color={
                                 (day.selected || day.month) ?
-                                    'themeText' : 'lightText'
+                                    "themeText" : "lightText"
                             }
                             textAlign="center"
-                            cursor={ setValue ? 'pointer' : 'default' }
+                            cursor={ setValue ? "pointer" : "default" }
                             fontSize="xs"
                             borderRadius="md"
                             borderLeftRadius={
-                                (day.selected && !day.leftBoundary) ? '0px' : 'md'
+                                (day.selected && !day.leftBoundary) ? "0px" : "md"
                             }
                             borderRightRadius={
-                                (day.selected && !day.rightBoundary) ? '0px' : 'md'
+                                (day.selected && !day.rightBoundary) ? "0px" : "md"
                             }
                             _hover={
-                                setValue ? { bg: 'selection' } : undefined
+                                setValue ? { bg: "selection" } : undefined
                             }
                             onClick={ () => onDateClick(day.value) }
                             onMouseOver={ () => onDateHover(day.value) }

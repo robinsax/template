@@ -9,9 +9,9 @@ export type AIChatMessageModel = {
     suggestions: (AIChatSuggestionModel[] | null)
 };
 
-export type AIChatMessageRole = ('user' | 'model');
+export type AIChatMessageRole = ("user" | "model");
 
-export const aIChatMessageRoles: AIChatMessageRole[] = ['user', 'model'];
+export const aIChatMessageRoles: AIChatMessageRole[] = ["user", "model"];
 
 export type AIChatModel = {
     id: string,
@@ -103,18 +103,18 @@ export type AdSpecModel = {
     composite_groups: (AdSpecCompositeGroupModel[] | null)
 };
 
-export type AdValidationError = ('invalid_assets' | 'not_enough_assets' | 'too_many_assets' | 'pool_too_small' | 'pool_too_large' | 'view_objective_non_video_creative' | 'google_ads_rsa_sitelink_domain_mismatch' | 'google_ads_rda_youtube_url_invalid' | 'google_dv360_invalid_caption_url' | 'snapchat_brand_name_required' | 'meta_invalid_feed_image_aspect_ratio' | 'meta_invalid_story_card_count' | 'meta_invalid_reels_carousel_video' | 'meta_cta_missing_for_objective' | 'pinterest_invalid_video_carousel' | 'pinterest_invalid_image_carousel' | 'amazon_dsp_invalid_video_duration');
+export type AdValidationError = ("invalid_assets" | "not_enough_assets" | "too_many_assets" | "pool_too_small" | "pool_too_large" | "view_objective_non_video_creative" | "google_ads_rsa_sitelink_domain_mismatch" | "google_ads_rda_youtube_url_invalid" | "google_dv360_invalid_caption_url" | "snapchat_brand_name_required" | "meta_invalid_feed_image_aspect_ratio" | "meta_invalid_story_card_count" | "meta_invalid_reels_carousel_video" | "meta_cta_missing_for_objective" | "pinterest_invalid_video_carousel" | "pinterest_invalid_image_carousel" | "amazon_dsp_invalid_video_duration");
 
-export const adValidationErrors: AdValidationError[] = ['invalid_assets', 'not_enough_assets', 'too_many_assets', 'pool_too_small', 'pool_too_large', 'view_objective_non_video_creative', 'google_ads_rsa_sitelink_domain_mismatch', 'google_ads_rda_youtube_url_invalid', 'google_dv360_invalid_caption_url', 'snapchat_brand_name_required', 'meta_invalid_feed_image_aspect_ratio', 'meta_invalid_story_card_count', 'meta_invalid_reels_carousel_video', 'meta_cta_missing_for_objective', 'pinterest_invalid_video_carousel', 'pinterest_invalid_image_carousel', 'amazon_dsp_invalid_video_duration'];
+export const adValidationErrors: AdValidationError[] = ["invalid_assets", "not_enough_assets", "too_many_assets", "pool_too_small", "pool_too_large", "view_objective_non_video_creative", "google_ads_rsa_sitelink_domain_mismatch", "google_ads_rda_youtube_url_invalid", "google_dv360_invalid_caption_url", "snapchat_brand_name_required", "meta_invalid_feed_image_aspect_ratio", "meta_invalid_story_card_count", "meta_invalid_reels_carousel_video", "meta_cta_missing_for_objective", "pinterest_invalid_video_carousel", "pinterest_invalid_image_carousel", "amazon_dsp_invalid_video_duration"];
 
 export type AdValidationModel = {
     valid: boolean,
     errors: AdValidationError[]
 };
 
-export type AgeRange = ('age_18_24' | 'age_25_34' | 'age_35_44' | 'age_45_54' | 'age_55_64' | 'age_65_plus');
+export type AgeRange = ("age_18_24" | "age_25_34" | "age_35_44" | "age_45_54" | "age_55_64" | "age_65_plus");
 
-export const ageRanges: AgeRange[] = ['age_18_24', 'age_25_34', 'age_35_44', 'age_45_54', 'age_55_64', 'age_65_plus'];
+export const ageRanges: AgeRange[] = ["age_18_24", "age_25_34", "age_35_44", "age_45_54", "age_55_64", "age_65_plus"];
 
 export type AssetModel = {
     id: string,
@@ -127,9 +127,9 @@ export type AssetModel = {
     audit_summary: AuditSummaryModel
 };
 
-export type AssetType = ('video' | 'image' | 'headline' | 'description' | 'cta' | 'url');
+export type AssetType = ("video" | "image" | "headline" | "description" | "cta" | "url");
 
-export const assetTypes: AssetType[] = ['video', 'image', 'headline', 'description', 'cta', 'url'];
+export const assetTypes: AssetType[] = ["video", "image", "headline", "description", "cta", "url"];
 
 export type AuditModel = {
     id: string,
@@ -165,21 +165,21 @@ export type AuthKeyModel = {
     restriction: (AuthKeyRestriction | null)
 };
 
-export type AuthKeyRestriction = ('asset_get' | 'invitation' | 'password_reset');
+export type AuthKeyRestriction = ("asset_get" | "invitation" | "password_reset");
 
-export const authKeyRestrictions: AuthKeyRestriction[] = ['asset_get', 'invitation', 'password_reset'];
+export const authKeyRestrictions: AuthKeyRestriction[] = ["asset_get", "invitation", "password_reset"];
 
-export type AuthzScopeType = ('global' | 'client' | 'business');
+export type AuthzScopeType = ("global" | "client" | "business");
 
-export const authzScopeTypes: AuthzScopeType[] = ['global', 'client', 'business'];
+export const authzScopeTypes: AuthzScopeType[] = ["global", "client", "business"];
 
-export type BasicAuditEvent = ('create' | 'update' | 'delete');
+export type BasicAuditEvent = ("create" | "update" | "delete");
 
-export const basicAuditEvents: BasicAuditEvent[] = ['create', 'update', 'delete'];
+export const basicAuditEvents: BasicAuditEvent[] = ["create", "update", "delete"];
 
-export type BrandSafety = ('derogatory' | 'downloads_sharing' | 'gambling' | 'violence' | 'suggestive' | 'profanity' | 'drugs_alcohol' | 'political' | 'young_audiences' | 'mature_audiences');
+export type BrandSafety = ("derogatory" | "downloads_sharing" | "gambling" | "violence" | "suggestive" | "profanity" | "drugs_alcohol" | "political" | "young_audiences" | "mature_audiences");
 
-export const brandSafeties: BrandSafety[] = ['derogatory', 'downloads_sharing', 'gambling', 'violence', 'suggestive', 'profanity', 'drugs_alcohol', 'political', 'young_audiences', 'mature_audiences'];
+export const brandSafeties: BrandSafety[] = ["derogatory", "downloads_sharing", "gambling", "violence", "suggestive", "profanity", "drugs_alcohol", "political", "young_audiences", "mature_audiences"];
 
 export type BriefConstraintsModel = {
     objective: (BriefValuesConstraintModel<Objective> | null),
@@ -199,13 +199,13 @@ export type BriefValuesConstraintModel<T> = {
     revision_locked: boolean
 };
 
-export type BriefValuesConstraintType = ('blocklist' | 'allowlist' | 'field_unsupported');
+export type BriefValuesConstraintType = ("blocklist" | "allowlist" | "field_unsupported");
 
-export const briefValuesConstraintTypes: BriefValuesConstraintType[] = ['blocklist', 'allowlist', 'field_unsupported'];
+export const briefValuesConstraintTypes: BriefValuesConstraintType[] = ["blocklist", "allowlist", "field_unsupported"];
 
-export type BudgetAllocation = ('fixed' | 'intelligent');
+export type BudgetAllocation = ("fixed" | "intelligent");
 
-export const budgetAllocations: BudgetAllocation[] = ['fixed', 'intelligent'];
+export const budgetAllocations: BudgetAllocation[] = ["fixed", "intelligent"];
 
 export type BusinessMetaModel = {
     industry: (Industry | null),
@@ -226,9 +226,9 @@ export type BusinessModel = {
     grants: OrganizationUserGrantModel[]
 };
 
-export type CTA = ('learn_more' | 'shop_now' | 'sign_up' | 'download' | 'apply_now' | 'contact_us' | 'watch_now' | 'book_now' | 'visit_site' | 'get_quote' | 'subscribe' | 'see_more');
+export type CTA = ("learn_more" | "shop_now" | "sign_up" | "download" | "apply_now" | "contact_us" | "watch_now" | "book_now" | "visit_site" | "get_quote" | "subscribe" | "see_more");
 
-export const cTAs: CTA[] = ['learn_more', 'shop_now', 'sign_up', 'download', 'apply_now', 'contact_us', 'watch_now', 'book_now', 'visit_site', 'get_quote', 'subscribe', 'see_more'];
+export const cTAs: CTA[] = ["learn_more", "shop_now", "sign_up", "download", "apply_now", "contact_us", "watch_now", "book_now", "visit_site", "get_quote", "subscribe", "see_more"];
 
 export type CTASlotSpecModel = {
     key: string,
@@ -251,9 +251,9 @@ export type CampaignAnalysisFindingModel = {
     data: (AIFindingDataModel | null)
 };
 
-export type CampaignAnalysisFindingType = ('low_ctr' | 'low_cpc' | 'low_cpa' | 'low_cpm' | 'low_roas' | 'high_ctr' | 'high_cpc' | 'high_cpa' | 'high_cpm' | 'high_roas' | 'insight' | 'recommendation' | 'prediction');
+export type CampaignAnalysisFindingType = ("low_ctr" | "low_cpc" | "low_cpa" | "low_cpm" | "low_roas" | "high_ctr" | "high_cpc" | "high_cpa" | "high_cpm" | "high_roas" | "insight" | "recommendation" | "prediction");
 
-export const campaignAnalysisFindingTypes: CampaignAnalysisFindingType[] = ['low_ctr', 'low_cpc', 'low_cpa', 'low_cpm', 'low_roas', 'high_ctr', 'high_cpc', 'high_cpa', 'high_cpm', 'high_roas', 'insight', 'recommendation', 'prediction'];
+export const campaignAnalysisFindingTypes: CampaignAnalysisFindingType[] = ["low_ctr", "low_cpc", "low_cpa", "low_cpm", "low_roas", "high_ctr", "high_cpc", "high_cpa", "high_cpm", "high_roas", "insight", "recommendation", "prediction"];
 
 export type CampaignAnalysisModel = {
     id: string,
@@ -264,17 +264,17 @@ export type CampaignAnalysisModel = {
     findings: CampaignAnalysisFindingModel[]
 };
 
-export type CampaignAnalysisPriority = ('low' | 'high');
+export type CampaignAnalysisPriority = ("low" | "high");
 
-export const campaignAnalysisPriorities: CampaignAnalysisPriority[] = ['low', 'high'];
+export const campaignAnalysisPriorities: CampaignAnalysisPriority[] = ["low", "high"];
 
-export type CampaignAnalysisSentiment = ('positive' | 'neutral' | 'negative');
+export type CampaignAnalysisSentiment = ("positive" | "neutral" | "negative");
 
-export const campaignAnalysisSentiments: CampaignAnalysisSentiment[] = ['positive', 'neutral', 'negative'];
+export const campaignAnalysisSentiments: CampaignAnalysisSentiment[] = ["positive", "neutral", "negative"];
 
-export type CampaignAnalysisSource = ('rule' | 'ai');
+export type CampaignAnalysisSource = ("rule" | "ai");
 
-export const campaignAnalysisSources: CampaignAnalysisSource[] = ['rule', 'ai'];
+export const campaignAnalysisSources: CampaignAnalysisSource[] = ["rule", "ai"];
 
 export type CampaignAnalysisSummaryModel = {
     id: string,
@@ -283,9 +283,9 @@ export type CampaignAnalysisSummaryModel = {
     sentiment: CampaignAnalysisSentiment
 };
 
-export type CampaignAuditEvent = ('create' | 'brief_update' | 'locations_update' | 'channels_update' | 'assets_update' | 'ads_update' | 'status_update' | 'archive' | 'dearchive');
+export type CampaignAuditEvent = ("create" | "brief_update" | "locations_update" | "channels_update" | "assets_update" | "ads_update" | "status_update" | "archive" | "dearchive");
 
-export const campaignAuditEvents: CampaignAuditEvent[] = ['create', 'brief_update', 'locations_update', 'channels_update', 'assets_update', 'ads_update', 'status_update', 'archive', 'dearchive'];
+export const campaignAuditEvents: CampaignAuditEvent[] = ["create", "brief_update", "locations_update", "channels_update", "assets_update", "ads_update", "status_update", "archive", "dearchive"];
 
 export type CampaignBriefModel = {
     objective: (Objective | null),
@@ -316,9 +316,9 @@ export type CampaignChannelBudgetExtensionModel = {
     allocations: CampaignChannelBudgetExtensionAllocationModel
 };
 
-export type CampaignChannelLocationValidationError = ('not_enough_ads' | 'invalid_ads' | 'invalid_location' | 'short_daily_budget');
+export type CampaignChannelLocationValidationError = ("not_enough_ads" | "invalid_ads" | "invalid_location" | "short_daily_budget");
 
-export const campaignChannelLocationValidationErrors: CampaignChannelLocationValidationError[] = ['not_enough_ads', 'invalid_ads', 'invalid_location', 'short_daily_budget'];
+export const campaignChannelLocationValidationErrors: CampaignChannelLocationValidationError[] = ["not_enough_ads", "invalid_ads", "invalid_location", "short_daily_budget"];
 
 export type CampaignChannelLocationValidationModel = {
     valid: boolean,
@@ -356,17 +356,17 @@ export type CampaignChannelOrchestrationRunStepsModel = {
     steps: CampaignChannelOrchestrationStep[]
 };
 
-export type CampaignChannelOrchestrationRunType = ('publish' | 'poll_review');
+export type CampaignChannelOrchestrationRunType = ("publish" | "poll_review");
 
-export const campaignChannelOrchestrationRunTypes: CampaignChannelOrchestrationRunType[] = ['publish', 'poll_review'];
+export const campaignChannelOrchestrationRunTypes: CampaignChannelOrchestrationRunType[] = ["publish", "poll_review"];
 
-export type CampaignChannelOrchestrationStep = ('auth' | 'complete' | 'push_campaign' | 'push_brief' | 'push_assets' | 'push_ads' | 'pull_campaign' | 'pull_ads');
+export type CampaignChannelOrchestrationStep = ("auth" | "complete" | "push_campaign" | "push_brief" | "push_assets" | "push_ads" | "pull_campaign" | "pull_ads");
 
-export const campaignChannelOrchestrationSteps: CampaignChannelOrchestrationStep[] = ['auth', 'complete', 'push_campaign', 'push_brief', 'push_assets', 'push_ads', 'pull_campaign', 'pull_ads'];
+export const campaignChannelOrchestrationSteps: CampaignChannelOrchestrationStep[] = ["auth", "complete", "push_campaign", "push_brief", "push_assets", "push_ads", "pull_campaign", "pull_ads"];
 
-export type CampaignChannelReviewDecision = ('approved' | 'rejected');
+export type CampaignChannelReviewDecision = ("approved" | "rejected");
 
-export const campaignChannelReviewDecisions: CampaignChannelReviewDecision[] = ['approved', 'rejected'];
+export const campaignChannelReviewDecisions: CampaignChannelReviewDecision[] = ["approved", "rejected"];
 
 export type CampaignChannelReviewModel = {
     ad_id: (string | null),
@@ -381,13 +381,13 @@ export type CampaignChannelSpendModel = {
     daily_based_min_value: (number | null)
 };
 
-export type CampaignChannelStatus = ('error' | 'published' | 'approved' | 'rejected' | 'live' | 'completed');
+export type CampaignChannelStatus = ("error" | "published" | "approved" | "rejected" | "live" | "completed");
 
-export const campaignChannelStatuses: CampaignChannelStatus[] = ['error', 'published', 'approved', 'rejected', 'live', 'completed'];
+export const campaignChannelStatuses: CampaignChannelStatus[] = ["error", "published", "approved", "rejected", "live", "completed"];
 
-export type CampaignChannelValidationError = ('incompatible_brief' | 'invalid_locations_mix' | 'invalid_locations' | 'short_campaign_daily_budget' | 'short_location_daily_budget' | 'short_campaign_lifetime_budget' | 'meta_missing_conversion_settings' | 'tiktok_missing_customized_user' | 'google_ads_rsa_multiple_ads_for_location' | 'google_ads_rsa_missing_search_keywords' | 'amazon_dsp_missing_product_categories' | 'amazon_dsp_invalid_language');
+export type CampaignChannelValidationError = ("incompatible_brief" | "invalid_locations_mix" | "invalid_locations" | "short_campaign_daily_budget" | "short_location_daily_budget" | "short_campaign_lifetime_budget" | "meta_missing_conversion_settings" | "tiktok_missing_customized_user" | "google_ads_rsa_multiple_ads_for_location" | "google_ads_rsa_missing_search_keywords" | "amazon_dsp_missing_product_categories" | "amazon_dsp_invalid_language");
 
-export const campaignChannelValidationErrors: CampaignChannelValidationError[] = ['incompatible_brief', 'invalid_locations_mix', 'invalid_locations', 'short_campaign_daily_budget', 'short_location_daily_budget', 'short_campaign_lifetime_budget', 'meta_missing_conversion_settings', 'tiktok_missing_customized_user', 'google_ads_rsa_multiple_ads_for_location', 'google_ads_rsa_missing_search_keywords', 'amazon_dsp_missing_product_categories', 'amazon_dsp_invalid_language'];
+export const campaignChannelValidationErrors: CampaignChannelValidationError[] = ["incompatible_brief", "invalid_locations_mix", "invalid_locations", "short_campaign_daily_budget", "short_location_daily_budget", "short_campaign_lifetime_budget", "meta_missing_conversion_settings", "tiktok_missing_customized_user", "google_ads_rsa_multiple_ads_for_location", "google_ads_rsa_missing_search_keywords", "amazon_dsp_missing_product_categories", "amazon_dsp_invalid_language"];
 
 export type CampaignChannelValidationModel = {
     valid: boolean,
@@ -397,9 +397,9 @@ export type CampaignChannelValidationModel = {
     locations: CampaignChannelLocationValidationModel[]
 };
 
-export type CampaignChannelValidationWarning = ('paused' | 'incompatible_brief' | 'discontinuous_age_range' | 'google_dv360_audience_selected' | 'snapchat_unsupported_language');
+export type CampaignChannelValidationWarning = ("paused" | "incompatible_brief" | "discontinuous_age_range" | "google_dv360_audience_selected" | "snapchat_unsupported_language");
 
-export const campaignChannelValidationWarnings: CampaignChannelValidationWarning[] = ['paused', 'incompatible_brief', 'discontinuous_age_range', 'google_dv360_audience_selected', 'snapchat_unsupported_language'];
+export const campaignChannelValidationWarnings: CampaignChannelValidationWarning[] = ["paused", "incompatible_brief", "discontinuous_age_range", "google_dv360_audience_selected", "snapchat_unsupported_language"];
 
 export type CampaignLocationModel = {
     id: string,
@@ -432,9 +432,9 @@ export type CampaignModel = {
     last_analysis_summary: (CampaignAnalysisSummaryModel | null)
 };
 
-export type CampaignReviewDecision = ('approved' | 'request_changes');
+export type CampaignReviewDecision = ("approved" | "request_changes");
 
-export const campaignReviewDecisions: CampaignReviewDecision[] = ['approved', 'request_changes'];
+export const campaignReviewDecisions: CampaignReviewDecision[] = ["approved", "request_changes"];
 
 export type CampaignReviewModel = {
     id: string,
@@ -445,9 +445,9 @@ export type CampaignReviewModel = {
     decision: CampaignReviewDecision
 };
 
-export type CampaignStatus = ('draft' | 'review' | 'published' | 'revision' | 'live' | 'completed');
+export type CampaignStatus = ("draft" | "review" | "published" | "revision" | "live" | "completed");
 
-export const campaignStatuses: CampaignStatus[] = ['draft', 'review', 'published', 'revision', 'live', 'completed'];
+export const campaignStatuses: CampaignStatus[] = ["draft", "review", "published", "revision", "live", "completed"];
 
 export type CampaignSummaryModel = {
     id: string,
@@ -457,9 +457,9 @@ export type CampaignSummaryModel = {
     ai_summary: (string | null)
 };
 
-export type CampaignValidationError = ('brief_incomplete' | 'invalid_duration' | 'duplicate_locations' | 'asset_validation' | 'channel_validation' | 'short_budget' | 'validation_failed');
+export type CampaignValidationError = ("brief_incomplete" | "invalid_duration" | "duplicate_locations" | "asset_validation" | "channel_validation" | "short_budget" | "validation_failed");
 
-export const campaignValidationErrors: CampaignValidationError[] = ['brief_incomplete', 'invalid_duration', 'duplicate_locations', 'asset_validation', 'channel_validation', 'short_budget', 'validation_failed'];
+export const campaignValidationErrors: CampaignValidationError[] = ["brief_incomplete", "invalid_duration", "duplicate_locations", "asset_validation", "channel_validation", "short_budget", "validation_failed"];
 
 export type CampaignValidationModel = {
     valid: boolean,
@@ -467,9 +467,9 @@ export type CampaignValidationModel = {
     warnings: CampaignValidationWarning[]
 };
 
-export type CampaignValidationWarning = ('launch_grace' | 'unused_assets' | 'pool_asset_validation' | 'channel_brief_validation' | 'dev_mode_invalid_duration');
+export type CampaignValidationWarning = ("launch_grace" | "unused_assets" | "pool_asset_validation" | "channel_brief_validation" | "dev_mode_invalid_duration");
 
-export const campaignValidationWarnings: CampaignValidationWarning[] = ['launch_grace', 'unused_assets', 'pool_asset_validation', 'channel_brief_validation', 'dev_mode_invalid_duration'];
+export const campaignValidationWarnings: CampaignValidationWarning[] = ["launch_grace", "unused_assets", "pool_asset_validation", "channel_brief_validation", "dev_mode_invalid_duration"];
 
 export type ClientModel = {
     id: string,
@@ -492,9 +492,9 @@ export type CommentModel = {
     reactions: Partial<Record<CommentReactionType, string[]>>
 };
 
-export type CommentReactionType = ('like' | 'dislike');
+export type CommentReactionType = ("like" | "dislike");
 
-export const commentReactionTypes: CommentReactionType[] = ['like', 'dislike'];
+export const commentReactionTypes: CommentReactionType[] = ["like", "dislike"];
 
 export type CommentTreeModel = {
     depth: number,
@@ -502,9 +502,9 @@ export type CommentTreeModel = {
     children: CommentTreeModel[]
 };
 
-export type Device = ('mobile' | 'desktop' | 'tablet' | 'connected_tv');
+export type Device = ("mobile" | "desktop" | "tablet" | "connected_tv");
 
-export const devices: Device[] = ['mobile', 'desktop', 'tablet', 'connected_tv'];
+export const devices: Device[] = ["mobile", "desktop", "tablet", "connected_tv"];
 
 export type EmbeddedReportModel = {
     id: string,
@@ -514,9 +514,9 @@ export type EmbeddedReportModel = {
     url: string
 };
 
-export type Gender = ('male' | 'female' | 'unknown');
+export type Gender = ("male" | "female" | "unknown");
 
-export const genders: Gender[] = ['male', 'female', 'unknown'];
+export const genders: Gender[] = ["male", "female", "unknown"];
 
 export type ImageSlotSpecModel = {
     key: string,
@@ -529,9 +529,9 @@ export type ImageSlotSpecModel = {
     size_range: [number, number]
 };
 
-export type Industry = ('ecommerce' | 'business_services' | 'real_estate' | 'media' | 'food_and_beverage' | 'financial_services' | 'non_profit' | 'travel' | 'retail' | 'insurance' | 'hospitality' | 'health_and_wellness' | 'mobile_app' | 'sports_and_fitness' | 'conservation' | 'technology' | 'education' | 'public_sector' | 'entertainment' | 'manufacturing');
+export type Industry = ("ecommerce" | "business_services" | "real_estate" | "media" | "food_and_beverage" | "financial_services" | "non_profit" | "travel" | "retail" | "insurance" | "hospitality" | "health_and_wellness" | "mobile_app" | "sports_and_fitness" | "conservation" | "technology" | "education" | "public_sector" | "entertainment" | "manufacturing");
 
-export const industries: Industry[] = ['ecommerce', 'business_services', 'real_estate', 'media', 'food_and_beverage', 'financial_services', 'non_profit', 'travel', 'retail', 'insurance', 'hospitality', 'health_and_wellness', 'mobile_app', 'sports_and_fitness', 'conservation', 'technology', 'education', 'public_sector', 'entertainment', 'manufacturing'];
+export const industries: Industry[] = ["ecommerce", "business_services", "real_estate", "media", "food_and_beverage", "financial_services", "non_profit", "travel", "retail", "insurance", "hospitality", "health_and_wellness", "mobile_app", "sports_and_fitness", "conservation", "technology", "education", "public_sector", "entertainment", "manufacturing"];
 
 export type LocationModel = {
     id: string,
@@ -541,9 +541,9 @@ export type LocationModel = {
     parent_id: (string | null)
 };
 
-export type LocationPresence = ('currently_in' | 'recently_in' | 'interested_in');
+export type LocationPresence = ("currently_in" | "recently_in" | "interested_in");
 
-export const locationPresences: LocationPresence[] = ['currently_in', 'recently_in', 'interested_in'];
+export const locationPresences: LocationPresence[] = ["currently_in", "recently_in", "interested_in"];
 
 export type LocationSupportModel = {
     country: (string[] | null),
@@ -561,9 +561,9 @@ export type LocationTaxonomyModel = {
     zip: (LocationModel | null)
 };
 
-export type LocationType = ('country' | 'state' | 'city' | 'zip');
+export type LocationType = ("country" | "state" | "city" | "zip");
 
-export const locationTypes: LocationType[] = ['country', 'state', 'city', 'zip'];
+export const locationTypes: LocationType[] = ["country", "state", "city", "zip"];
 
 export type LocationWithFeatureModel = {
     id: string,
@@ -592,9 +592,9 @@ export type MediaSlotSpecOptionModel = {
     size_range: ([number, number] | null)
 };
 
-export type NotificationEmailStatus = ('pending' | 'skipped' | 'error' | 'sent');
+export type NotificationEmailStatus = ("pending" | "skipped" | "error" | "sent");
 
-export const notificationEmailStatuses: NotificationEmailStatus[] = ['pending', 'skipped', 'error', 'sent'];
+export const notificationEmailStatuses: NotificationEmailStatus[] = ["pending", "skipped", "error", "sent"];
 
 export type NotificationModel = {
     id: string,
@@ -608,13 +608,13 @@ export type NotificationModel = {
     cosmetic_metadata: (Record<string, string> | null)
 };
 
-export type NotificationType = ('invited' | 'campaign_created' | 'campaign_submitted' | 'campaign_changes_requested' | 'campaign_approved' | 'campaign_published' | 'campaign_channel_approved' | 'campaign_channel_rejected' | 'comment_reply' | 'password_reset');
+export type NotificationType = ("invited" | "campaign_created" | "campaign_submitted" | "campaign_changes_requested" | "campaign_approved" | "campaign_published" | "campaign_channel_approved" | "campaign_channel_rejected" | "comment_reply" | "password_reset");
 
-export const notificationTypes: NotificationType[] = ['invited', 'campaign_created', 'campaign_submitted', 'campaign_changes_requested', 'campaign_approved', 'campaign_published', 'campaign_channel_approved', 'campaign_channel_rejected', 'comment_reply', 'password_reset'];
+export const notificationTypes: NotificationType[] = ["invited", "campaign_created", "campaign_submitted", "campaign_changes_requested", "campaign_approved", "campaign_published", "campaign_channel_approved", "campaign_channel_rejected", "comment_reply", "password_reset"];
 
-export type Objective = ('reach' | 'traffic' | 'video_views' | 'community_interaction' | 'lead_generation' | 'website_conversions');
+export type Objective = ("reach" | "traffic" | "video_views" | "community_interaction" | "lead_generation" | "website_conversions");
 
-export const objectives: Objective[] = ['reach', 'traffic', 'video_views', 'community_interaction', 'lead_generation', 'website_conversions'];
+export const objectives: Objective[] = ["reach", "traffic", "video_views", "community_interaction", "lead_generation", "website_conversions"];
 
 export type OrganizationSummaryModel = {
     id: string,
@@ -634,25 +634,25 @@ export type OrganizationUserGrantModel = {
     user: UserModel
 };
 
-export type Permission = ('manage_clients' | 'manage_org' | 'manage_iam' | 'manage_oauths' | 'view_campaign_contents' | 'view_analytics' | 'manage_briefs' | 'manage_creatives' | 'manage_campaigns');
+export type Permission = ("manage_clients" | "manage_org" | "manage_iam" | "manage_oauths" | "view_campaign_contents" | "view_analytics" | "manage_briefs" | "manage_creatives" | "manage_campaigns");
 
-export const permissions: Permission[] = ['manage_clients', 'manage_org', 'manage_iam', 'manage_oauths', 'view_campaign_contents', 'view_analytics', 'manage_briefs', 'manage_creatives', 'manage_campaigns'];
+export const permissions: Permission[] = ["manage_clients", "manage_org", "manage_iam", "manage_oauths", "view_campaign_contents", "view_analytics", "manage_briefs", "manage_creatives", "manage_campaigns"];
 
-export type RelationshipInterest = ('men' | 'women' | 'unknown');
+export type RelationshipInterest = ("men" | "women" | "unknown");
 
-export const relationshipInterests: RelationshipInterest[] = ['men', 'women', 'unknown'];
+export const relationshipInterests: RelationshipInterest[] = ["men", "women", "unknown"];
 
-export type RelationshipStatus = ('single' | 'in_relationship' | 'married' | 'unknown');
+export type RelationshipStatus = ("single" | "in_relationship" | "married" | "unknown");
 
-export const relationshipStatuses: RelationshipStatus[] = ['single', 'in_relationship', 'married', 'unknown'];
+export const relationshipStatuses: RelationshipStatus[] = ["single", "in_relationship", "married", "unknown"];
 
-export type Role = ('admin' | 'account_manager' | 'campaign_manager' | 'data_analyst' | 'business_manager' | 'manager' | 'member');
+export type Role = ("admin" | "account_manager" | "campaign_manager" | "data_analyst" | "business_manager" | "manager" | "member");
 
-export const roles: Role[] = ['admin', 'account_manager', 'campaign_manager', 'data_analyst', 'business_manager', 'manager', 'member'];
+export const roles: Role[] = ["admin", "account_manager", "campaign_manager", "data_analyst", "business_manager", "manager", "member"];
 
-export type SlotAssetValidationError = ('unsupported_type' | 'unsupported_dimension' | 'unsupported_dimension_value' | 'unsupported_size' | 'unsupported_format' | 'unsupported_pattern' | 'unsupported_duration' | 'unsupported_option' | 'pending_processing');
+export type SlotAssetValidationError = ("unsupported_type" | "unsupported_dimension" | "unsupported_dimension_value" | "unsupported_size" | "unsupported_format" | "unsupported_pattern" | "unsupported_duration" | "unsupported_option" | "pending_processing");
 
-export const slotAssetValidationErrors: SlotAssetValidationError[] = ['unsupported_type', 'unsupported_dimension', 'unsupported_dimension_value', 'unsupported_size', 'unsupported_format', 'unsupported_pattern', 'unsupported_duration', 'unsupported_option', 'pending_processing'];
+export const slotAssetValidationErrors: SlotAssetValidationError[] = ["unsupported_type", "unsupported_dimension", "unsupported_dimension_value", "unsupported_size", "unsupported_format", "unsupported_pattern", "unsupported_duration", "unsupported_option", "pending_processing"];
 
 export type SlotAssetValidationModel = {
     valid: boolean,
@@ -693,13 +693,13 @@ export type StandaloneCampaignAnalysisFindingModel = {
     analysis_summary: CampaignAnalysisSummaryModel
 };
 
-export type State = ('active' | 'inactive');
+export type State = ("active" | "inactive");
 
-export const states: State[] = ['active', 'inactive'];
+export const states: State[] = ["active", "inactive"];
 
-export type TargetAudience = ('online_stores' | 'tech_and_gadgets' | 'home_and_garden' | 'pet_supplies_and_products' | 'consumer_products' | 'fashion_and_apparel' | 'beauty_and_personal_care' | 'sports_and_fitness_products' | 'subscription_boxes' | 'specialty_foods_and_drinks' | 'automotive_parts_and_accessories');
+export type TargetAudience = ("online_stores" | "tech_and_gadgets" | "home_and_garden" | "pet_supplies_and_products" | "consumer_products" | "fashion_and_apparel" | "beauty_and_personal_care" | "sports_and_fitness_products" | "subscription_boxes" | "specialty_foods_and_drinks" | "automotive_parts_and_accessories");
 
-export const targetAudiences: TargetAudience[] = ['online_stores', 'tech_and_gadgets', 'home_and_garden', 'pet_supplies_and_products', 'consumer_products', 'fashion_and_apparel', 'beauty_and_personal_care', 'sports_and_fitness_products', 'subscription_boxes', 'specialty_foods_and_drinks', 'automotive_parts_and_accessories'];
+export const targetAudiences: TargetAudience[] = ["online_stores", "tech_and_gadgets", "home_and_garden", "pet_supplies_and_products", "consumer_products", "fashion_and_apparel", "beauty_and_personal_care", "sports_and_fitness_products", "subscription_boxes", "specialty_foods_and_drinks", "automotive_parts_and_accessories"];
 
 export type TextSlotSpecModel = {
     key: string,
@@ -745,9 +745,9 @@ export type UploadModel = {
     processing_aborted: (boolean | null)
 };
 
-export type UploadType = ('campaign_assets' | 'avatars' | 'thumbnails' | 'platform_data');
+export type UploadType = ("campaign_assets" | "avatars" | "thumbnails" | "platform_data");
 
-export const uploadTypes: UploadType[] = ['campaign_assets', 'avatars', 'thumbnails', 'platform_data'];
+export const uploadTypes: UploadType[] = ["campaign_assets", "avatars", "thumbnails", "platform_data"];
 
 export type UploadVideoMetadataModel = {
     width: number,
@@ -793,9 +793,9 @@ export type UserModel = {
     locale: (string | null)
 };
 
-export type UserType = ('client' | 'platform_owner');
+export type UserType = ("client" | "platform_owner");
 
-export const userTypes: UserType[] = ['client', 'platform_owner'];
+export const userTypes: UserType[] = ["client", "platform_owner"];
 
 export type VideoSlotSpecModel = {
     key: string,
@@ -1039,9 +1039,9 @@ export type GoogleAdsSearchKeyword = {
     match_type: GoogleAdsSearchKeywordMatchType
 };
 
-export type GoogleAdsSearchKeywordMatchType = ('EXACT' | 'PHRASE' | 'BROAD');
+export type GoogleAdsSearchKeywordMatchType = ("EXACT" | "PHRASE" | "BROAD");
 
-export const googleAdsSearchKeywordMatchTypes: GoogleAdsSearchKeywordMatchType[] = ['EXACT', 'PHRASE', 'BROAD'];
+export const googleAdsSearchKeywordMatchTypes: GoogleAdsSearchKeywordMatchType[] = ["EXACT", "PHRASE", "BROAD"];
 
 export type GoogleDV360AccountModel = {
     id: string,
@@ -1071,9 +1071,9 @@ export type GoogleDV360OAuthMetadataModel = {
     active_advertiser_audiences: GoogleDV360AudienceModel[]
 };
 
-export type GoogleDV360TargetingMethod = ('audience' | 'retargeting' | 'list' | 'lookalike');
+export type GoogleDV360TargetingMethod = ("audience" | "retargeting" | "list" | "lookalike");
 
-export const googleDV360TargetingMethods: GoogleDV360TargetingMethod[] = ['audience', 'retargeting', 'list', 'lookalike'];
+export const googleDV360TargetingMethods: GoogleDV360TargetingMethod[] = ["audience", "retargeting", "list", "lookalike"];
 
 export type ImageEditParams = {
     crop_box: BoundingBoxModel,
@@ -1083,13 +1083,13 @@ export type ImageEditParams = {
     compression: (number | null)
 };
 
-export type ImageGenAspectRatioOption = ('1:1' | '3:4' | '4:3' | '9:16' | '16:9');
+export type ImageGenAspectRatioOption = ("1:1" | "3:4" | "4:3" | "9:16" | "16:9");
 
-export const imageGenAspectRatioOptions: ImageGenAspectRatioOption[] = ['1:1', '3:4', '4:3', '9:16', '16:9'];
+export const imageGenAspectRatioOptions: ImageGenAspectRatioOption[] = ["1:1", "3:4", "4:3", "9:16", "16:9"];
 
-export type ImageGenMimeTypeOption = ('JPEG' | 'PNG');
+export type ImageGenMimeTypeOption = ("JPEG" | "PNG");
 
-export const imageGenMimeTypeOptions: ImageGenMimeTypeOption[] = ['JPEG', 'PNG'];
+export const imageGenMimeTypeOptions: ImageGenMimeTypeOption[] = ["JPEG", "PNG"];
 
 export type ImageGenOptionsModel = {
     image_size: ImageGenSizeOption,
@@ -1097,9 +1097,9 @@ export type ImageGenOptionsModel = {
     output_mime_type: ImageGenMimeTypeOption
 };
 
-export type ImageGenSizeOption = ('1K' | '2K');
+export type ImageGenSizeOption = ("1K" | "2K");
 
-export const imageGenSizeOptions: ImageGenSizeOption[] = ['1K', '2K'];
+export const imageGenSizeOptions: ImageGenSizeOption[] = ["1K", "2K"];
 
 export type ImageGenerationParams = {
     type: AssetType,
@@ -1125,9 +1125,9 @@ export type MetaChannelSettingsOptionsModel = {
     conversion_event_types: MetaConversionEventType[]
 };
 
-export type MetaConversionEventType = ('ADD_PAYMENT_INFO' | 'ADD_TO_CART' | 'ADD_TO_WISHLIST' | 'CONTACT' | 'CUSTOMIZE_PRODUCT' | 'DONATE' | 'FIND_LOCATION' | 'INITIALIZE_CHECKOUT' | 'LEAD' | 'PURCHASE' | 'SCHEDULE' | 'SEARCH' | 'START_TRIAL' | 'SUBMIT_APPLICATION' | 'SUBSCRIBE' | 'VIEW_CONTENT');
+export type MetaConversionEventType = ("ADD_PAYMENT_INFO" | "ADD_TO_CART" | "ADD_TO_WISHLIST" | "CONTACT" | "CUSTOMIZE_PRODUCT" | "DONATE" | "FIND_LOCATION" | "INITIALIZE_CHECKOUT" | "LEAD" | "PURCHASE" | "SCHEDULE" | "SEARCH" | "START_TRIAL" | "SUBMIT_APPLICATION" | "SUBSCRIBE" | "VIEW_CONTENT");
 
-export const metaConversionEventTypes: MetaConversionEventType[] = ['ADD_PAYMENT_INFO', 'ADD_TO_CART', 'ADD_TO_WISHLIST', 'CONTACT', 'CUSTOMIZE_PRODUCT', 'DONATE', 'FIND_LOCATION', 'INITIALIZE_CHECKOUT', 'LEAD', 'PURCHASE', 'SCHEDULE', 'SEARCH', 'START_TRIAL', 'SUBMIT_APPLICATION', 'SUBSCRIBE', 'VIEW_CONTENT'];
+export const metaConversionEventTypes: MetaConversionEventType[] = ["ADD_PAYMENT_INFO", "ADD_TO_CART", "ADD_TO_WISHLIST", "CONTACT", "CUSTOMIZE_PRODUCT", "DONATE", "FIND_LOCATION", "INITIALIZE_CHECKOUT", "LEAD", "PURCHASE", "SCHEDULE", "SEARCH", "START_TRIAL", "SUBMIT_APPLICATION", "SUBSCRIBE", "VIEW_CONTENT"];
 
 export type MetaOAuthBusinessModel = {
     id: string,
@@ -1332,21 +1332,21 @@ export const permissionsMatrix: Record<Role, Partial<Record<Permission, boolean>
 };
 
 export const roleScopes: Record<Role, AuthzScopeType[]> = {
-    admin: ['global'],
-    account_manager: ['global', 'client', 'business'],
-    campaign_manager: ['global', 'client', 'business'],
-    data_analyst: ['global', 'client', 'business'],
-    business_manager: ['client', 'business'],
-    manager: ['client', 'business'],
-    member: ['business']
+    admin: ["global"],
+    account_manager: ["global", "client", "business"],
+    campaign_manager: ["global", "client", "business"],
+    data_analyst: ["global", "client", "business"],
+    business_manager: ["client", "business"],
+    manager: ["client", "business"],
+    member: ["business"]
 };
 
 export const roleUserTypes: Record<Role, UserType> = {
-    admin: 'platform_owner',
-    account_manager: 'platform_owner',
-    campaign_manager: 'platform_owner',
-    data_analyst: 'platform_owner',
-    business_manager: 'client',
-    manager: 'client',
-    member: 'client'
+    admin: "platform_owner",
+    account_manager: "platform_owner",
+    campaign_manager: "platform_owner",
+    data_analyst: "platform_owner",
+    business_manager: "client",
+    manager: "client",
+    member: "client"
 };

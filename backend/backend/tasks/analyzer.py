@@ -1,6 +1,6 @@
-'''
+"""
 Campaign analysis.
-'''
+"""
 import os
 import json
 from typing import Optional
@@ -8,15 +8,15 @@ from datetime import timedelta
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session
 
-from kedet.model import (
+from backend.model import (
     Campaign, CampaignChannel, CampaignAnalysisFindingType, CampaignStatus,
     CampaignAnalysisPriority, CampaignAnalysisFinding, CampaignAnalysis,
     CampaignAnalysisSource, CampaignAnalysisSentiment, Finding, Objective,
     current_datetime
 )
-from kedet.ai import generate_channel_findings
-from kedet.analytics import AnalyticsModel, get_analytics_backend
-from kedet.service import task, task_batch_query
+from backend.ai import generate_channel_findings
+from backend.analytics import AnalyticsModel, get_analytics_backend
+from backend.service import task, task_batch_query
 
 Threshold = dict[str, float]
 MetricThreshold = dict[str, Threshold]
@@ -28,38 +28,38 @@ MetricConfig = tuple[str, bool, CampaignAnalysisFindingType, CampaignAnalysisFin
 
 METRIC_CONFIGS: list[MetricConfig] = [
     MetricConfig((
-        'cpa', True,
+        "cpa", True,
         CampaignAnalysisFindingType.LOW_CPA,
         CampaignAnalysisFindingType.HIGH_CPA
     )),
     MetricConfig((
-        'cpc', True,
+        "cpc", True,
         CampaignAnalysisFindingType.LOW_CPC,
         CampaignAnalysisFindingType.HIGH_CPC
     )),
     MetricConfig((
-        'cpm', True,
+        "cpm", True,
         CampaignAnalysisFindingType.LOW_CPM,
         CampaignAnalysisFindingType.HIGH_CPM
     )),
     MetricConfig((
-        'ctr', False,
+        "ctr", False,
         CampaignAnalysisFindingType.LOW_CTR,
         CampaignAnalysisFindingType.HIGH_CTR
     )),
     MetricConfig((
-        'roas', False,
+        "roas", False,
         CampaignAnalysisFindingType.LOW_ROAS,
         CampaignAnalysisFindingType.HIGH_ROAS
     ))
 ]
 
 def _load_thresholds() -> ChannelThresholds:
-    '''
+    """
     Load the thresholds from the JSON file.
-    '''
-    file_path = os.path.join(os.path.dirname(__file__), 'analyzer_thresholds.json')
-    with open(file_path, 'r', encoding='utf-8') as fh:
+    """
+    file_path = os.path.join(os.path.dirname(__file__), "analyzer_thresholds.json")
+    with open(file_path, "r", encoding="utf-8") as fh:
         data = json.load(fh)
 
     return data
@@ -72,12 +72,12 @@ def _check_metric_threshold(
     high_finding_type: CampaignAnalysisFindingType,
     low_is_good: bool = True
 ) -> Optional[Finding]:
-    '''
+    """
     Check if a metric is outside threshold bounds and return appropriate findings.
 
     Low values are good for costs, bad for performance.
-    '''
-    if metric_value < threshold['low']:
+    """
+    if metric_value < threshold["low"]:
         return Finding(
             channel_id=channel_id,
             priority=(
@@ -91,7 +91,7 @@ def _check_metric_threshold(
             )
         )
 
-    if metric_value > threshold['high']:
+    if metric_value > threshold["high"]:
         return Finding(
             channel_id=channel_id,
             priority=(
@@ -110,24 +110,24 @@ def _check_metric_threshold(
 def rule_analysis(
     campaign: Campaign, channel: CampaignChannel, analytics: AnalyticsModel
 ) -> list[Finding]:
-    '''
+    """
     Run rule-based analysis on a campaign channel.
-    '''
+    """
     thresholds = _load_thresholds()
 
     channel_key = channel.channel_key
     if channel_key not in thresholds.keys():
         return []
 
-    objective = 'Awareness'
+    objective = "Awareness"
     if campaign.brief.objective in (
         Objective.TRAFFIC, Objective.VIDEO_VIEWS, Objective.COMMUNITY_INTERACTION
     ):
-        objective = 'Consideration'
+        objective = "Consideration"
     elif campaign.brief.objective in (
         Objective.LEAD_GENERATION, Objective.WEBSITE_CONVERSIONS
     ):
-        objective = 'Conversion'
+        objective = "Conversion"
 
     if objective not in thresholds[channel_key]:
         return []
@@ -152,9 +152,9 @@ def rule_analysis(
 def ai_analysis(
     campaign: Campaign, channel: CampaignChannel, analytics: AnalyticsModel
 ) -> list[Finding]:
-    '''
+    """
     Run AI-based analysis on a campaign channel.
-    '''
+    """
     findings = []
 
     findings.extend(generate_channel_findings(
@@ -175,9 +175,9 @@ def ai_analysis(
     return findings
 
 def run_campaign_analysis(session: Session, campaign: Campaign):
-    '''
+    """
     Run channel level analysis on the given campaign.
-    '''
+    """
     findings: list[CampaignAnalysisFinding] = []
     priorities = list(CampaignAnalysisPriority)
     max_priority = priorities[0]
@@ -185,10 +185,10 @@ def run_campaign_analysis(session: Session, campaign: Campaign):
     sentiment_counts = { sentiment: 0 for sentiment in sentiments }
 
     def convert_findings(targets: list[Finding], source: CampaignAnalysisSource):
-        '''
+        """
         Convert the given `targets` to `CampaignAnalysisFinding` and add them to the
         `findings` list.
-        '''
+        """
         nonlocal max_priority
 
         for target in targets:
@@ -247,9 +247,9 @@ def run_campaign_analysis(session: Session, campaign: Campaign):
 
 @task(interval_seconds=60 * 60)
 def analyze_campaigns(session: Session):
-    '''
+    """
     Analyze live campaigns that have not been analyzed in the last 24 hours.
-    '''
+    """
     batches = task_batch_query(
         session, Campaign,
         and_(

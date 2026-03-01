@@ -4,17 +4,17 @@
 import React, {
     ReactElement, ReactNode, useCallback, useState, useMemo, useContext, 
     createContext, MouseEvent
-} from 'react';
+} from "react";
 import {
     Modal, ModalOverlay, ModalContent, ModalBody, Button, VStack, Heading, Input,
     HStack, Text, Tooltip, PlacementWithLogical, Spinner, useDisclosure
-} from '@chakra-ui/react';
+} from "@chakra-ui/react";
 
-import { Permission } from '@/models';
-import { I18nValueFn, useAuthzCheck, useI18n, useQueryParamBehavior } from '@/hooks';
+import { Permission } from "@/models";
+import { I18nValueFn, useAuthzCheck, useI18n, useQueryParamBehavior } from "@/hooks";
 
-import { IconName, Icon } from './icons';
-import { ClickTarget } from './layouts';
+import { IconName, Icon } from "./icons";
+import { ClickTarget } from "./layouts";
 
 // Enable state context.
 const enableStateContext = createContext<string[]>([]);
@@ -56,7 +56,7 @@ export type ConfirmationProps = {
     onConfirm: () => void
 };
 
-export type ConfirmationProxyProps = Omit<ConfirmationProps, 'onDone' | 'onConfirm'>;
+export type ConfirmationProxyProps = Omit<ConfirmationProps, "onDone" | "onConfirm">;
 
 /**
 *   Render a confirmation prompt, optionally with a required entry safeguard.
@@ -66,7 +66,7 @@ export const Confirmation = ({
 }: ConfirmationProps) => {
     const t = useI18n();
 
-    const [entry, setEntry] = useState('');
+    const [entry, setEntry] = useState("");
 
     const onTryConfirm = useMemo(() => {
         return () => {
@@ -80,7 +80,7 @@ export const Confirmation = ({
     return (
         <VStack alignItems="left" width="full" spacing={ 6 }>
             <Heading>
-                { t('Are you sure?') }
+                { t("Are you sure?") }
             </Heading>
             { confirmDetail && (
                 <Text fontSize="sm">
@@ -90,7 +90,7 @@ export const Confirmation = ({
             { requireEntry && (
                 <>
                     <Text fontSize="sm">
-                        { t('Type "{entry}" to confirm.', {
+                        { t("Type "{entry}" to confirm.", {
                             entry: requireEntry
                         }) }
                     </Text>
@@ -107,7 +107,7 @@ export const Confirmation = ({
                     variant="ghost"
                     onClick={ onDone }
                 >
-                    { t('Cancel') }
+                    { t("Cancel") }
                 </Button>
                 <Button
                     width="50%"
@@ -116,7 +116,7 @@ export const Confirmation = ({
                     }
                     onClick={ onTryConfirm }
                 >
-                    { t('Confirm') }
+                    { t("Confirm") }
                 </Button>
             </HStack>
         </VStack>
@@ -160,10 +160,10 @@ export const ModalButton = ({
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const [onOpenModal, onCloseModal] = useQueryParamBehavior(
-        behaviorQueryParam || 'never', 'true', onOpen, onClose
+        behaviorQueryParam || "never", "true", onOpen, onClose
     );
 
-    // Use query parameter binding if passed, otherwise don't.
+    // Use query parameter binding if passed, otherwise don"t.
     const onCloseFinal = useCallback(() => {
         if (behaviorQueryParam) onCloseModal();
         else onClose();
@@ -272,7 +272,7 @@ export const ActionIcon = ({
             p={ 2 }
             showHighlight={ showHighlight }
             disableHighlight={ !active }
-            cursor={ active ? 'pointer' : 'not-allowed' }
+            cursor={ active ? "pointer" : "not-allowed" }
             // Prevent working state from resizing us vertically.
             height="32px"
             onClick={ active ? onClick : undefined }
@@ -305,7 +305,7 @@ export const ActionIcon = ({
 export const ConfirmedActionIcon = ({
     confirmDetail, requireEntry, onConfirm, ...actionIconProps
 }: (
-    Omit<ActionIconProps, 'onClick'> &
+    Omit<ActionIconProps, "onClick"> &
     ConfirmationProxyProps &
     { onConfirm: () => void }
 )) => {

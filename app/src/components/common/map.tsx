@@ -4,17 +4,17 @@
 /// <reference types="@types/google.maps" />
 import React, {
     ReactNode, useCallback, useEffect, useMemo, useRef, useState
-} from 'react';
-import { Box } from '@chakra-ui/react';
-import { GoogleMap, PolygonF, MarkerF, useJsApiLoader } from '@react-google-maps/api';
-import * as turf from '@turf/turf';
-import { Geometry, Polygon } from 'geojson';
+} from "react";
+import { Box } from "@chakra-ui/react";
+import { GoogleMap, PolygonF, MarkerF, useJsApiLoader } from "@react-google-maps/api";
+import * as turf from "@turf/turf";
+import { Geometry, Polygon } from "geojson";
 
-import { error } from '@/util';
-import { LocationsEmbedResp } from '@/models';
-import { useThemeColor } from '@/theme';
-import { useFetchedState } from '@/hooks';
-import { FullAreaSpinner } from '@/components/common';
+import { error } from "@/util";
+import { LocationsEmbedResp } from "@/models";
+import { useThemeColor } from "@/theme";
+import { useFetchedState } from "@/hooks";
+import { FullAreaSpinner } from "@/components/common";
 
 const INIT_POSITION: google.maps.LatLngLiteral = {
     lat: 56.17002298293205,
@@ -48,19 +48,19 @@ const ObjectShape = ({ feature, highlight, onClick }: {
             ring.map(([lng, lat]) => ({ lat, lng }))
         );
     
-        if (feature.type == 'Point') {
+        if (feature.type == "Point") {
             const [lng, lat] = feature.coordinates as [number, number];
     
             return [{ lat, lng }, null];
         }
-        else if (feature.type == 'Polygon') {
+        else if (feature.type == "Polygon") {
             const paths = (
                 feature.coordinates as [number, number][][]
             ).map(ring => [convertRing(ring)]);
     
             return [null, paths];
         }
-        else if (feature.type == 'MultiPolygon') {
+        else if (feature.type == "MultiPolygon") {
             const paths = (
                 feature.coordinates as [number, number][][][]
             ).map(polygon => polygon.map(convertRing));
@@ -68,13 +68,13 @@ const ObjectShape = ({ feature, highlight, onClick }: {
             return [null, paths];
         }
         else {
-            return error('unsupported GeoJSON for <Map/>', [null, null]);
+            return error("unsupported GeoJSON for <Map/>", [null, null]);
         }
     }, [feature]);
 
     const [hovered, setHovered] = useState(false);
 
-    const highlightColor = useThemeColor('mapSelection');
+    const highlightColor = useThemeColor("mapSelection");
     const showHighlight = useMemo(() => highlight || hovered, [highlight, hovered]);
 
     return (
@@ -83,7 +83,7 @@ const ObjectShape = ({ feature, highlight, onClick }: {
                 position={ point }
                 onClick={ onClick }
                 icon={ {
-                    url: '/marker.png',
+                    url: "/marker.png",
                     scaledSize: new google.maps.Size(40, 40)
                 } }
             />
@@ -94,8 +94,8 @@ const ObjectShape = ({ feature, highlight, onClick }: {
                         key={ j }
                         paths={ path }
                         options={ {
-                            fillColor: showHighlight ? highlightColor : 'transparent',
-                            strokeColor: showHighlight ? highlightColor : 'transparent',
+                            fillColor: showHighlight ? highlightColor : "transparent",
+                            strokeColor: showHighlight ? highlightColor : "transparent",
                             strokeWeight: 2,
                             zIndex: highlight ? 0 : 1
                         } }
@@ -113,50 +113,50 @@ const ObjectShape = ({ feature, highlight, onClick }: {
 *   Internal helper for Google Maps configurations.
 */
 const useMapConfig = (lock?: boolean) => {
-    const waterColor = useThemeColor('mapPanelBg');
-    const featureColor = useThemeColor('mapFeature');
-    const landColor = useThemeColor('mapLand');
+    const waterColor = useThemeColor("mapPanelBg");
+    const featureColor = useThemeColor("mapFeature");
+    const landColor = useThemeColor("mapLand");
 
     return useMemo(() => {
         const styles = {
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'transparent'
+            width: "100%",
+            height: "100%",
+            backgroundColor: "transparent"
         };
 
         const mapStyle = [
             {
-                featureType: 'all',
-                elementType: 'labels',
-                stylers: [{ visibility: 'off' }]
+                featureType: "all",
+                elementType: "labels",
+                stylers: [{ visibility: "off" }]
             },
             {
-                featureType: 'road',
-                elementType: 'geometry',
+                featureType: "road",
+                elementType: "geometry",
                 stylers: [{ color: featureColor }]
             },
             {
                 // This throws an error in the console for being the wrong key but
                 // appears to in fact be correct...
-                featureType: 'pointOfInterest.recreation.park',
-                elementType: 'geometry',
+                featureType: "pointOfInterest.recreation.park",
+                elementType: "geometry",
                 stylers: [{ color: featureColor }]
             },
             {
-                featureType: 'landscape',
-                elementType: 'geometry',
+                featureType: "landscape",
+                elementType: "geometry",
                 stylers: [{ color: landColor }]
             },
             {
-                featureType: 'water',
-                elementType: 'geometry',
+                featureType: "water",
+                elementType: "geometry",
                 stylers: [{ color: waterColor }]
             }
         ];
 
         const options: google.maps.MapOptions = {
             disableDefaultUI: true,
-            gestureHandling: lock ? 'none' : 'greedy',
+            gestureHandling: lock ? "none" : "greedy",
             keyboardShortcuts: false,
             styles: mapStyle,
             maxZoom: 10,
@@ -256,7 +256,7 @@ export const Map = <T extends MapObject>({
 
         const geom = focusObject.feature as unknown as Geometry;
         let bounds = null;
-        if (geom.type == 'MultiPolygon') {
+        if (geom.type == "MultiPolygon") {
             let largestPolygon = null;
             let maxArea = 0;
 

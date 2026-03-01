@@ -1,23 +1,23 @@
-'''
+"""
 Periodic campaign brief summarization.
-'''
+"""
 from logging import getLogger
 from datetime import timedelta
 from sqlalchemy.orm import Session
 
-from kedet.ai import generate_campaign_summary
-from kedet.model import (
+from backend.ai import generate_campaign_summary
+from backend.model import (
     Campaign, Audit, CampaignAuditEvent, Location, current_datetime
 )
-from kedet.service import task, task_batch_query
+from backend.service import task, task_batch_query
 
 logger = getLogger(__name__)
 
 @task(interval_seconds=60)
 def summarize_campaigns(session: Session):
-    '''
+    """
     Summarizes the campaign strategy and attaches the summary to the campaign.
-    '''
+    """
     for campaign in task_batch_query(session, Campaign):
         if campaign.ai_summarized_at:
             last_update = Audit.get_latest_for_target(session, campaign, [
@@ -37,10 +37,10 @@ def summarize_campaigns(session: Session):
 
             # Skip if it just changed (expect currently changing).
             if current_datetime() - last_update.occurred_at < timedelta(minutes=1):
-                logger.debug('skip campaign %s: recency', campaign.id)
+                logger.debug("skip campaign %s: recency", campaign.id)
                 continue
 
-        logger.info('summarizing campaign: %s', campaign.id)
+        logger.info("summarizing campaign: %s", campaign.id)
 
         location_ids = [loc.id for loc in campaign.locations]
         locations = Location.get_all(session, location_ids)

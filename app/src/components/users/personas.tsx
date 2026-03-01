@@ -1,30 +1,30 @@
 /**
 *   User persona UI.
 */
-import React, { ReactNode, useMemo, useCallback } from 'react';
+import React, { ReactNode, useMemo, useCallback } from "react";
 import {
     Popover, PopoverTrigger, PopoverContent, PopoverBody, PopoverArrow, HStack,
     VStack, Portal, Text, Box, Spacer, Tooltip
-} from '@chakra-ui/react';
+} from "@chakra-ui/react";
 import {
     Persona, PersonaAvatar, PersonaDetails, PersonaLabel, PersonaSecondaryLabel
-} from '@saas-ui/react';
-import { useNavigate } from 'react-router-dom';
+} from "@saas-ui/react";
+import { useNavigate } from "react-router-dom";
 
-import { grantContainsScope } from '@/util';
-import { AuditSummaryModel, UserModel } from '@/models';
+import { grantContainsScope } from "@/util";
+import { AuditSummaryModel, UserModel } from "@/models";
 import {
     useCurrentUser, useAuthControl, useAsyncCallback, useI18n, useFetchedUpload,
     useAuthzScope, useActiveClientOrNull, useClients
-} from '@/hooks';
+} from "@/hooks";
 import {
     ClickTarget, ActionIcon, Sidebar, Icon, useSidebarControl
-} from '@/components/common';
-import { OrganizationPersona } from '@/components/organizations';
+} from "@/components/common";
+import { OrganizationPersona } from "@/components/organizations";
 
-import { roleTitle, userTypeTitle } from './authz';
-import { UserEditForm } from './forms';
-import { NotificationsIndicator, NotificationsList } from './notifications';
+import { roleTitle, userTypeTitle } from "./authz";
+import { UserEditForm } from "./forms";
+import { NotificationsIndicator, NotificationsList } from "./notifications";
 
 /**
 *   User persona UI with flags to show various information. Can be used as a placeholder
@@ -77,7 +77,7 @@ export const UserPersona = ({
         if (!user) return null;
 
         if (user.email.length > 25) {
-            return user.email.substring(0, 25) + '...';
+            return user.email.substring(0, 25) + "...";
         }
 
         return user.email;
@@ -87,9 +87,9 @@ export const UserPersona = ({
         <PersonaAvatar
             src={ dataURI ? dataURI : undefined }
             name={ user ? user.name : undefined }
-            presence={ (!user || user.is_claimed) ? undefined : 'offline' }
+            presence={ (!user || user.is_claimed) ? undefined : "offline" }
             presenceLabel={
-                (!user || user.is_claimed) ? undefined : t('Invite pending')
+                (!user || user.is_claimed) ? undefined : t("Invite pending")
             }
             size={ size }
         />
@@ -100,16 +100,16 @@ export const UserPersona = ({
             { !reverse && avatar }
             { !avatarOnly && (
                 <PersonaDetails
-                    alignItems={ reverse ? 'flex-end' : undefined }
-                    marginLeft={ reverse ? '0px' : '0.5rem' }
-                    marginRight={ reverse ? '0.5rem' : undefined }
+                    alignItems={ reverse ? "flex-end" : undefined }
+                    marginLeft={ reverse ? "0px" : "0.5rem" }
+                    marginRight={ reverse ? "0.5rem" : undefined }
                 >
                     <PersonaLabel>
                         <HStack>
                             <Text
-                                fontSize={ headingName ? 'xl' : undefined }
-                                fontFamily={ headingName ? 'heading' : undefined }
-                                fontWeight={ headingName ? 'bold' : undefined }
+                                fontSize={ headingName ? "xl" : undefined }
+                                fontFamily={ headingName ? "heading" : undefined }
+                                fontWeight={ headingName ? "bold" : undefined }
                                 lineHeight={ 0.9 }
                             >
                                 { user && user.name }
@@ -178,7 +178,7 @@ export const OwnPersona = ({
     }, []);
 
     const onSwitchClient = useCallback(() => {
-        navigate('/select-client');
+        navigate("/select-client");
     }, []);
 
     return (
@@ -234,7 +234,7 @@ export const OwnPersona = ({
                                 <Spacer/>
                                 <VStack spacing={ 1 }>
                                     <ActionIcon
-                                        tooltip={ t => t('Log out') }
+                                        tooltip={ t => t("Log out") }
                                         tooltipPlacement="right"
                                         iconName="logOut"
                                         permission={ null }
@@ -242,7 +242,7 @@ export const OwnPersona = ({
                                         working={ logoutWorking }
                                     />
                                     <ActionIcon
-                                        tooltip={ t => t('Edit details') }
+                                        tooltip={ t => t("Edit details") }
                                         tooltipPlacement="right"
                                         iconName="edit"
                                         permission={ null }
@@ -255,12 +255,12 @@ export const OwnPersona = ({
                                     <OrganizationPersona
                                         for={ client }
                                         size="sm"
-                                        nullHint={ t => t('No client selected') }
+                                        nullHint={ t => t("No client selected") }
                                         reverse
                                     />
                                     { clients.length > 1 && (
                                         <ActionIcon
-                                            tooltip={ t => t('Switch client') }
+                                            tooltip={ t => t("Switch client") }
                                             tooltipPlacement="right"
                                             iconName="switch"
                                             permission={ null }
@@ -274,7 +274,7 @@ export const OwnPersona = ({
                                     <HStack width="full" color="lightText">
                                         <Icon name="notifications"/>
                                         <Text fontSize="xs">
-                                            { t('Notifications') }
+                                            { t("Notifications") }
                                         </Text>
                                     </HStack>
                                     <NotificationsList
@@ -308,7 +308,7 @@ export const AuditSummaryUserPersona = ({ summary }: {
     const user = useMemo(() => {
         const who = summary.last_updated_by;
         
-        return who == 'self' ? currentUser : who as UserModel;
+        return who == "self" ? currentUser : who as UserModel;
     }, [summary, currentUser]);
 
     return (

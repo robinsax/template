@@ -3,15 +3,15 @@
 */
 import React, {
     ReactNode, createContext, useContext, useEffect, useRef, useState
-} from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+} from "react";
+import { Navigate, useLocation } from "react-router-dom";
 
-import { AuthKeyModel, UserModel } from '@/models';
-import { error } from '@/util';
+import { AuthKeyModel, UserModel } from "@/models";
+import { error } from "@/util";
 
-import { useSavedState, useAsyncEffect, useAsyncCallback } from './util';
-import { APIError, useAPI } from './api';
-import { I18nLocaleKey, useLocale } from './i18n';
+import { useSavedState, useAsyncEffect, useAsyncCallback } from "./util";
+import { APIError, useAPI } from "./api";
+import { I18nLocaleKey, useLocale } from "./i18n";
 
 export type LoginCredentials = {
     email: string,
@@ -51,8 +51,8 @@ export const AuthProvider = ({ children, onReady }: {
 
     const [user, setUser] = useState<UserModel | null>(null);
     const [authControl, setAuthControl] = useState<AuthControl | null>(null);
-    const [authKey, setAuthKey] = useSavedState<AuthKeyModel | null>('auth-key', null);
-    const [authToken, setAuthToken] = useSavedState<string | null>('auth-token', null);
+    const [authKey, setAuthKey] = useSavedState<AuthKeyModel | null>("auth-key", null);
+    const [authToken, setAuthToken] = useSavedState<string | null>("auth-token", null);
 
     useEffect(() => {
         if (!authControl) return;
@@ -165,7 +165,7 @@ export const useCurrentUserOrNull = () => {
 };
 
 /**
-*   Returns the current {@link UserModel} or throws if there isn't one. Must only be
+*   Returns the current {@link UserModel} or throws if there isn"t one. Must only be
 *   called below an {@link AuthGuard}.
 */
 export const useCurrentUser = () => {
@@ -173,7 +173,7 @@ export const useCurrentUser = () => {
 
     if (!user) {
         return error<UserModel>(
-            'useCurrentUser outside AuthGuard',
+            "useCurrentUser outside AuthGuard",
             {} as unknown as UserModel
         );
     }
@@ -182,14 +182,14 @@ export const useCurrentUser = () => {
 };
 
 /**
-*   Returns the current authentication token or throws if there isn't one. Must only be
+*   Returns the current authentication token or throws if there isn"t one. Must only be
 *   called below an {@link AuthGuard}.
 */
 export const useCurrentAuthToken = () => {
     const context = useContext(authContext);
 
     if (!context) {
-        return error<string>('useCurrentAuthToken outside AuthGuard', '');
+        return error<string>("useCurrentAuthToken outside AuthGuard", "");
     }
 
     return context.authToken as string;
@@ -202,7 +202,7 @@ export const AuthGuard = ({ children }: { children: ReactNode }) => {
     const location = useLocation();
     const user = useCurrentUserOrNull();
 
-    if (!user) return <Navigate to={ '/home?dest=' + location.pathname }/>;
+    if (!user) return <Navigate to={ "/home?dest=" + location.pathname }/>;
 
     return <>{ children }</>;
 };

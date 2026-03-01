@@ -1,15 +1,15 @@
 /**
 *   Video player against the streams service. 
 */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Box, ChakraProps, useInterval } from '@chakra-ui/react';
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Box, ChakraProps, useInterval } from "@chakra-ui/react";
 
-import { UploadModel } from '@/models';
-import { useAsyncEffect, useAPI, useFetchedUpload } from '@/hooks';
-import { useBoxShadow } from '@/theme';
+import { UploadModel } from "@/models";
+import { useAsyncEffect, useAPI, useFetchedUpload } from "@/hooks";
+import { useBoxShadow } from "@/theme";
 
-import { FullAreaSpinner } from './layouts';
-import { Icon } from './icons';
+import { FullAreaSpinner } from "./layouts";
+import { Icon } from "./icons";
 
 /**
 *   Video element, deferred until interaction. Handles access token provision.
@@ -28,7 +28,7 @@ const VideoElement = ({ upload, forcedSize, forceYCenter, onLoaded }: {
 
     useAsyncEffect(async () => {
         const authResp = await api.auth.post({
-            restriction: 'asset_get',
+            restriction: "asset_get",
             email: null,
             password: null
         });
@@ -46,9 +46,9 @@ const VideoElement = ({ upload, forcedSize, forceYCenter, onLoaded }: {
             onLoaded();
         };
 
-        video.addEventListener('canplay', onCanPlay);
+        video.addEventListener("canplay", onCanPlay);
         return () => {
-            video.removeEventListener('canplay', onCanPlay);
+            video.removeEventListener("canplay", onCanPlay);
         };
     }, []);
 
@@ -57,17 +57,17 @@ const VideoElement = ({ upload, forcedSize, forceYCenter, onLoaded }: {
             ref={ onVideoRef }
             src={ `/streams/v1/${upload.id}?token=${accessToken}` }
             style={ {
-                borderRadius: '5px',
+                borderRadius: "5px",
                 boxShadow,
-                margin: 'auto',
-                width: forcedSize ? forcedSize[0] + 'px' : '100%',
-                height: forcedSize ? forcedSize[1] + 'px' : '100%',
+                margin: "auto",
+                width: forcedSize ? forcedSize[0] + "px" : "100%",
+                height: forcedSize ? forcedSize[1] + "px" : "100%",
                 opacity: loaded ? 1 : 0,
-                transition: 'opacity 0.2s ease-in-out',
-                position: loaded ? (forceYCenter ? 'relative' : 'static') : 'absolute',
-                top: forceYCenter ? '50%' : 0,
+                transition: "opacity 0.2s ease-in-out",
+                position: loaded ? (forceYCenter ? "relative" : "static") : "absolute",
+                top: forceYCenter ? "50%" : 0,
                 left: 0,
-                transform: forceYCenter ? 'translateY(-50%)' : undefined
+                transform: forceYCenter ? "translateY(-50%)" : undefined
             } }
             autoPlay controls muted
         />
@@ -90,10 +90,10 @@ export const VideoPlayer = ({ upload, ...props }: {
 
     const boxShadow = useBoxShadow();
     const centerStyles = useMemo(() => ({
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)'
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)"
     } as ChakraProps), []);
 
     const isLandscape = useMemo(() => {
@@ -109,7 +109,7 @@ export const VideoPlayer = ({ upload, ...props }: {
         let videoWidth = containerEl.offsetWidth;
         let videoHeight = videoWidth / aspect;
 
-        const maxHeight = props.height != 'auto' && containerEl.offsetHeight > 0
+        const maxHeight = props.height != "auto" && containerEl.offsetHeight > 0
             ? containerEl.offsetHeight
             : Infinity;
 
@@ -147,18 +147,18 @@ export const VideoPlayer = ({ upload, ...props }: {
                     { !playerLoaded && (
                         <img
                             style={ {
-                                borderRadius: props.borderRadius as string || '5px',
+                                borderRadius: props.borderRadius as string || "5px",
                                 boxShadow,
-                                margin: 'auto',
-                                cursor: 'pointer',
-                                width: forcedSize ? forcedSize[0] + 'px' : '100%',
-                                height: forcedSize ? forcedSize[1] + 'px' : '100%',
-                                transition: '0.1s width, 0.1s height',
-                                position: props.height == 'auto' ? 'static' : 'relative',
-                                top: props.height == 'auto' ? 'unset' : '50%',
-                                transform: props.height == 'auto' 
-                                    ? 'none' 
-                                    : 'translateY(-50%)'
+                                margin: "auto",
+                                cursor: "pointer",
+                                width: forcedSize ? forcedSize[0] + "px" : "100%",
+                                height: forcedSize ? forcedSize[1] + "px" : "100%",
+                                transition: "0.1s width, 0.1s height",
+                                position: props.height == "auto" ? "static" : "relative",
+                                top: props.height == "auto" ? "unset" : "50%",
+                                transform: props.height == "auto" 
+                                    ? "none" 
+                                    : "translateY(-50%)"
                             } }
                             src={ thumbDataURI }
                             onClick={ () => setShowPlayer(true) }

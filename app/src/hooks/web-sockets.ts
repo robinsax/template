@@ -1,15 +1,15 @@
 /**
 *   WebSocket hooks.
 */
-import { useEffect, useRef, useMemo, useState } from 'react';
+import { useEffect, useRef, useMemo, useState } from "react";
 
-import config from '@/config';
+import config from "@/config";
 import {
     AIChatMessageWSParams, AIChatMessageWSResp, AIChatStartWSParams, AIChatStartWSResp,
     AIChatSyncWSResp, AuthWSParams
-} from '@/models';
+} from "@/models";
 
-import { useCurrentAuthToken } from './auth';
+import { useCurrentAuthToken } from "./auth";
 
 /**
 *   Options for {@link useWebSocket}.
@@ -39,19 +39,19 @@ const useWebSocket = <T, R>(
     const txQueueRef = useRef<T[]>([]);
 
     useEffect(() => {
-        const url = config.apiRootUrl.replace('http', 'ws') + endpoint;
+        const url = config.apiRootUrl.replace("http", "ws") + endpoint;
 
         const socket = new WebSocket(url);
 
-        socket.addEventListener('message', (event) => {
+        socket.addEventListener("message", (event) => {
             onReceive(JSON.parse(event.data));
         });
 
-        socket.addEventListener('error', () => {
+        socket.addEventListener("error", () => {
             if (onConnectionError) onConnectionError();
         });
 
-        socket.addEventListener('open', () => {
+        socket.addEventListener("open", () => {
             socketRef.current = socket;
 
             for (const data of txQueueRef.current) {
@@ -110,14 +110,14 @@ export const useAIChatSocket = (
     const send = useWebSocket<
         AIChatParams | AIChatStartWSParams,
         AIChatResp | AIChatStartWSResp | AIChatSyncWSResp
-    >('/ai-chat', {
+    >("/ai-chat", {
         onReceive: (data) => {
-            if ('chat_id' in data) {
+            if ("chat_id" in data) {
                 setChatId(data.chat_id);
                 return;
             }
 
-            if ('synced' in data) {
+            if ("synced" in data) {
                 setSynchronized(true);
                 return;
             }

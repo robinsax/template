@@ -4,20 +4,20 @@
 import React, {
     ReactNode, MouseEvent, createContext, useCallback, useContext, useEffect, useMemo,
     useState
-} from 'react';
-import { VStack, Spinner, HStack, Text, Spacer, Box, Tooltip } from '@chakra-ui/react';
-import { formatDistanceToNow } from 'date-fns';
+} from "react";
+import { VStack, Spinner, HStack, Text, Spacer, Box, Tooltip } from "@chakra-ui/react";
+import { formatDistanceToNow } from "date-fns";
 
-import { idToUrlForm } from '@/util';
-import { NotificationModel, NotificationType } from '@/models';
+import { idToUrlForm } from "@/util";
+import { NotificationModel, NotificationType } from "@/models";
 import {
     I18nValueFn, InvalidationScope, useAsyncCallback, useAPI, useCurrentUserOrNull,
     useFetchedState, useI18n
-} from '@/hooks';
-import { useGrowOnHover } from '@/theme';
-import { Icon, ClickTargetLink, ClickTarget } from '@/components/common';
+} from "@/hooks";
+import { useGrowOnHover } from "@/theme";
+import { Icon, ClickTargetLink, ClickTarget } from "@/components/common";
 
-import { UserPersona } from './personas';
+import { UserPersona } from "./personas";
 
 // Presentations per type.
 type NotificationPresentation = {
@@ -27,67 +27,67 @@ type NotificationPresentation = {
 
 const notificationPresentations: Record<NotificationType, NotificationPresentation> = {
     invited: {
-        label: t => t('invited you to Kedet. Welcome!'),
+        label: t => t("invited you to Kedet. Welcome!"),
         link: null
     },
     campaign_created: {
         label: (t, meta) => (
             (meta && meta.campaign_name) ?
-                t('created campaign {name}', {
+                t("created campaign {name}", {
                     name: meta.campaign_name
                 })
             :
-                t('created a new campaign')
+                t("created a new campaign")
         ),
         link: notification => (
             `/campaigns/${idToUrlForm(notification.target_id as string)}`
         )
     },
     campaign_submitted: {
-        label: (t, meta) => t('submitted {ref} for review', {
-            ref: (meta && meta.campaign_name) ? meta.campaign_name : t('a campaign')
+        label: (t, meta) => t("submitted {ref} for review", {
+            ref: (meta && meta.campaign_name) ? meta.campaign_name : t("a campaign")
         }),
         link: notification => (
             `/campaigns/${idToUrlForm(notification.target_id as string)}/review`
         )
     },
     campaign_changes_requested: {
-        label: (t, meta) => t('requested changes to {ref}', {
-            ref: (meta && meta.campaign_name) ? meta.campaign_name : t('a campaign')
+        label: (t, meta) => t("requested changes to {ref}", {
+            ref: (meta && meta.campaign_name) ? meta.campaign_name : t("a campaign")
         }),
         link: notification => (
             `/campaigns/${idToUrlForm(notification.target_id as string)}/review`
         )
     },
     campaign_approved: {
-        label: (t, meta) => t('approved {ref}', {
-            ref: (meta && meta.campaign_name) ? meta.campaign_name : t('a campaign')
+        label: (t, meta) => t("approved {ref}", {
+            ref: (meta && meta.campaign_name) ? meta.campaign_name : t("a campaign")
         }),
         link: notification => (
             `/campaigns/${idToUrlForm(notification.target_id as string)}/review`
         )
     },
     campaign_published: {
-        label: (t, meta) => t('published {ref}', {
-            ref: (meta && meta.campaign_name) ? meta.campaign_name : t('a campaign')
+        label: (t, meta) => t("published {ref}", {
+            ref: (meta && meta.campaign_name) ? meta.campaign_name : t("a campaign")
         }),
         link: notification => (
             `/campaigns/${idToUrlForm(notification.target_id as string)}/review`
         )
     },
     campaign_channel_approved: {
-        label: (t, meta) => t('{ref} was approved by {chanRef}', {
-            ref: (meta && meta.campaign_name) ? meta.campaign_name : t('A campaign'),
-            chanRef: (meta && meta.channel) ? meta.channel : t('a channel')
+        label: (t, meta) => t("{ref} was approved by {chanRef}", {
+            ref: (meta && meta.campaign_name) ? meta.campaign_name : t("A campaign"),
+            chanRef: (meta && meta.channel) ? meta.channel : t("a channel")
         }),
         link: notification => (
             `/campaigns/${idToUrlForm(notification.target_id as string)}/stage`
         )
     },
     campaign_channel_rejected: {
-        label: (t, meta) => t('{ref} was rejected by {chanRef}', {
-            ref: (meta && meta.campaign_name) ? meta.campaign_name : t('A campaign'),
-            chanRef: (meta && meta.channel) ? meta.channel : t('a channel')
+        label: (t, meta) => t("{ref} was rejected by {chanRef}", {
+            ref: (meta && meta.campaign_name) ? meta.campaign_name : t("A campaign"),
+            chanRef: (meta && meta.channel) ? meta.channel : t("a channel")
         }),
         link: notification => (
             `/campaigns/${idToUrlForm(notification.target_id as string)}/stage`
@@ -96,18 +96,18 @@ const notificationPresentations: Record<NotificationType, NotificationPresentati
     comment_reply: {
         label: (t, meta) => (
             (meta && meta.campaign_name) ?
-                t('replied to your comment on {ref}', {
+                t("replied to your comment on {ref}", {
                     ref: meta.campaign_name
                 })
             :
-                t('replied to your comment')
+                t("replied to your comment")
         ),
         link: notification => (
             `/campaigns/${idToUrlForm(notification.target_id as string)}/review`
         )
     },
     password_reset: {
-        label: t => t('requested a password reset'),
+        label: t => t("requested a password reset"),
         link: null
     }
 };
@@ -155,7 +155,7 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
     const [notifications, invalidateNotifications] = useFetchedState(
         !currentUser ? null :
             api => api.users.id(currentUser.id).notifications.get(
-                all ? { query: { all: 'true' } } : undefined
+                all ? { query: { all: "true" } } : undefined
             ),
         { pollInterval: 120000 }
     );
@@ -227,7 +227,7 @@ const NotificationItem = ({ notification }: { notification: NotificationModel })
                 ) }
                 <VStack spacing={ 0 } alignItems="left">
                     <Text fontSize="xs">
-                        { !notification.user ? '' : (notification.user.name + ' ') }
+                        { !notification.user ? "" : (notification.user.name + " ") }
                         { label(t, notification.cosmetic_metadata) }
                     </Text>
                     <Spacer/>
@@ -243,7 +243,7 @@ const NotificationItem = ({ notification }: { notification: NotificationModel })
                     position="absolute"
                     top="50%" transform="translateY(-50%)" right="0px"
                 >
-                    <Tooltip label={ t('Dismiss') }>
+                    <Tooltip label={ t("Dismiss") }>
                         <ClickTarget
                             p={ 1 }
                             onClick={ onClickDismiss }
@@ -297,7 +297,7 @@ export const NotificationsList = ({ limit }: {
                             <Text
                                 width="full" variant="light" textAlign="right"
                             >
-                                { t('{count} more...', { count: remaining }) }
+                                { t("{count} more...", { count: remaining }) }
                             </Text>
                         )}
                     </VStack>
@@ -306,7 +306,7 @@ export const NotificationsList = ({ limit }: {
                         width="full" variant="light" textAlign="center"
                         p={ 2 }
                     >
-                        { t('No new notifications.') }
+                        { t("No new notifications.") }
                     </Text>
                 ) }
             </VStack>

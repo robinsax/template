@@ -10,7 +10,7 @@
 *
 *   On hot paths, a `queryReplacer` can be provided that replaces the state
 *   with some known value while refetch is pending. Usually this known value would be a
-*   PUT / POST response body. Leveraging this is not required, it's a performance
+*   PUT / POST response body. Leveraging this is not required, it"s a performance
 *   optimization. When `queryReplacer` is specified for a key, do not include it in
 *   `queryKeys`.
 *
@@ -19,28 +19,28 @@
 */
 import React, {
     ReactNode, useCallback, useMemo, useContext, createContext
-} from 'react';
+} from "react";
 
 import {
     ClientModel, UserModel, AdPlatformOAuthTokenModel, CampaignModel,
     AssetModel, AdModel, CommentModel, NotificationModel
-} from '@/models';
-import config from '@/config';
+} from "@/models";
+import config from "@/config";
 
 // Query key definitions - must be updated to add new invalidatable state.
 /**
 *   The comprehensive set of query keys that exist.
 */
 export type QueryKey = (
-    'clients' |
-    'users' |
-    'adPlatforms' |
-    'campaign' |
-    'campaigns' |
-    'campaignAssets' |
-    'campaignAds' |
-    'comments' |
-    'notifications'
+    "clients" |
+    "users" |
+    "adPlatforms" |
+    "campaign" |
+    "campaigns" |
+    "campaignAssets" |
+    "campaignAds" |
+    "comments" |
+    "notifications"
 );
 
 type QueryTypes = {
@@ -62,7 +62,7 @@ type QueryType<T extends QueryKey> = QueryTypes[T];
 *   while refetch is pending.
 */
 export type QueryReplacer<T extends QueryKey = QueryKey> = {
-    update: QueryType<T> extends Array<unknown> ? ('setItem' | 'removeItem') : 'set',
+    update: QueryType<T> extends Array<unknown> ? ("setItem" | "removeItem") : "set",
     data: QueryType<T> extends Array<infer U> ? U : QueryType<T>
 };
 
@@ -114,7 +114,7 @@ export const InvalidationScope = ({ children, queryKey, invalidate }: {
 
 /**
 *   Returns a function that triggers invalidation of {@link InvalidationScope}s above
-*   the caller's mount point.
+*   the caller"s mount point.
 * 
 *   Call this after performing an API call that changed something relevant within the
 *   current component tree.
@@ -127,7 +127,7 @@ export const useInvalidate = () => {
     return useCallback((params: InvalidationParams) => {
         if (config.devMode) {
             // eslint-disable-next-line no-console
-            console.debug('Invalidate: ', {
+            console.debug("Invalidate: ", {
                 keys: params.queryKeys,
                 replacers: params.queryReplacers,
                 scope
@@ -150,10 +150,10 @@ export const useInvalidate = () => {
             if (!replacer) continue;
 
             const replace = (prev: unknown) => {
-                if (replacer.update == 'set') {
+                if (replacer.update == "set") {
                     return replacer.data;
                 }
-                else if (replacer.update == 'setItem') {
+                else if (replacer.update == "setItem") {
                     let replaced = false;
                     const updated = (prev as unknown[]).map(item => {
                         // @ts-expect-error ts(2339)
@@ -171,7 +171,7 @@ export const useInvalidate = () => {
 
                     return updated;
                 }
-                else if (replacer.update == 'removeItem') {
+                else if (replacer.update == "removeItem") {
                     return (prev as unknown[]).filter(item => (
                         // @ts-expect-error ts(2339)
                         item.id != replacer.data.id
@@ -185,7 +185,7 @@ export const useInvalidate = () => {
 
         if (config.devMode) {
             // eslint-disable-next-line no-console
-            console.debug('Invalidate result: ', {
+            console.debug("Invalidate result: ", {
                 invalidateCount,
                 replaceCount
             });

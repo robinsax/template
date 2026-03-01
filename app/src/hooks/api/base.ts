@@ -1,7 +1,7 @@
 /**
 *   API client internals. 
 */
-import config from '@/config';
+import config from "@/config";
 
 /**
 *   Thrown when an API call fails.
@@ -15,7 +15,7 @@ export class APIError extends Error {
     }
 };
 
-export type APICallMethod = 'get' | 'post' | 'put' | 'delete';
+export type APICallMethod = "get" | "post" | "put" | "delete";
 
 export type RawAPICallParams = {
     path: string,
@@ -51,7 +51,7 @@ export type APIClientBase = {
 const convertFromAPI = (input: unknown, suspectDate: boolean = false): unknown => {
     if (!input) return input;
 
-    if (suspectDate && typeof input === 'string') {
+    if (suspectDate && typeof input === "string") {
         return new Date(input);
     }
 
@@ -59,12 +59,12 @@ const convertFromAPI = (input: unknown, suspectDate: boolean = false): unknown =
         return input.map(item => convertFromAPI(item));
     }
 
-    if (input && typeof input == 'object') {
+    if (input && typeof input == "object") {
         const obj: Record<string, unknown> = { ...input };
         for (const [key, value] of Object.entries(obj)) {
             obj[key] = convertFromAPI(
                 value,
-                key.endsWith('_at') || key.endsWith('_date')
+                key.endsWith("_at") || key.endsWith("_date")
             );
         }
 
@@ -75,7 +75,7 @@ const convertFromAPI = (input: unknown, suspectDate: boolean = false): unknown =
 };
 
 const convertForAPI = (input: unknown): unknown => {
-    if (!input || typeof input != 'object') return input;
+    if (!input || typeof input != "object") return input;
 
     const obj: Record<string, unknown> = { ...input };
     for (const [key, value] of Object.entries(obj)) {
@@ -85,7 +85,7 @@ const convertForAPI = (input: unknown): unknown => {
         else if (value instanceof Array) {
             obj[key] = value.map(convertForAPI);
         }
-        else if (value && typeof value == 'object') {
+        else if (value && typeof value == "object") {
             obj[key] = convertForAPI(value);
         }
     }
@@ -123,22 +123,22 @@ export const createAPIClientBase = (): APIClientBase => {
         const extParams: Record<string, unknown> = {};
 
         let body: ReadableStream | string | undefined;
-        let query = '';
+        let query = "";
 
         // Solve auth.
         const reqAuth = options.authToken || authToken;
-        if (reqAuth) headers['Authorization'] = reqAuth;
+        if (reqAuth) headers["Authorization"] = reqAuth;
 
-        if (locale) headers['X-Locale'] = locale;
+        if (locale) headers["X-Locale"] = locale;
 
         // Solve URL.
         if (options.query) {
             const parts = [];
             for (const key in options.query) {
-                parts.push(key + '=' + options.query[key]);
+                parts.push(key + "=" + options.query[key]);
             }
 
-            query = '?' + parts.join('&');
+            query = "?" + parts.join("&");
         }
 
         const url = config.apiRootUrl + params.path + query;
@@ -148,7 +148,7 @@ export const createAPIClientBase = (): APIClientBase => {
             if (params.body instanceof File) {
                 const file = params.body;
 
-                // Use XHR because fetch ReadableStream requires ALPN which isn't
+                // Use XHR because fetch ReadableStream requires ALPN which isn"t
                 // possible on localhost, and split configs suck.
                 const xhr = new XMLHttpRequest();
                 xhr.open(params.method, url);
@@ -156,16 +156,16 @@ export const createAPIClientBase = (): APIClientBase => {
                     xhr.setRequestHeader(key, value);
                 }
 
-                xhr.upload.addEventListener('progress', (e) => {
+                xhr.upload.addEventListener("progress", (e) => {
                     if (options.onProgress) options.onProgress(e.loaded / e.total);
                 });
 
                 const resolver = new Promise(resolve => {
-                    xhr.addEventListener('load', resolve);
+                    xhr.addEventListener("load", resolve);
                 });
 
                 const formData = new FormData();
-                formData.append('file', file);
+                formData.append("file", file);
                 xhr.send(formData);
 
                 await resolver;
@@ -173,7 +173,7 @@ export const createAPIClientBase = (): APIClientBase => {
                 return processRespBody<T>(JSON.parse(xhr.response), xhr.status);
             }
             else {
-                headers['Content-Type'] = 'application/json';
+                headers["Content-Type"] = "application/json";
 
                 body = JSON.stringify(convertForAPI(params.body));
             }

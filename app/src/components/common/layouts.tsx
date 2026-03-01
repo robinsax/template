@@ -3,54 +3,54 @@
 */
 import React, {
     ComponentType, MouseEvent, ReactNode, useCallback, useMemo, useState
-} from 'react';
+} from "react";
 import {
     HTMLChakraProps, VStack, HStack, Heading, Text, Spacer, Box, Button, Spinner,
     Flex, ChakraProps, Checkbox, Popover, PopoverTrigger, PopoverContent, PopoverBody,
     Portal, shouldForwardProp, chakra
-} from '@chakra-ui/react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { isValidMotionProp } from 'framer-motion';
+} from "@chakra-ui/react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { isValidMotionProp } from "framer-motion";
 
-import { UploadModel, Permission } from '@/models';
+import { UploadModel, Permission } from "@/models";
 import {
     I18nValueFn, useI18n, useAPI, useFetchedUpload, useWindowListener, useAuthzCheck
-} from '@/hooks';
+} from "@/hooks";
 import {
     usePanelStylesFix, useGrowOnHover, useMediaBg, useBoxShadow, useHideScrollbars
-} from '@/theme';
+} from "@/theme";
 
-import { Icon, IconName } from './icons';
-import { useEnableStateCheck } from './actions';
-import { UploadArea, UploadMenuTrigger, useUpload } from './upload';
+import { Icon, IconName } from "./icons";
+import { useEnableStateCheck } from "./actions";
+import { UploadArea, UploadMenuTrigger, useUpload } from "./upload";
 
 // Highlight areas.
-export type HighlightedProps<T extends 'span' | 'a'> = (
+export type HighlightedProps<T extends "span" | "a"> = (
     HTMLChakraProps<T> &
     { showHighlight?: boolean, disableHighlight?: boolean, highlightColor?: string }
 );
 
-const createHighlighted = <T extends 'span' | 'a'>(type: T) => {
+const createHighlighted = <T extends "span" | "a">(type: T) => {
     return chakra<T, HighlightedProps<T>>(type, {
         baseStyle: (props) => {
             const {
-                showHighlight, disableHighlight, highlightColor = 'insetPanelBg'
+                showHighlight, disableHighlight, highlightColor = "insetPanelBg"
             } = props as unknown as HighlightedProps<T>;
 
             return {
-                display: 'inline-block',
-                cursor: !disableHighlight ? 'pointer' : 'inherit',
+                display: "inline-block",
+                cursor: !disableHighlight ? "pointer" : "inherit",
                 bg: (
-                    (showHighlight && !disableHighlight) ? highlightColor : 'transparent'
+                    (showHighlight && !disableHighlight) ? highlightColor : "transparent"
                 ),
-                borderRadius: 'md',
+                borderRadius: "md",
                 _hover: {
-                    backgroundColor: !disableHighlight ? highlightColor : 'transparent'
+                    backgroundColor: !disableHighlight ? highlightColor : "transparent"
                 }
             };
         },
         shouldForwardProp: (prop) => (
-            !['showHighlight', 'disableHighlight', 'highlightColor'].includes(prop) &&
+            !["showHighlight", "disableHighlight", "highlightColor"].includes(prop) &&
             !isValidMotionProp(prop) &&
             shouldForwardProp(prop)
         )
@@ -60,14 +60,14 @@ const createHighlighted = <T extends 'span' | 'a'>(type: T) => {
 /**
 *   A clickable target area with highlight presentation.
 */
-export const ClickTarget = createHighlighted('span');
+export const ClickTarget = createHighlighted("span");
 
-const ClickTargetAnchor = createHighlighted('a');
+const ClickTargetAnchor = createHighlighted("a");
 
 /**
 *   A clickable link that is highlighted while active.
 */
-export const ClickTargetLink = ({ href, ...props }: HighlightedProps<'a'>) => {
+export const ClickTargetLink = ({ href, ...props }: HighlightedProps<"a">) => {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -90,7 +90,7 @@ export const ClickTargetLink = ({ href, ...props }: HighlightedProps<'a'>) => {
 /**
 *   A spinner centered in its container.
 */
-export const FullAreaSpinner = (props: HTMLChakraProps<'div'>) => {
+export const FullAreaSpinner = (props: HTMLChakraProps<"div">) => {
     return (
         <Flex
             justifyContent="center"
@@ -197,24 +197,24 @@ export const RichSelection = ({
             { ...((onClick || selectableWhenDisabled) ? growStyles : {}) }
             sx={ {
                 ...panelStyles.sx,
-                background: selected ? panelStyles.sx.background : 'transparent'
+                background: selected ? panelStyles.sx.background : "transparent"
             } }
             backdropFilter={ selected ? panelStyles.backdropFilter : undefined }
-            cursor={ (onClick || selectableWhenDisabled) ? 'pointer' : 'default' }
+            cursor={ (onClick || selectableWhenDisabled) ? "pointer" : "default" }
             borderRadius="md"
             border="2px solid"
             width={ width }
             maxWidth="30rem"
-            borderColor={ error ? 'error' : 'transparent' }
+            borderColor={ error ? "error" : "transparent" }
             py={ 2 }
             px={ 4 }
             spacing={ 4 }
             onClick={ onClick }
-            boxShadow={ selected ? 'raise' : undefined }
+            boxShadow={ selected ? "raise" : undefined }
         >
             <Box
                 borderRadius="full"
-                bg={ error ? 'error' : selected ? 'selection' : 'panelBg' }
+                bg={ error ? "error" : selected ? "selection" : "panelBg" }
                 p={ 2 }
             >
                 <Icon name={ iconName } size="2rem"/>
@@ -247,15 +247,15 @@ export const MediaContainerLayout = ({
         <Box
             height={ height }
             minHeight={ minHeight }
-            width={ width || 'full' }
+            width={ width || "full" }
             flexGrow={ 0 }
             flexShrink={ 0 }
             flexBasis="auto"
-            borderRadius={ borderRadius || 'md' }
+            borderRadius={ borderRadius || "md" }
             p={ 4 }
             { ...checkerStyles }
             onClick={ onClick }
-            pointerEvents={ noEvents ? 'none' : undefined }
+            pointerEvents={ noEvents ? "none" : undefined }
         >
             { children }
         </Box>
@@ -311,16 +311,16 @@ export const MediaContainerImage = ({
                     src={ dataURI }
                     title={ title ? title(t) : undefined }
                     style={ {
-                        cursor: 'pointer',
-                        objectFit: 'contain',
-                        maxWidth: '100%',
-                        maxHeight: '100%',
-                        width: 'auto',
-                        height: 'auto',
-                        margin: 'auto',
-                        borderRadius: '5px',
+                        cursor: "pointer",
+                        objectFit: "contain",
+                        maxWidth: "100%",
+                        maxHeight: "100%",
+                        width: "auto",
+                        height: "auto",
+                        margin: "auto",
+                        borderRadius: "5px",
                         boxShadow,
-                        filter: disabled ? 'grayscale(100%)' : undefined
+                        filter: disabled ? "grayscale(100%)" : undefined
                     } }
                 />
                 { children && (
@@ -330,8 +330,8 @@ export const MediaContainerImage = ({
                     >
                         <Box
                             position="relative"
-                            width={ imageSize[0] + 'px' }
-                            height={ imageSize[1] + 'px' }
+                            width={ imageSize[0] + "px" }
+                            height={ imageSize[1] + "px" }
                             top="50%" left="50%"
                             transform="translate(-50%, -50%)"
                         >
@@ -352,16 +352,16 @@ const useBlockCardStyles = (dropPanelStyles?: boolean, dropGrowStyles?: boolean)
 
     return useMemo<ChakraProps>(() => ({
         p: 4,
-        borderRadius: 'md',
-        border: '1px solid',
-        borderColor: !dropPanelStyles ? 'lightBorder' : 'transparent',
-        width: '20rem',
-        height: '26rem',
-        alignItems: 'center',
-        justifyContent: 'center',
-        display: 'flex',
-        flexDirection: 'column',
-        boxShadow: !dropPanelStyles ? 'raise' : undefined,
+        borderRadius: "md",
+        border: "1px solid",
+        borderColor: !dropPanelStyles ? "lightBorder" : "transparent",
+        width: "20rem",
+        height: "26rem",
+        alignItems: "center",
+        justifyContent: "center",
+        display: "flex",
+        flexDirection: "column",
+        boxShadow: !dropPanelStyles ? "raise" : undefined,
         ...(!dropPanelStyles ? panelStyles : {}),
         ...(!dropGrowStyles ? growStyles : {})
     }), [panelStyles, growStyles, dropPanelStyles]);
@@ -418,14 +418,14 @@ export const BlockCardNew = ({
             backdropFilter="none"
             boxShadow="none"
             {...props}
-            cursor={ active ? 'pointer' : 'not-allowed' }
+            cursor={ active ? "pointer" : "not-allowed" }
             onClick={ active ? onClick : undefined }
         >
             { working ? (
                 <FullAreaSpinner/>
             ) : (
                 <>
-                    <Icon name={ iconName || 'add' } size="1.5rem"/>
+                    <Icon name={ iconName || "add" } size="1.5rem"/>
                     <Text variant="light" mt={ 2 }>
                         { label(t) }
                     </Text>
@@ -457,7 +457,7 @@ export const BlockCard = <
     return (
         // @ts-expect-error ts(2769)
         <Component
-            cursor={ onClick ? 'pointer' : undefined }
+            cursor={ onClick ? "pointer" : undefined }
             { ...(styleOnHover ? noPanelStyles : styles) }
             justifyContent="flex-start"
             { ...props }
@@ -497,16 +497,16 @@ export const TargetableIndication = ({ possible, active, borderRadius }: {
             width="full"
             height="full"
             border="3px dashed"
-            borderRadius={ borderRadius || 'md' }
+            borderRadius={ borderRadius || "md" }
             zIndex={ 1 }
             pointerEvents="none"
             borderColor={
                 active ?
-                    'dndTarget'
+                    "dndTarget"
                 : possible ?
-                    'lightBorder'
+                    "lightBorder"
                 :
-                    'transparent'
+                    "transparent"
             }
         />
     );
@@ -562,13 +562,13 @@ export const Sidebar = ({ control, width, minWidth, maxWidth, children }: {
 }) => {
     const panelStyles = usePanelStylesFix();
 
-    useWindowListener('click', () => {
+    useWindowListener("click", () => {
         if (!control.fullyOpen) return;
 
         control.close();
     });
 
-    const finalSize = width || '30rem';
+    const finalSize = width || "30rem";
     return control.open && (
         <Portal>
             <Box overflowX="hidden">
@@ -576,7 +576,7 @@ export const Sidebar = ({ control, width, minWidth, maxWidth, children }: {
                     { ...panelStyles }
                     position="fixed"
                     top={ 0 }
-                    right={ control.fullyOpen ? 0 : '-' + finalSize }
+                    right={ control.fullyOpen ? 0 : "-" + finalSize }
                     width={ finalSize }
                     minWidth={ minWidth }
                     maxWidth={ maxWidth }
@@ -783,7 +783,7 @@ export const AvatarUpload = <T,>({
                             { working ? 
                                 <Spinner/>
                             :
-                                t('Change')
+                                t("Change")
                             }
                         </Button>
                     ) }

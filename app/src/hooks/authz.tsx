@@ -1,12 +1,12 @@
 /**
 *   Authorization state hooks and contexts. 
 */
-import React, { ReactNode, createContext, useContext, useMemo } from 'react';
+import React, { ReactNode, createContext, useContext, useMemo } from "react";
 
-import { Permission, AuthzScope, permissionsMatrix, UserModel } from '@/models';
-import { grantContainsScope, isUserWithinManageScopeOf } from '@/util';
+import { Permission, AuthzScope, permissionsMatrix, UserModel } from "@/models";
+import { grantContainsScope, isUserWithinManageScopeOf } from "@/util";
 
-import { useCurrentUser } from './auth';
+import { useCurrentUser } from "./auth";
 
 const DEFAULT_AUTHZ_SCOPE: AuthzScope = {
     clientId: null,
@@ -41,13 +41,13 @@ export const AuthzScopeProvider = ({ children, clientId, businessId }: {
 };
 
 /**
-*   Returns the current {@link AuthzScope} at the caller's mount point.
+*   Returns the current {@link AuthzScope} at the caller"s mount point.
 */
 export const useAuthzScope = () => useContext(authzScopeContext);
 
 /**
 *   Return whether the current user has the given permission within the authorization
-*   scope at the caller's mount point.
+*   scope at the caller"s mount point.
 * 
 *   If multiple permissions are specified, returns whether the current user has any of
 *   them.
@@ -105,7 +105,7 @@ export const useAuthzCheck = (
 
 /**
 *   Return whether the current user has IAM permission on the given `targetUser` within
-*   the authorization scope at the caller's mount point.
+*   the authorization scope at the caller"s mount point.
 */
 export const useUserManageAuthzCheck = (targetUser: UserModel) => {
     const user = useCurrentUser();

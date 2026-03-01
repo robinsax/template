@@ -4,26 +4,26 @@
 import React, {
     KeyboardEvent, ReactNode, useState, createContext, useContext, useMemo,
     useCallback
-} from 'react';
-import { Text, Textarea, VStack, HStack, Spacer } from '@chakra-ui/react';
-import { formatDistanceToNow } from 'date-fns';
+} from "react";
+import { Text, Textarea, VStack, HStack, Spacer } from "@chakra-ui/react";
+import { formatDistanceToNow } from "date-fns";
 
 import {
     CommentReactionType, commentReactionTypes, CommentTreeModel, Permission
-} from '@/models';
+} from "@/models";
 import {
     APIBinding, APIClient, InvalidationScope, useAPI, useAsyncCallback, useAuthzCheck,
     useCurrentUser, useFetchedState, useI18n, useInvalidate
-} from '@/hooks';
+} from "@/hooks";
 
-import { UserPersona } from '../users';
-import { Icon, IconName } from './icons';
-import { ClickTarget, FullAreaSpinner } from './layouts';
+import { UserPersona } from "../users";
+import { Icon, IconName } from "./icons";
+import { ClickTarget, FullAreaSpinner } from "./layouts";
 
 /**
 *   Endpoint binding schema required for comments system to function.
 */
-export type CommentsEndpoints = ReturnType<APIBinding['campaigns']['id']>['comments'];
+export type CommentsEndpoints = ReturnType<APIBinding["campaigns"]["id"]>["comments"];
 
 type CommentContextType = {
     comments: CommentTreeModel[] | null,
@@ -37,14 +37,14 @@ type CommentContextType = {
 const context = createContext<CommentContextType>(null as unknown as CommentContextType);
 
 /**
-*   Return the comments at the caller's mount point or `null` if they haven't loaded yet.
+*   Return the comments at the caller"s mount point or `null` if they haven"t loaded yet.
 *   Can only be used below a {@link CommentsProvider}.
 */
 export const useComments = () => useContext(context).comments;
 
 const reactIcons: Record<CommentReactionType, IconName> = {
-    like: 'like',
-    dislike: 'dislike'
+    like: "like",
+    dislike: "dislike"
 };
 
 /**
@@ -158,10 +158,10 @@ export const Comment = ({ comment, replyLocked }: {
             await endpoints.id(comment.comment.id).reactions.type(type).post();
 
             // Remove the opposite reaction if it exists
-            const oppositeType: CommentReactionType = type == 'like' 
-                ? 'dislike' 
-                : 'like';
-            if (hasReacted(oppositeType) && (['like', 'dislike'].includes(type))) {
+            const oppositeType: CommentReactionType = type == "like" 
+                ? "dislike" 
+                : "like";
+            if (hasReacted(oppositeType) && (["like", "dislike"].includes(type))) {
                 await endpoints
                     .id(comment.comment.id).reactions
                     .type(oppositeType)
@@ -170,7 +170,7 @@ export const Comment = ({ comment, replyLocked }: {
         }
 
         invalidate({
-            queryKeys: ['comments']
+            queryKeys: ["comments"]
         });
     }, [hasReacted]);
 
@@ -225,20 +225,20 @@ export const Comment = ({ comment, replyLocked }: {
                         onClick={ () => setRepliesOpen(!repliesOpen) }
                     >
                         <HStack>
-                            <Icon name={ repliesOpen ? 'up' : 'down' }/>
+                            <Icon name={ repliesOpen ? "up" : "down" }/>
                             <Text fontSize="xs">
                                 { repliesOpen ? (
                                     hasChildren ?
-                                        t('Hide replies')
+                                        t("Hide replies")
                                     :
-                                        t('Cancel')
+                                        t("Cancel")
                                 ) : (
                                     hasChildren ?
-                                        t('{count} Repl{count:y:ies}', {
+                                        t("{count} Repl{count:y:ies}", {
                                             count: comment.children.length
                                         })
                                     :
-                                        t('Reply')
+                                        t("Reply")
                                 ) }
                             </Text>
                         </HStack>
@@ -277,7 +277,7 @@ export const Comments = () => {
                         <Comment key={ comment.comment.id } comment={ comment }/>
                     ))
                 ) : (
-                    <Text variant="light">{ t('No comments.') }</Text>
+                    <Text variant="light">{ t("No comments.") }</Text>
                 )
             ) : (
                 <FullAreaSpinner/>
@@ -301,10 +301,10 @@ export const CommentInput = ({ parentId, onDone }: {
         commentEnabled, endpoints, subtargetId, subtargetType
     } = useContext(context);
 
-    const [input, setInput] = useState('');
+    const [input, setInput] = useState("");
 
     const [onKeyUp] = useAsyncCallback(async (e: KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.key != 'Enter' || e.shiftKey) return;
+        if (e.key != "Enter" || e.shiftKey) return;
 
         const content = e.currentTarget.value.trim();
         if (!content) return;
@@ -317,16 +317,16 @@ export const CommentInput = ({ parentId, onDone }: {
         });
 
         invalidate({
-            queryKeys: ['comments']
+            queryKeys: ["comments"]
         });
-        setInput('');
+        setInput("");
         if (onDone) onDone();
     }, []);
 
     return commentEnabled && (
         <Textarea
             resize="none"
-            placeholder={ t('Leave a comment...') }
+            placeholder={ t("Leave a comment...") }
             value={ input }
             onChange={ e => setInput(e.target.value) }
             onKeyUp={ onKeyUp }

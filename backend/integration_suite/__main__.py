@@ -1,6 +1,6 @@
 import sys
 
-sys.path.insert(0, '.')
+sys.path.insert(0, ".")
 
 from integration_suite import cli # pylint: disable=wrong-import-position
 

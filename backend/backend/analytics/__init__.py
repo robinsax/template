@@ -1,7 +1,7 @@
-'''
+"""
 Analytics backend adapters.
-'''
-from kedet.config import ConfigError, config
+"""
+from backend.config import ConfigError, config
 
 from .base import (
     AnalyticsBackend, AnalyticsModel, DailyMetricsModel, RawAnalyticsModel,
@@ -11,15 +11,15 @@ from .bigquery import BigQueryAnalyticsBackend
 from .dummy import DummyAnalyticsBackend
 
 def get_analytics_backend() -> AnalyticsBackend:
-    '''
+    """
     Return the configured `AnalyticsBackend`.
-    '''
+    """
     backend = config.analytics_backend.get()
 
-    if backend == 'bigquery':
+    if backend == "bigquery":
         return BigQueryAnalyticsBackend()
 
-    if backend == 'dummy':
+    if backend == "dummy":
         return DummyAnalyticsBackend()
 
-    raise ConfigError('invalid analytics backend: ' + backend)
+    raise ConfigError("invalid analytics backend: " + backend)

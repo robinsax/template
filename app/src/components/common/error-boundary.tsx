@@ -1,7 +1,7 @@
 /**
 *   Error boundary component.
 */
-import { Component, ReactNode, ErrorInfo } from 'react';
+import { Component, ReactNode, ErrorInfo } from "react";
 
 export type ErrorBoundaryProps = {
     fallback: ReactNode,
@@ -24,7 +24,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps> {
   
     componentDidCatch(err: Error, info: ErrorInfo) {
         // eslint-disable-next-line no-console
-        console.error('ErrorBoundary trigger', err, info);
+        console.error("ErrorBoundary trigger", err, info);
     }
   
     render() {

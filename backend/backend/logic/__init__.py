@@ -1,6 +1,6 @@
-'''
+"""
 Various types of common pure logic.
-'''
+"""
 from .authz import (
     is_role_more_permissive_than, is_role_at_least_as_permissive_as, scope_contains_scope,
     would_grant_be_valid, role_provides_permission, check_authz, check_scopeless_authz,

@@ -1,28 +1,28 @@
 /**
 *   User management UI. 
 */
-import React, { ReactNode, useMemo, useCallback } from 'react';
+import React, { ReactNode, useMemo, useCallback } from "react";
 import {
     VStack, Box, Text, HStack, Badge, Spacer, Flex, Tooltip, Popover, PopoverTrigger,
     PopoverContent, PopoverBody, PopoverArrow, Portal, Alert, Heading
-} from '@chakra-ui/react';
+} from "@chakra-ui/react";
 
-import { AuthzScope, UserGrantModel, UserModel } from '@/models';
-import { mergeCallbacks } from '@/util';
+import { AuthzScope, UserGrantModel, UserModel } from "@/models";
+import { mergeCallbacks } from "@/util";
 import {
     I18nValueFn, useAuthzCheck, useAsyncCallback, useI18n, useAPI, useInvalidate,
     useCurrentUser, useUserManageAuthzCheck
-} from '@/hooks';
-import { OrganizationPersona } from '@/components/organizations';
+} from "@/hooks";
+import { OrganizationPersona } from "@/components/organizations";
 import {
     ManagerLayout, ModalButton, ClickTarget, Icon, ActiveStateToggleButton,
     StateBadge, ActionIcon, BlockCard, Sidebar, useListSystem, useSidebarControl
-} from '@/components/common';
+} from "@/components/common";
 
-import { UserPersona } from './personas';
-import { UserEditForm, UserInviteForm } from './forms';
-import { roleTitle, userTypeTitle } from './authz';
-import { GrantControl, grantsEndpointsForScope } from './grant-control';
+import { UserPersona } from "./personas";
+import { UserEditForm, UserInviteForm } from "./forms";
+import { roleTitle, userTypeTitle } from "./authz";
+import { GrantControl, grantsEndpointsForScope } from "./grant-control";
 
 /**
 *   Canonical user list system.
@@ -38,7 +38,7 @@ export const useUserList = () => {
                 grant.business ? grant.business.name : null
             ].filter(Boolean) as string[])).flat()
         ],
-        emptyLabel: t => t('No users found.')
+        emptyLabel: t => t("No users found.")
     });
 };
 
@@ -54,7 +54,7 @@ export const UserInvite = ({ onInvited, children }: {
     return (
         <VStack width="full" spacing={ 4 }>
             <Alert status="info">
-                { t('This person will be invited via email.') }
+                { t("This person will be invited via email.") }
             </Alert>
             <Box width="full">
                 <UserInviteForm onInvited={ onInvited }/>
@@ -78,7 +78,7 @@ export const UserInviteButton = ({ onInvited }: {
         <ModalButton
             variant="ghost"
             leftIcon={ <Icon name="add"/> }
-            label={ t => t('Invite someone') }
+            label={ t => t("Invite someone") }
         >
             { onClose => (
                 <UserInvite onInvited={ mergeCallbacks(onInvited, onClose) }/>
@@ -98,7 +98,7 @@ export const UserEditButton = ({ user, label }: {
         <ModalButton
             variant="ghost"
             leftIcon={ <Icon name="edit"/> }
-            label={ t => label ? label(t) : t('Edit User') }
+            label={ t => label ? label(t) : t("Edit User") }
             modalSize="lg"
         >
             { onClose => (
@@ -109,7 +109,7 @@ export const UserEditButton = ({ user, label }: {
 };
 
 /**
-*   Modalized flow to change a user's role at the given `grant`s scope.
+*   Modalized flow to change a user"s role at the given `grant`s scope.
 */
 export const UserGrantChangeButton = ({ user, grant }: {
     user: UserModel,
@@ -119,7 +119,7 @@ export const UserGrantChangeButton = ({ user, grant }: {
         <ModalButton
             variant="ghost"
             iconName="switch"
-            tooltip={ t => t('Change role') }
+            tooltip={ t => t("Change role") }
         >
             { onClose => (
                 <GrantControl
@@ -148,7 +148,7 @@ export const AddPlatformGrantToUser = ({ user, onDone }: {
         <VStack width="full" alignItems="left" spacing={ 6 }>
             <HStack width="full">
                 <Heading size="sm">
-                    { t('Adding platform role for') }
+                    { t("Adding platform role for") }
                 </Heading>
                 <UserPersona for={ user } size="xs"/>
             </HStack>
@@ -181,7 +181,7 @@ export const UserGrantListItem = ({ user, grant }: {
         };
     }, [grant.client_id, grant.business_id]);
 
-    const manageAllowed = useAuthzCheck('manage_iam', {
+    const manageAllowed = useAuthzCheck("manage_iam", {
         scope: authzScope
     });
 
@@ -191,7 +191,7 @@ export const UserGrantListItem = ({ user, grant }: {
         await endpoint.users.id(grant.user_id).delete();
 
         invalidate({
-            queryKeys: ['users', 'clients']
+            queryKeys: ["users", "clients"]
         });
     }, []);
 
@@ -207,7 +207,7 @@ export const UserGrantListItem = ({ user, grant }: {
             ) : (
                 <HStack width="full">
                     <Badge colorScheme="orange">
-                        { t('Platform') }
+                        { t("Platform") }
                     </Badge>
                     <Text>
                         { roleTitle(t, grant.role) }
@@ -217,14 +217,14 @@ export const UserGrantListItem = ({ user, grant }: {
             <Spacer/>
             { manageAllowed && user.id != currentUser.id && (
                 <>
-                    <Tooltip label={ t('Change role') }>
+                    <Tooltip label={ t("Change role") }>
                         <UserGrantChangeButton
                             user={ user }
                             grant={ grant }
                         />
                     </Tooltip>
                     <ActionIcon
-                        tooltip={ t => t('Revoke') }
+                        tooltip={ t => t("Revoke") }
                         tooltipPlacement="left"
                         permission="manage_iam"
                         iconName="delete"
@@ -254,7 +254,7 @@ export const UserGrantList = ({ user }: { user: UserModel }) => {
                 ))
             ) : (
                 <Text variant="light">
-                    { t('No roles granted.') }
+                    { t("No roles granted.") }
                 </Text>
             ) }
         </VStack>
@@ -272,7 +272,7 @@ export const UserCard = ({ user }: { user: UserModel }) => {
     const manageAllowed = useUserManageAuthzCheck(user);
     // The only use-case for role management on this screen is adding platform-level
     // roles, which can only be done by users with manage_iam at platform level.
-    const rolesAllowed = useAuthzCheck('manage_iam', {
+    const rolesAllowed = useAuthzCheck("manage_iam", {
         scope: { clientId: null, businessId: null }
     });
 
@@ -299,7 +299,7 @@ export const UserCard = ({ user }: { user: UserModel }) => {
                                 <HStack>
                                     <Icon name="manage"/>
                                     <Text fontSize="xs">
-                                        { t('{count} role{count::s}', {
+                                        { t("{count} role{count::s}", {
                                             count: user.grants.length
                                         }) }
                                     </Text>
@@ -320,13 +320,13 @@ export const UserCard = ({ user }: { user: UserModel }) => {
                         <ActiveStateToggleButton
                             for={ user }
                             endpoint={ api => api.users.id(user.id) }
-                            queryKeys={ ['users'] }
+                            queryKeys={ ["users"] }
                             permission="manage_iam"
                             activateDetails={
-                                t => t('This allows users to log in again.')
+                                t => t("This allows users to log in again.")
                             }
                             deactivateDetails={
-                                t => t('This prevents users from logging in.')
+                                t => t("This prevents users from logging in.")
                             }
                         />
                     ) }
@@ -334,7 +334,7 @@ export const UserCard = ({ user }: { user: UserModel }) => {
                         <ModalButton
                             variant="ghost"
                             iconName="add"
-                            tooltip={ t => t('Add role') }
+                            tooltip={ t => t("Add role") }
                         >
                             { onClose => (
                                 <AddPlatformGrantToUser
@@ -346,7 +346,7 @@ export const UserCard = ({ user }: { user: UserModel }) => {
                     ) }
                     { (manageEnabled || user.id == currentUser.id) && (
                         <ActionIcon
-                            tooltip={ t => t('Edit') }
+                            tooltip={ t => t("Edit") }
                             tooltipPlacement="left"
                             // Button only shown if permissions valid.
                             permission={ null }
@@ -378,21 +378,21 @@ export const UserManager = ({ users }: {
 
     // Although any user with manage_iam at any scope can invite users, we only
     // show the invite button on this screen for platform-level IAM use-cases.
-    const globalIAMAllowed = useAuthzCheck('manage_iam', {
+    const globalIAMAllowed = useAuthzCheck("manage_iam", {
         scope: { clientId: null, businessId: null }
     });
 
     const onInvite = useCallback(() => {
         invalidate({
-            queryKeys: ['users']
+            queryKeys: ["users"]
         });
     }, []);
 
     return (
         <ListProvider data={ users }>
             <ManagerLayout
-                heading={ t => t('Users') }
-                description={ t => t('Manage users and roles.') }
+                heading={ t => t("Users") }
+                description={ t => t("Manage users and roles.") }
                 headerRight={
                     <>
                         { globalIAMAllowed && (

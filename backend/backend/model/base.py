@@ -1,6 +1,6 @@
-'''
+"""
 Base machinery for SQLAlchemy mappers, Pydantic models, and enums.
-'''
+"""
 import uuid
 from typing import Optional, Type, TypeVar, Union, get_args, get_origin
 from pydantic import BaseModel
@@ -11,16 +11,16 @@ from sqlalchemy.inspection import inspect
 MAX_TABLENAME_LEN = 64
 
 Base: Type = declarative_base()
-'''
+"""
 Declarative base. All SQLAlchemy mappers must extend from both this and `BaseMixin`.
-'''
+"""
 Model = BaseModel
-'''
+"""
 Base Pydantic model type which all serializable model definitions must extend.
-'''
+"""
 
 class EnumMixin(str):
-    '''
+    """
     Base enum mixin which all model-involved enums must extend.
 
     Must come before `Enum` in the MRO.
@@ -30,53 +30,53 @@ class EnumMixin(str):
     class MyEnum(EnumMixin, Enum):
         # ...
     ```
-    '''
+    """
     value: str
 
-T = TypeVar('T', bound=Base)
+T = TypeVar("T", bound=Base)
 class BaseMixin:
-    '''
+    """
     A mixin with shared functionality which all SQLAlchemy mappers must extend.
 
     Allows serialization to `Model`s. A `__model__` class variable must be set
     (alongside `__tablename__`) to the default `Model` to which this mapper converts by
     default.
-    '''
+    """
     __model__: Type[Model]
-    '''
+    """
     The `Model` type to which this mapper converts by default.
 
     See `BaseMixin.to_model`.
-    '''
+    """
     __tablename__: str
     id: Column
 
     @classmethod
     def default_query(cls: Type[T], session: Session) -> Query[T]:
-        '''
+        """
         The default query configuration for this mapper. This can be used to declare
         default load strategy.
 
         Respected by `BaseMixin.get`.
-        '''
+        """
         return session.query(cls)
 
     @classmethod
     def get(cls: Type[T], session: Session, get_id: str) -> T:
-        '''
+        """
         Query an instance by `id`.
-        '''
+        """
         return cls.default_query(session).filter(cls.id == get_id).first()
 
     @classmethod
     def exists(cls, session: Session, get_id: str) -> bool:
-        '''
+        """
         Return whether or not an instance exists, without loading it, by `id`.
-        '''
+        """
         return session.query(cls).filter(cls.id == get_id).count() > 0
 
     def to_model(self, *, model_cls: Optional[Type[Model]] = None) -> Model:
-        '''
+        """
         Create a `Model` from this mapper instance, by default of the type of
         `__model__`.
 
@@ -100,7 +100,7 @@ class BaseMixin:
 
             # ...
 
-            children: Mapped[list['Thing']] = relationship('Thing', ...)
+            children: Mapped[list["Thing"]] = relationship("Thing", ...)
 
         thing.to_model().model_dump()
         # { "id": 1, "children": [{ "id": 2 }, { "id": 3 }]}
@@ -108,11 +108,11 @@ class BaseMixin:
 
         This is often necessary when creating `Model`s containing deep relationships,
         to prevent circularity.
-        '''
+        """
         from .common import ModelGracefulEnumReconstructMixin # pylint: disable=import-outside-toplevel
 
         if not model_cls:
-            model_cls = getattr(self, '__model__', None)
+            model_cls = getattr(self, "__model__", None)
 
         if isinstance(model_cls, str):
             from kedet import model # pylint: disable=import-outside-toplevel
@@ -152,9 +152,9 @@ class BaseMixin:
         return model_cls.model_validate(data)
 
     def expunge(self, *, skip: Optional[list[str]] = None):
-        '''
+        """
         Expunge this instance from the session.
-        '''
+        """
         session = Session.object_session(self)
 
         session.refresh(self)

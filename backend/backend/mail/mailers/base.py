@@ -1,25 +1,25 @@
-'''
+"""
 Email dispatcher adapter base.
-'''
+"""
 from sqlalchemy.orm import Session
 
-from kedet.config import config
-from kedet.model import Notification
+from backend.config import config
+from backend.model import Notification
 
 from ..common import MailContent, get_renderer
 
 class Mailer:
-    '''
+    """
     Generic email dispatcher.
-    '''
+    """
 
     def maybe_send_for_notification(
         self, session: Session, notification: Notification
     ) -> bool:
-        '''
+        """
         Send an email for the given `notification` if the renderer for it exists and
         chooses to render it.
-        '''
+        """
         renderer = get_renderer(notification.type)
         if not renderer:
             return False
@@ -35,9 +35,9 @@ class Mailer:
         return True
 
     def do_send(self, recipient_addr: str, content: MailContent):
-        '''
+        """
         Dispatch the provided email to the given recipients.
 
         Implementations must override.
-        '''
+        """
         raise NotImplementedError()

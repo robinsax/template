@@ -1,6 +1,6 @@
-'''
+"""
 User, authentication, and authorization objects.
-'''
+"""
 
 from .auth import AuthKey, AuthKeyModel, AuthKeyRestriction
 from .authz import (

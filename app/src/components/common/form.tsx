@@ -13,18 +13,18 @@
 import React, {
     ReactNode, KeyboardEvent, ComponentType, createContext, useState, useMemo,
     useContext, useEffect, useCallback
-} from 'react';
+} from "react";
 import {
     Alert, Button, Input, Spinner, FormControl, FormLabel, FormErrorMessage, Textarea
-} from '@chakra-ui/react';
-import { Select, SelectButton, SelectList } from '@saas-ui/react';
+} from "@chakra-ui/react";
+import { Select, SelectButton, SelectList } from "@saas-ui/react";
 
-import { error } from '@/util';
+import { error } from "@/util";
 import {
     APIError, I18nValueFn, QueryKey, useI18n, useAsyncCallback, useInvalidate
-} from '@/hooks';
+} from "@/hooks";
 
-import { IconName, Icon } from './icons';
+import { IconName, Icon } from "./icons";
 
 // Spec types.
 export type FormSelectOption<V extends string> = {
@@ -66,21 +66,21 @@ export type FormFieldSpec<T, N extends keyof T> = (
                 {
                     label: I18nValueFn,
                     placeholder?: I18nValueFn,
-                    type: 'number'
+                    type: "number"
                 }
             : string extends T[N] ? (
                 // Specify text or password for raw strings.
                 {
                     label: I18nValueFn,
                     placeholder?: I18nValueFn,
-                    type?: 'text' | 'textarea' | 'password'
+                    type?: "text" | "textarea" | "password"
                 } | (
                     NonNullable<T[N]> extends string ?
                     // Specify select for enumerated types.
                     {
                         label: I18nValueFn,
                         placeholder?: I18nValueFn,
-                        type: 'select',
+                        type: "select",
                         options: FormSelectOption<NonNullable<T[N]>>[]
                     }
                     :
@@ -91,10 +91,10 @@ export type FormFieldSpec<T, N extends keyof T> = (
                 {
                     label: I18nValueFn,
                     placeholder?: I18nValueFn,
-                    type: 'datetime'
+                    type: "datetime"
                 }
             :
-                // Can't automatically render this field.
+                // Can"t automatically render this field.
                 never
         )
     )
@@ -141,7 +141,7 @@ export type FormKey = string | number | symbol;
 *   Error state including per-field errors and global error.
 */
 export type FormErrorValues<F extends FormKey> = {
-    [name in F | '_global']: string | null
+    [name in F | "_global"]: string | null
 };
 
 /**
@@ -157,7 +157,7 @@ export type FormAnyValueSetFn<T, F extends keyof T> = (
 );
 
 /**
-*   Form controller interface made available through hooks and to the form provider's
+*   Form controller interface made available through hooks and to the form provider"s
 *   parent.
 */
 export type FormController<T, F extends keyof T = keyof T> = {
@@ -206,7 +206,7 @@ export type FormProviderProps<T, F extends keyof T = keyof T> = {
     */
     onSubmit?: FormSubmitFn<T, F>,
     /**
-    *   Invoked with the {@link FormController} when the it's ready.
+    *   Invoked with the {@link FormController} when the it"s ready.
     */
     onReady?: (context: FormController<T, F>) => void,
     /**
@@ -259,7 +259,7 @@ const useErrors = <T, F extends keyof T>(fieldsSpec: FormFieldSpecs<T, F>) => {
 
     const setError = useMemo(() => {
         return (name: F | null, error: string | null) => {
-            setErrors(errors => ({ ...errors, [name || '_global']: error }));
+            setErrors(errors => ({ ...errors, [name || "_global"]: error }));
         };
     }, []);
 
@@ -335,11 +335,11 @@ export const createFormSystem = <T, F extends keyof T = keyof T>({
 
         // Submit handling.
         const [submit, working] = useAsyncCallback(async () => {
-            if (!onSubmit) return error('no onSubmit');
+            if (!onSubmit) return error("no onSubmit");
 
             let hasError = false;
             for (const name in fieldsSpec) {
-                if (!fieldsSpec[name] || 'Component' in fieldsSpec[name]) continue;
+                if (!fieldsSpec[name] || "Component" in fieldsSpec[name]) continue;
     
                 if (errors[name]) {
                     hasError = true;
@@ -347,7 +347,7 @@ export const createFormSystem = <T, F extends keyof T = keyof T>({
                 }
     
                 if (!values[name] && !fieldsSpec[name].optional) {
-                    setError(name, t('Required.'));
+                    setError(name, t("Required."));
                     hasError = true;
                 }
             }
@@ -369,7 +369,7 @@ export const createFormSystem = <T, F extends keyof T = keyof T>({
     
                 const errorLabel = errorsSpec[err.detail];
     
-                setError(null, errorLabel ? errorLabel(t) : t('An error occurred.'));
+                setError(null, errorLabel ? errorLabel(t) : t("An error occurred."));
             }
         }, [errors, values]);
 
@@ -407,35 +407,35 @@ export const createFormSystem = <T, F extends keyof T = keyof T>({
         } = useForm();
 
         const options = useMemo(() => {
-            if (!('options' in spec)) return undefined;
+            if (!("options" in spec)) return undefined;
 
             return spec.options.map(option => option.value);
         }, [spec]);
 
         const labelFor = useCallback((value: string): string => {
-            if (!options || !('options' in spec)) return '';
+            if (!options || !("options" in spec)) return "";
 
             const option = spec.options[options.indexOf(value as T[N] & string)];
 
-            return option ? option.label(t) : '';
+            return option ? option.label(t) : "";
         }, [t]);
 
         const valueFor = useCallback((label: string): T[N] => {
-            if (!options || !('options' in spec)) return '' as T[N];
+            if (!options || !("options" in spec)) return "" as T[N];
 
             const option = spec.options.find(option => option.label(t) == label);
 
-            return option ? option.value : '' as T[N];
+            return option ? option.value : "" as T[N];
         }, [spec]);
 
         const onEnter = useCallback((event: KeyboardEvent) => {
-            if (event.key != 'Enter') return;
+            if (event.key != "Enter") return;
 
             submit();
         }, [submit]);
 
         return (
-            'Component' in spec ? (
+            "Component" in spec ? (
                 // Custom component.
                 <spec.Component
                     target={ target }
@@ -450,13 +450,13 @@ export const createFormSystem = <T, F extends keyof T = keyof T>({
                     <FormLabel>
                         { spec.label(t) }
                     </FormLabel>
-                    { spec.type == 'select' ? (
+                    { spec.type == "select" ? (
                         <Select
                             name={ name as string }
                             placeholder={
                                 spec.placeholder ? spec.placeholder(t) : undefined
                             }
-                            value={ values[name] as string || '' }
+                            value={ values[name] as string || "" }
                             options={ options ? options.map(labelFor) : [] }
                             renderValue={ value => labelFor(value[0] as string) }
                             onChange={ label => setValue(name, valueFor(label)) }
@@ -464,13 +464,13 @@ export const createFormSystem = <T, F extends keyof T = keyof T>({
                             <SelectButton/>
                             <SelectList/>
                         </Select>
-                    ) : spec.type == 'textarea' ? (
+                    ) : spec.type == "textarea" ? (
                         <Textarea
                             name={ name as string }
                             placeholder={
                                 spec.placeholder ? spec.placeholder(t) : undefined
                             }
-                            value={ values[name] as string || '' }
+                            value={ values[name] as string || "" }
                             resize="none"
                             onChange={ e => setValue(name, e.target.value as T[N]) }
                         />
@@ -480,8 +480,8 @@ export const createFormSystem = <T, F extends keyof T = keyof T>({
                             placeholder={
                                 spec.placeholder ? spec.placeholder(t) : undefined
                             }
-                            type={ spec.type || 'text' }
-                            value={ values[name] as string || '' }
+                            type={ spec.type || "text" }
+                            value={ values[name] as string || "" }
                             onChange={ e => setValue(name, e.target.value as T[N]) }
                             onKeyUp={ onEnter }
                         />
@@ -553,7 +553,7 @@ export const createFormSystem = <T, F extends keyof T = keyof T>({
                 { working ? (
                     <Spinner/>
                 ) : (
-                    label ? label(t, target || null) : t('Save')
+                    label ? label(t, target || null) : t("Save")
                 ) }
             </Button>
         );

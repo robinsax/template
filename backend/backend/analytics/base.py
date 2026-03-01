@@ -2,13 +2,13 @@ from datetime import datetime
 from typing import Optional
 from collections import defaultdict
 
-from kedet.model import Model, Campaign, CampaignChannel
-from kedet.channels import get_ad_platform_for_channel
+from backend.model import Model, Campaign, CampaignChannel
+from backend.channels import get_ad_platform_for_channel
 
 class RawAnalyticsModel(Model):
-    '''
+    """
     Raw advertising analytics collected from ad platforms for a single day.
-    '''
+    """
     spend: float
     impressions: Optional[int] = None
     clicks: Optional[int] = None
@@ -23,34 +23,34 @@ class RawAnalyticsTrendModel(Model):
     revenue: Optional[float] = None
 
 class PerformanceMetricsModel(Model):
-    '''
+    """
     Derived advertising performance metrics calculated from raw data.
-    '''
+    """
     cpa: Optional[float] = None
-    '''
+    """
     Cost per acquisition (spend / conversions)
-    '''
+    """
     cpc: Optional[float] = None
-    '''
+    """
     Cost per click (spend / clicks)
-    '''
+    """
     cpm: Optional[float] = None
-    '''
+    """
     Cost per thousand impressions (spend / impressions * 1000)
-    '''
+    """
     ctr: Optional[float] = None
-    '''
+    """
     Click-through rate (clicks / impressions)
-    '''
+    """
     roas: Optional[float] = None
-    '''
+    """
     Return on ad spend (revenue / spend)
-    '''
+    """
 
 class DailyMetricsModel(Model):
-    '''
+    """
     Daily metrics for a campaign, optionally broken down by channel.
-    '''
+    """
     date: datetime
     raw: RawAnalyticsModel
     computed: PerformanceMetricsModel
@@ -59,9 +59,9 @@ class DailyMetricsModel(Model):
     def _calculate_performance_metrics(
         cls, raw: RawAnalyticsModel
     ) -> PerformanceMetricsModel:
-        '''
+        """
         Calculate derived metrics (CPA, CPC, CPM, CTR, ROAS) from raw data.
-        '''
+        """
         cpa = None
         cpc = None
         cpm = None
@@ -94,7 +94,7 @@ class DailyMetricsModel(Model):
     @classmethod
     def create(
         cls, date: datetime, raw: RawAnalyticsModel
-    ) -> 'DailyMetricsModel':
+    ) -> "DailyMetricsModel":
         return cls(
             date=date,
             raw=raw,
@@ -102,11 +102,11 @@ class DailyMetricsModel(Model):
         )
 
     def calculate_trends_against_previous(
-        self, previous_day: 'DailyMetricsModel'
+        self, previous_day: "DailyMetricsModel"
     ) -> tuple[RawAnalyticsTrendModel, PerformanceMetricsModel]:
-        '''
+        """
         Calculate day-over-day trend metrics.
-        '''
+        """
         def trend(curr: float, prev: float) -> Optional[float]:
             return ((curr - prev) / prev) if prev > 0 else None
 
@@ -159,14 +159,14 @@ class DailyMetricsModel(Model):
         return raw, computed
 
 class AnalyticsModel(Model):
-    '''
+    """
     Aggregated analytics for a single campaign including:
     - Aggregated daily metrics with performance calculations, including totals.
     - Pacing metrics (budget vs spend, elapsed time).
     - Burn rate analysis (current vs target daily spend).
     - Spend projections and forecasting.
     - Day-over-day trend analysis.
-    '''
+    """
     budget: float
     totals: DailyMetricsModel
     daily_metrics: list[DailyMetricsModel]
@@ -181,9 +181,9 @@ class AnalyticsModel(Model):
     def _aggregate_daily_metrics_from_channels(
         cls, daily_metrics_by_channel: dict[str, list[DailyMetricsModel]]
     ) -> list[DailyMetricsModel]:
-        '''
+        """
         Aggregate daily metrics from multiple channels.
-        '''
+        """
         all_dates = set()
         for channel_metrics in daily_metrics_by_channel.values():
             for daily_metric in channel_metrics:
@@ -192,21 +192,21 @@ class AnalyticsModel(Model):
         daily_metrics = []
         # Use dict of dicts instead of RawAnalyticsModel
         date_to_metric = defaultdict(lambda: {
-            'spend': 0.0,
-            'impressions': 0,
-            'clicks': 0,
-            'conversions': 0,
-            'revenue': 0.0
+            "spend": 0.0,
+            "impressions": 0,
+            "clicks": 0,
+            "conversions": 0,
+            "revenue": 0.0
         })
 
         for channel_metrics in daily_metrics_by_channel.values():
             for daily_metric in channel_metrics:
                 date = daily_metric.date
-                date_to_metric[date]['spend'] += daily_metric.raw.spend
-                date_to_metric[date]['impressions'] += daily_metric.raw.impressions or 0
-                date_to_metric[date]['clicks'] += daily_metric.raw.clicks or 0
-                date_to_metric[date]['conversions'] += daily_metric.raw.conversions or 0
-                date_to_metric[date]['revenue'] += daily_metric.raw.revenue or 0.0
+                date_to_metric[date]["spend"] += daily_metric.raw.spend
+                date_to_metric[date]["impressions"] += daily_metric.raw.impressions or 0
+                date_to_metric[date]["clicks"] += daily_metric.raw.clicks or 0
+                date_to_metric[date]["conversions"] += daily_metric.raw.conversions or 0
+                date_to_metric[date]["revenue"] += daily_metric.raw.revenue or 0.0
 
         for date in sorted(all_dates):
             raw_aggregate = RawAnalyticsModel(**date_to_metric[date])
@@ -219,23 +219,23 @@ class AnalyticsModel(Model):
     def _calculate_totals(
         cls, daily_metrics: list[DailyMetricsModel]
     ) -> DailyMetricsModel:
-        '''
+        """
         Calculate totals from daily metrics.
-        '''
+        """
         totals = {
-            'spend': 0.0,
-            'impressions': 0,
-            'clicks': 0,
-            'conversions': 0,
-            'revenue': 0.0
+            "spend": 0.0,
+            "impressions": 0,
+            "clicks": 0,
+            "conversions": 0,
+            "revenue": 0.0
         }
 
         for daily_metric in daily_metrics:
-            totals['spend'] += daily_metric.raw.spend
-            totals['impressions'] += daily_metric.raw.impressions or 0
-            totals['clicks'] += daily_metric.raw.clicks or 0
-            totals['conversions'] += daily_metric.raw.conversions or 0
-            totals['revenue'] += daily_metric.raw.revenue or 0.0
+            totals["spend"] += daily_metric.raw.spend
+            totals["impressions"] += daily_metric.raw.impressions or 0
+            totals["clicks"] += daily_metric.raw.clicks or 0
+            totals["conversions"] += daily_metric.raw.conversions or 0
+            totals["revenue"] += daily_metric.raw.revenue or 0.0
 
         raw_totals = RawAnalyticsModel(**totals)
         return DailyMetricsModel.create(datetime.now(), raw_totals)
@@ -244,10 +244,10 @@ class AnalyticsModel(Model):
     def create( # pylint: disable=too-many-locals
         cls, campaign: Campaign, channels: list[CampaignChannel],
         daily_metrics_by_channel: dict[str, list[DailyMetricsModel]]
-    ) -> 'AnalyticsModel':
-        '''
+    ) -> "AnalyticsModel":
+        """
         Create an `AnalyticsModel` for the provided `campaign` and `channels`.
-        '''
+        """
         # Aggregate across channels if needed.
         if len(daily_metrics_by_channel) > 1:
             daily_metrics = cls._aggregate_daily_metrics_from_channels(
@@ -316,7 +316,7 @@ class AnalyticsBackend:
     def get_analytics(
         self, campaign: Campaign, channels: list[CampaignChannel] = None
     ) -> AnalyticsModel:
-        '''
+        """
         Build comprehensive analytics for a campaign by aggregating data from all 
         channels.
 
@@ -329,7 +329,7 @@ class AnalyticsBackend:
 
         Returns a fully populated `AnalyticsModel` with aggregated daily metrics and
         campaign insights ready for analysis and reporting.
-        '''
+        """
         if not channels:
             channels = campaign.channels
 
@@ -350,7 +350,7 @@ class AnalyticsBackend:
     def get_channel_metrics(
         self, channel: CampaignChannel, ids: list[str]
     ) -> list[DailyMetricsModel]:
-        '''
+        """
         Load daily analytics data for a specific campaign channel.
 
         Returns a list of `DailyMetricsModel` containing raw analytics data for each day,
@@ -358,5 +358,5 @@ class AnalyticsBackend:
         not yet calculated.
 
         Implementations must override.
-        '''
+        """
         raise NotImplementedError()

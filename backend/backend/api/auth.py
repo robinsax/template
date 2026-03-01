@@ -1,17 +1,17 @@
-'''
+"""
 Authentication endpoints.
-'''
+"""
 from typing import Optional
 from datetime import timedelta
 from fastapi import Request, Depends
 from sqlalchemy.orm import Session
 
-from kedet.config import config
-from kedet.model import (
+from backend.config import config
+from backend.model import (
     Model, User, AuthKey, AuthKeyModel, AuthKeyRestriction, Notification,
     NotificationType, current_datetime
 )
-from kedet.service import (
+from backend.service import (
     Unauthorized, Invalid, get_current_auth_key, get_session, get_current_user
 )
 
@@ -19,7 +19,7 @@ from .app import app
 
 # Auth keys.
 class AuthParams(Model):
-    '''
+    """
     Authentication JSON body.
 
     Either:
@@ -29,24 +29,24 @@ class AuthParams(Model):
     In some cases both `Authorization` and `password` are required.
 
     `restriction` can be set to generate a restricted key.
-    '''
+    """
     email: Optional[str] = None
     password: Optional[str] = None
     restriction: Optional[AuthKeyRestriction] = None
 
 class AuthResp(Model):
-    '''
+    """
     Response upon successful authentication. Contains a token and the `AuthKeyModel`
     associated to it.
-    '''
+    """
     token: str
     auth: AuthKeyModel
 
-@app.post('/auth')
+@app.post("/auth")
 def provision_auth_key(
     req: Request, params: AuthParams, session: Session = Depends(get_session)
 ) -> AuthResp:
-    '''
+    """
     Provision an expiring authentication key and corresponding `token` that can be
     provided to authenticate under it.
 
@@ -63,18 +63,18 @@ def provision_auth_key(
         - Usable to change your own password.
         - Both an existing unrestricted key, and `password`, must be provided.
         - Reset link emails contain a token for an equivalent key.
-    '''
+    """
     # Validate credentials.
     if params.email and params.password:
         user = User.get_by_email(session, params.email)
 
         if not user or not user.check_password(params.password):
-            raise Invalid('invalid_credentials')
+            raise Invalid("invalid_credentials")
     else:
         user = get_current_user(req, session)
 
     if user.is_inactive:
-        raise Unauthorized('inactive_user')
+        raise Unauthorized("inactive_user")
 
     # Solve restriction and expiry.
     restriction = None
@@ -83,7 +83,7 @@ def provision_auth_key(
         try:
             restriction = AuthKeyRestriction(params.restriction)
         except ValueError:
-            raise Invalid('invalid_restriction') from None
+            raise Invalid("invalid_restriction") from None
 
         if restriction == AuthKeyRestriction.ASSET_GET:
             expiry_delta = timedelta(
@@ -93,13 +93,13 @@ def provision_auth_key(
             # Also require password for reset tokens (block physical session
             # hijack).
             if not params.password or not user.check_password(params.password):
-                raise Invalid('invalid_password')
+                raise Invalid("invalid_password")
 
             expiry_delta = timedelta(
                 hours=config.auth_key_password_reset_expiry_hours.get()
             )
         else:
-            raise Invalid('invalid_restriction')
+            raise Invalid("invalid_restriction")
 
     # Create key with default expiry.
     key = AuthKey(
@@ -118,16 +118,16 @@ def provision_auth_key(
         auth=key.to_model()
     )
 
-@app.put('/auth')
+@app.put("/auth")
 def refresh_auth_key(
     req: Request, session: Session = Depends(get_session)
 ) -> AuthKeyModel:
-    '''
+    """
     Refresh the current authentication key to defer expiry.
-    '''
+    """
     key = get_current_auth_key(req, session)
     if not key:
-        raise Unauthorized('invalid_auth')
+        raise Unauthorized("invalid_auth")
 
     key.refresh(
         current_datetime() + timedelta(hours=config.auth_key_expiry_hours.get())
@@ -138,16 +138,16 @@ def refresh_auth_key(
 
     return key.to_model()
 
-@app.delete('/auth')
+@app.delete("/auth")
 def revoke_auth_key(
     req: Request, session: Session = Depends(get_session)
 ) -> AuthKeyModel:
-    '''
+    """
     Immediately revoke the current authentication key.
-    '''
+    """
     key = get_current_auth_key(req, session)
     if not key:
-        raise Unauthorized('invalid_auth')
+        raise Unauthorized("invalid_auth")
 
     key.revoke()
     session.commit()
@@ -158,13 +158,13 @@ def revoke_auth_key(
 class PasswordResetRequestParams(Model):
     email: str
 
-@app.post('/auth/password-resets')
+@app.post("/auth/password-resets")
 def request_password_reset(
     params: PasswordResetRequestParams, session: Session = Depends(get_session)
 ) -> None:
-    '''
+    """
     Anonymously request a password reset for the user with the given email.
-    '''
+    """
     user = User.get_by_email(session, params.email)
     if not user:
         return None

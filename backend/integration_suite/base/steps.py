@@ -1,6 +1,6 @@
-'''
+"""
 Step declarations.
-'''
+"""
 import inspect
 from collections import deque
 from dataclasses import dataclass
@@ -12,10 +12,10 @@ StepRef = Union[str, Callable]
 
 @dataclass
 class OutputInjection:
-    '''
+    """
     Sentinel value representing that a step argument should be injected with the
     output of another step.
-    '''
+    """
     step_ref: StepRef
     key: Optional[str]
     subchain: Optional[str]
@@ -24,30 +24,30 @@ def output(
     step_ref: StepRef, key: Optional[str] = None, *,
     subchain: Optional[str] = None
 ):
-    '''
+    """
     Default value annotation for step arguments that will cause them to receive the
     specified output from another step.
-    '''
+    """
     return OutputInjection(step_ref=step_ref, key=key, subchain=subchain)
 
 @dataclass
 class StepNeedsAny:
-    '''
+    """
     Representation of an "any of" dependency.
-    '''
+    """
     steps: list[str]
 
 def any_of(*steps: StepRef):
-    '''
+    """
     Declare a set of steps such that at least one of them must be met.
-    '''
+    """
     return StepNeedsAny(steps=_resolve_refs(steps))
 
 @dataclass
 class StepSubchains:
-    '''
+    """
     Representation of a "subchain" dependency.
-    '''
+    """
     count: int
     from_step: str
     branch_at: Optional[str]
@@ -55,10 +55,10 @@ class StepSubchains:
 def subchains(
     count: int, from_step: StepRef, branch_at: Optional[StepRef] = None
 ):
-    '''
+    """
     Declare a dependency on a set of steps for `from_step` being run multiple times,
     where the chains branch at `branch_at`.
-    '''
+    """
     return StepSubchains(
         count=count,
         from_step=_resolve_refs([from_step])[0],
@@ -67,9 +67,9 @@ def subchains(
 
 @dataclass
 class StepInfo:
-    '''
+    """
     Registered information for a step.
-    '''
+    """
     fn: Callable
     is_assert: bool
     is_branch: bool
@@ -79,13 +79,13 @@ class StepInfo:
     def get_name(self) -> str:
         name = self.fn.__name__
         if self.subchain:
-            name += ':' + self.subchain
+            name += ":" + self.subchain
         return name
 
-    def with_subchain(self, subchain: str) -> 'StepInfo':
+    def with_subchain(self, subchain: str) -> "StepInfo":
         if self.subchain:
             if subchain:
-                subchain = self.subchain + ':' + subchain
+                subchain = self.subchain + ":" + subchain
             else:
                 subchain = self.subchain
 
@@ -116,9 +116,9 @@ def step(
     needs: Optional[list[StepRef, StepNeedsAny, StepSubchains]] = None, *,
     is_assert: Optional[bool] = None, is_branch: Optional[bool] = None
 ):
-    '''
+    """
     Decorator for integration suite steps.
-    '''
+    """
     def decorator(fn):
         injected_outputs = {
             name: param.default
@@ -130,9 +130,9 @@ def step(
         _steps[fn.__name__] = StepInfo(
             fn=fn,
             is_assert=(
-                fn.__name__.startswith('assert_') if is_assert is None else is_assert
+                fn.__name__.startswith("assert_") if is_assert is None else is_assert
             ),
-            is_branch=fn.__name__.startswith('each_') or is_branch,
+            is_branch=fn.__name__.startswith("each_") or is_branch,
             needs=_resolve_refs(needs or []),
             subchain=None
         )
@@ -154,14 +154,14 @@ def get_all_step_names(asserts_only: bool = False) -> list[str]:
 def plan_steps( # pylint: disable=too-many-locals,too-many-statements
     final_step_name: str
 ) -> list[StepInfo]:
-    '''
+    """
     Return a list of steps to run to reach the final step. Ordering attempts to respect
     declared order of needs.
 
     Must be invoked in order with a shared context.
-    '''
+    """
     if final_step_name not in _steps:
-        raise IntegrationSuiteError(f'Unknown step: { final_step_name }')
+        raise IntegrationSuiteError(f"Unknown step: { final_step_name }")
 
     # Collect all concrete needs.
     concrete_needs = set()
@@ -253,7 +253,7 @@ def plan_steps( # pylint: disable=too-many-locals,too-many-statements
                     edge_order[(option, name)] = edge_index
                     edge_index += 1
 
-    # Topo sort, Kahn's.
+    # Topo sort, Kahn"s.
     queue = deque([
         name for name, deg in in_degree.items() if deg == 0
     ])
@@ -275,7 +275,7 @@ def plan_steps( # pylint: disable=too-many-locals,too-many-statements
             queue.append(neighbor)
 
     if len(plan) != len(needed):
-        raise ValueError('Cyclic needs graph')
+        raise ValueError("Cyclic needs graph")
 
     plan = [_steps[step_name] for step_name in plan]
 

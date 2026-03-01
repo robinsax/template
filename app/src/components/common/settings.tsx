@@ -1,19 +1,19 @@
 /**
 *   Settings control components. 
 */
-import React from 'react';
+import React from "react";
 import {
     HStack, Switch, Text, Popover, PopoverTrigger, PopoverContent, PopoverBody, Button,
     VStack, PopoverArrow, useColorMode
-} from '@chakra-ui/react';
+} from "@chakra-ui/react";
 
 import {
     I18nLocaleKey, useLocale, useSupportedLocales, useI18n, useCurrentUserOrNull, useAPI,
     useAsyncCallback
-} from '@/hooks';
+} from "@/hooks";
 
-import { Icon } from './icons';
-import { ClickTarget } from './layouts';
+import { Icon } from "./icons";
+import { ClickTarget } from "./layouts";
 
 /**
 *   UI to toggle the theme.
@@ -24,7 +24,7 @@ export const ThemeToggle = () => {
     return (
         <HStack justifyContent="right">
             <Switch
-                isChecked={ colorMode == 'dark' }
+                isChecked={ colorMode == "dark" }
                 onChange={ toggleColorMode }
             />
             <Icon name="darkTheme"/>

@@ -1,17 +1,17 @@
 /**
 *   Grant control UI.
 */
-import React, { useEffect, useMemo, useState } from 'react';
-import { VStack, HStack, Button, Alert, Box, Spinner, Text } from '@chakra-ui/react';
-import { Select, SelectButton, SelectList } from '@saas-ui/react';
+import React, { useEffect, useMemo, useState } from "react";
+import { VStack, HStack, Button, Alert, Box, Spinner, Text } from "@chakra-ui/react";
+import { Select, SelectButton, SelectList } from "@saas-ui/react";
 
-import { AuthzScope, UserModel, Role, UserGrantModel } from '@/models';
-import { grantContainsScope } from '@/util';
+import { AuthzScope, UserModel, Role, UserGrantModel } from "@/models";
+import { grantContainsScope } from "@/util";
 import {
     APIClient, useAsyncCallback, useI18n, useAPI, useInvalidate, useAuthzScope,
     useFetchedState,
-} from '@/hooks';
-import { UserPersona, RoleSummary, roleTitle } from '@/components/users';
+} from "@/hooks";
+import { UserPersona, RoleSummary, roleTitle } from "@/components/users";
 
 /**
 *   Returns the API endpoints for grant control at the given scope.
@@ -96,7 +96,7 @@ export const GrantControl = ({ user, authzScope: authzScopeProp, onDone }: {
         await endpoint.users.id(user.id).put({ role });
 
         invalidate({
-            queryKeys: ['users', 'clients']
+            queryKeys: ["users", "clients"]
         });
         onDone();
     }, [user, authzScope.clientId]);
@@ -114,11 +114,11 @@ export const GrantControl = ({ user, authzScope: authzScopeProp, onDone }: {
         <VStack width="full" spacing={ 6 }>
             { roleOptionsError ? (
                 <Alert status="error">
-                    { roleOptionsError == 'invalid_target' ?
+                    { roleOptionsError == "invalid_target" ?
                         // eslint-disable-next-line max-len
-                        t('Roles cannot be assigned to this organization. Either it is deactivated or does not exist.')
+                        t("Roles cannot be assigned to this organization. Either it is deactivated or does not exist.")
                     :
-                        t('Failed to gather role options.')
+                        t("Failed to gather role options.")
                     }
                 </Alert>
             ) : !roleOptions ? (
@@ -127,17 +127,17 @@ export const GrantControl = ({ user, authzScope: authzScopeProp, onDone }: {
                 <>
                     { parentGrants.length > 0 && (
                         <Alert status="warning">
-                            { t('{name} is {roles} above this level.', {
+                            { t("{name} is {roles} above this level.", {
                                 name: user.name,
                                 roles: parentGrants.map(grant => (
                                     roleTitle(t, grant.role)
-                                )).join(', ')
+                                )).join(", ")
                             }) }
                         </Alert>
                     ) }
                     { currentRole && (
                         <Alert>
-                            { t('{role} is {name}\'s current role.', {
+                            { t("{role} is {name}\"s current role.", {
                                 name: user.name,
                                 role: roleTitle(t, currentRole)
                             }) }
@@ -147,11 +147,11 @@ export const GrantControl = ({ user, authzScope: authzScopeProp, onDone }: {
                         <Alert status="error">
                             <VStack alignItems="left">
                                 <Text size="sm">
-                                    { t('No roles available.') }
+                                    { t("No roles available.") }
                                 </Text>
                                 <Text>{ 
                                     // eslint-disable-next-line max-len
-                                    t('Either {user} already has a role that makes any roles at this level redundant, or there are no roles assignable at this level for this type of user.', {
+                                    t("Either {user} already has a role that makes any roles at this level redundant, or there are no roles assignable at this level for this type of user.", {
                                         user: user.name
                                     })
                                 }</Text>
@@ -183,7 +183,7 @@ export const GrantControl = ({ user, authzScope: authzScopeProp, onDone }: {
                                         onClick={ () => onSelect(role) }
                                         isLoading={ working }
                                     >
-                                        { t('Grant Role') }
+                                        { t("Grant Role") }
                                     </Button>
                                 </>
                             ) }

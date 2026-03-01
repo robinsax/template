@@ -1,23 +1,23 @@
-'''
+"""
 Functionality shared between base API endpoints.
-'''
+"""
 import uuid
 from typing import TypeVar, Optional
 from sqlalchemy.orm import Session
 
-from kedet.model import (
+from backend.model import (
     User, Permission, AuthzScope, State, Model, Audit, StateMixin, BasicAuditEvent,
     Client, PERMISSIONS_MATRIX
 )
-from kedet.service import assert_authz
+from backend.service import assert_authz
 
 # Scope helpers.
 def get_business_ids_in_client_for_user(
     user: User, client: Client, permission: Optional[Permission]
 ) -> list[uuid.UUID]:
-    '''
+    """
     Return the IDs of businesses the user has access to within the given client.
-    '''
+    """
     business_ids = set()
     for grant in user.grants:
         if not grant.client_id:
@@ -43,21 +43,21 @@ def get_business_ids_in_client_for_user(
 
 # Generic base API handlers.
 class StateUpdateParams(Model):
-    '''
+    """
     Canonical request body for `State` change endpoints.
-    '''
+    """
     state: State
 
-S = TypeVar('S', bound=StateMixin)
+S = TypeVar("S", bound=StateMixin)
 def state_update_handler(
     session: Session, user: User, target: S, authz_scope: AuthzScope,
     update: StateUpdateParams, *, require_permission: Permission
 ) -> S:
-    '''
+    """
     Re-usable handler for updating the `State` of an SQLAlchemy mapper.
 
     Checks authorization using the provided permission. Handles auditing.
-    '''
+    """
     assert_authz(user, authz_scope, require_permission)
 
     target.state = update.state

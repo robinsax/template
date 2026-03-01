@@ -1,22 +1,22 @@
 /**
 *   Global application sidebar. 
 */
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
     HStack, Spacer, Divider, VStack, Box, Popover, PopoverTrigger, PopoverContent,
     PopoverBody, PopoverArrow, Portal
-} from '@chakra-ui/react';
-import { NavGroup, NavItem, Sidebar, SidebarSection } from '@saas-ui/react';
-import { Link, useLocation } from 'react-router-dom';
+} from "@chakra-ui/react";
+import { NavGroup, NavItem, Sidebar, SidebarSection } from "@saas-ui/react";
+import { Link, useLocation } from "react-router-dom";
 
-import { usePanelStylesFix } from '@/theme';
-import { useAuthzCheck, useI18n, useSavedState, useWindowListener } from '@/hooks';
-import { ClickTarget } from '@/components/common';
-import { OwnPersona } from '@/components/users';
+import { usePanelStylesFix } from "@/theme";
+import { useAuthzCheck, useI18n, useSavedState, useWindowListener } from "@/hooks";
+import { ClickTarget } from "@/components/common";
+import { OwnPersona } from "@/components/users";
 
-import { ThemeToggle, LocaleSelect } from './settings';
-import { Brand } from './brand';
-import { Icon } from './icons';
+import { ThemeToggle, LocaleSelect } from "./settings";
+import { Brand } from "./brand";
+import { Icon } from "./icons";
 
 const COLLAPSE_BREAKPOINT = 1000;
 
@@ -28,18 +28,18 @@ export const AppSidebar = () => {
     const location = useLocation();
 
     const [preferCollapsed, setPreferCollapsed] = useSavedState(
-        'sidebar-collapsed', false
+        "sidebar-collapsed", false
     );
     const [forceCollapsed, setForceCollapsed] = useState(false);
 
-    useWindowListener('resize', () => {
+    useWindowListener("resize", () => {
         setForceCollapsed(window.innerWidth < COLLAPSE_BREAKPOINT);
     });
 
-    const manageClientAllowed = useAuthzCheck('manage_org', {
+    const manageClientAllowed = useAuthzCheck("manage_org", {
         scopeless: true
     });
-    const manageUsersAllowed = useAuthzCheck('manage_iam', {
+    const manageUsersAllowed = useAuthzCheck("manage_iam", {
         scopeless: true
     });
 
@@ -60,8 +60,8 @@ export const AppSidebar = () => {
             borderRight="solid 1px"
             borderRightColor="lightBorder"
             boxShadow="raise"
-            variant={ collapsed ? 'compact' : 'default' }
-            width={ collapsed ? undefined : '14rem' }
+            variant={ collapsed ? "compact" : "default" }
+            width={ collapsed ? undefined : "14rem" }
             toggleBreakpoint={ false }
             transition="width 0.1s ease-in-out"
         >
@@ -82,7 +82,7 @@ export const AppSidebar = () => {
                         alignItems="center" justifyContent="center"
                     >
                         <Icon
-                            name={ preferCollapsed ? 'right' : 'left' }
+                            name={ preferCollapsed ? "right" : "left" }
                             size="0.5rem"
                         />
                     </ClickTarget>
@@ -93,7 +93,7 @@ export const AppSidebar = () => {
                 alignItems="right"
                 py={ 2 } px={ collapsed ? 1 : 2 }
                 spacing={ 4 }
-                sx={ { marginTop: '0 !important' } }
+                sx={ { marginTop: "0 !important" } }
             >
                 <OwnPersona
                     reverse
@@ -108,49 +108,49 @@ export const AppSidebar = () => {
             <SidebarSection>
                 <NavItem
                     as={ Link }
-                    isActive={ location.pathname == '/' }
+                    isActive={ location.pathname == "/" }
                     icon={ <Icon name="dashboard"/> }
                     to="/"
                 >
-                    { t('Dashboard') }
+                    { t("Dashboard") }
                 </NavItem>
                 <NavItem
                     as={ Link }
-                    isActive={ location.pathname == '/campaigns' }
+                    isActive={ location.pathname == "/campaigns" }
                     icon={ <Icon name="ad"/> }
                     to="/campaigns"
                 >
-                    { t('Campaigns') }
+                    { t("Campaigns") }
                 </NavItem>
                 <NavItem
                     as={ Link }
-                    isActive={ location.pathname == '/reports' }
+                    isActive={ location.pathname == "/reports" }
                     icon={ <Icon name="analytics"/> }
                     to="/reports"
                     mb={ 3 }
                 >
-                    { t('Reports') }
+                    { t("Reports") }
                 </NavItem>
                 { (manageClientAllowed || manageUsersAllowed) && (
-                    <NavGroup title={ t('Management') }>
+                    <NavGroup title={ t("Management") }>
                         { manageClientAllowed && (
                             <NavItem
                                 as={ Link }
-                                isActive={ location.pathname == '/management/clients' }
+                                isActive={ location.pathname == "/management/clients" }
                                 icon={ <Icon name="manage"/> }
                                 to="/management/clients"
                             >
-                                { t('Clients') }
+                                { t("Clients") }
                             </NavItem>
                         ) }
                         { manageUsersAllowed && (
                             <NavItem
                                 as={ Link }
-                                isActive={ location.pathname == '/management/users' }
+                                isActive={ location.pathname == "/management/users" }
                                 icon={ <Icon name="person"/> }
                                 to="/management/users"
                             >
-                                { t('Users') }
+                                { t("Users") }
                             </NavItem>
                         ) }
                     </NavGroup>

@@ -1,21 +1,21 @@
-'''
+"""
 Common task queries.
-'''
+"""
 from typing import Generator, Optional, TypeVar
 from sqlalchemy import ColumnElement
 from sqlalchemy.orm import Session
 
-from kedet.model import BaseMixin
+from backend.model import BaseMixin
 
-T = TypeVar('T', bound=BaseMixin)
+T = TypeVar("T", bound=BaseMixin)
 def task_batch_query(
     session: Session, target_cls: type[T],
     query: Optional[ColumnElement] = None, page_size: int = 5
 ) -> Generator[T, None, None]:
-    '''
+    """
     Yield SQLAlchemy mappers from batches, optionally matching a given query, for
     processing.
-    '''
+    """
     last_id = None
     while True:
         query_obj = session.query(target_cls)

@@ -1,7 +1,7 @@
-import React from 'react';
+import React from "react";
 
-import { InvalidationScope, useFetchedState } from '@/hooks';
-import { UserManager } from '@/components/users';
+import { InvalidationScope, useFetchedState } from "@/hooks";
+import { UserManager } from "@/components/users";
 
 export const ManageUsers = () => {
     const [users, invalidateUsers] = useFetchedState(api => api.users.get());

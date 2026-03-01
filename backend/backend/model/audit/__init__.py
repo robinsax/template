@@ -1,4 +1,4 @@
-'''
+"""
 Auditing model.
 
 Auditing works by calling `Audit.create` when relevant events occur (usually from
@@ -10,6 +10,6 @@ a different implementation by defining an `__audit__` attribute.
 
 This setup prevents generic event tracking from being duplicated across all tables
 (and maintains a better history that that approach usually would).
-'''
+"""
 from .audit import Audit, AuditModel, AuditStandaloneModel, BasicAuditEvent
 from .mixin import AuditSummaryModel, AuditMixin, AuditSummaryMixin
