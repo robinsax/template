@@ -7,10 +7,10 @@ import yaml
 sys.path.insert(0, ".")
 from codegen_common import * # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-position, wrong-import-order
 
-SEARCH = ["app/kedet", "backend/kedet"]
+SEARCH = ["app/src", "backend/backend"]
 SKIP = ["dist", "__pycache__", "locations", "public"]
 
-PATTERN = r"[^\w]t\((["\"])([^)]+)\)"
+PATTERN = r'[^\w]t\((["\"])([^)]+)\)'
 
 def collect_from_file(file_path: str):
     messages = []

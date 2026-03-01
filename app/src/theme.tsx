@@ -213,7 +213,7 @@ const theme = extendTheme(saasTheme, {
     styles: {
         global: {
             // Remove default Chakra outlines.
-            "*:focus, [aria-expanded="true"]": {
+            '*:focus, [aria-expanded="true"]': {
                 boxShadow: force("none"),
                 outline: force("none"),
             },
@@ -228,14 +228,14 @@ const theme = extendTheme(saasTheme, {
             "input:-webkit-autofill, input:-webkit-autofill:focus": {
                 color: force("black")
             },
-            "[data-theme="dark"] input:-webkit-autofill, [data-theme="dark"] input:-webkit-autofill:focus": { // eslint-disable-line
+            '[data-theme="dark"] input:-webkit-autofill, [data-theme="dark"] input:-webkit-autofill:focus': { // eslint-disable-line
                 color: force("white")
             },
             // Override default hover effects.
             "&[data-active]": {
                 backgroundColor: force(semanticTokens.colors.insetPanelBg.default)
             },
-            "[data-theme="dark"] &[data-active]": {
+            '[data-theme="dark"] &[data-active]': {
                 backgroundColor: force(semanticTokens.colors.insetPanelBg._dark)
             },
             ".sui-nav-item__link:hover": {
@@ -243,7 +243,7 @@ const theme = extendTheme(saasTheme, {
                     semanticTokens.colors.insetPanelBgVariantA.default
                 )
             },
-            "[data-theme="dark"] .sui-nav-item__link:hover": {
+            '[data-theme="dark"] .sui-nav-item__link:hover': {
                 backgroundColor: force(
                     semanticTokens.colors.insetPanelBgVariantA._dark
                 )
@@ -262,10 +262,10 @@ const theme = extendTheme(saasTheme, {
                 backdropFilter
             },
             [".chakra-menu__menuitem-option:hover," +
-            ".chakra-menu__menuitem-option[aria-checked="true"]"]: {
+            '.chakra-menu__menuitem-option[aria-checked="true"]']: {
                 backgroundColor: force("transparent")
             },
-            "[data-theme="dark"] .chakra-menu__menu-list": {
+            '[data-theme="dark"] .chakra-menu__menu-list': {
                 backgroundColor: force(
                     semanticTokens.colors.panelBg._dark
                 ),
@@ -549,20 +549,6 @@ export const useGrowOnHover = () => {
             }
         };
     }, []);
-};
-
-export const useMediaBg = (size: number) => {
-    const { colorMode } = useColorMode();
-
-    const a = useThemeColor("panelBg");
-    const b = colorMode == "dark" ? "#2d2d2d" : "#D3B6A9";
-
-    return useMemo(() => {
-        // eslint-disable-next-line max-len
-        const bg = `repeating-linear-gradient(45deg, ${ a }, ${ a } ${ size }px, ${ b } ${ size }px, ${ b } ${ size * 2}px)`;
-
-        return { bg };
-    }, [a, b, size]);
 };
 
 export const useBoxShadow = () => {

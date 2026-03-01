@@ -421,7 +421,7 @@ def _user_prompt_login(root_url: str):
 @cli.verb(short_names={ "r": "root_url" })
 def client_login(*, root_url: Optional[str] = None):
     """
-    Log in to the Kedet API and output a token.
+    Log in to the API and output a token.
     """
     root_url = root_url or "http://localhost/api/v1"
 
@@ -433,7 +433,7 @@ def client_login(*, root_url: Optional[str] = None):
 @cli.verb(short_names={ "r": "root_url" })
 def client(*, root_url: Optional[str] = None):
     """
-    Run an HTTP client for the Kedet API.
+    Run an HTTP client for the API.
 
     Initiates a loop after authentication where requests are executed from user
     input.

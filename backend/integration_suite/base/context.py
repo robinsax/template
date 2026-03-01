@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session
 
 from backend.model import Model
 from backend.service import get_session_as_context, cli as cli
-from backend.api import app as kedet_api
+from backend.api import app as backend_api
 from backend.tasks.notifier import send_notification_emails
 
 from .mocks import MockMailer
@@ -181,7 +181,7 @@ class StepsContext:
     def _get_endpoint_model_cls(
         self, method: str, endpoint: str
     ) -> tuple[Optional[type[Model]], bool]:
-        for route in kedet_api.routes:
+        for route in backend_api.routes:
             if not isinstance(route, APIRoute):
                 continue
 
@@ -330,9 +330,9 @@ class StepsContext:
 
     def cli(self, args: list[str]):
         """
-        Invoke the kedet CLI with the given arguments.
+        Invoke the CLI with the given arguments.
         """
-        log_message = "CLI call:\npython3 kedet "
+        log_message = "CLI call:\npython3 backend "
         for arg in args:
             if arg.startswith("--"):
                 log_message += "\\\n    "

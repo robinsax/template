@@ -20,9 +20,9 @@ import {
     usePanelStylesFix, useGrowOnHover, useMediaBg, useBoxShadow, useHideScrollbars
 } from "@/theme";
 
-import { Icon, IconName } from "./icons";
-import { useEnableStateCheck } from "./actions";
-import { UploadArea, UploadMenuTrigger, useUpload } from "./upload";
+import { Icon, IconName } from "../common/icons";
+import { useEnableStateCheck } from "../common/actions";
+import { UploadArea, UploadMenuTrigger, useUpload } from "../common/upload";
 
 // Highlight areas.
 export type HighlightedProps<T extends "span" | "a"> = (

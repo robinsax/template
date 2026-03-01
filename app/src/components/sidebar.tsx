@@ -15,7 +15,7 @@ import { ClickTarget } from "@/components/common";
 import { OwnPersona } from "@/components/users";
 
 import { ThemeToggle, LocaleSelect } from "./settings";
-import { Brand } from "./brand";
+import { Brand } from "../layouts/brand";
 import { Icon } from "./icons";
 
 const COLLAPSE_BREAKPOINT = 1000;

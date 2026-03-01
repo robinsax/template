@@ -33,7 +33,7 @@ class CLI:
     ```
     would be run as:
     ```bash
-    python -m kedet do thing --foo foo -b bar
+    python -m backend do thing --foo foo -b bar
     ```
 
     Use the global instance `cli`.
@@ -167,7 +167,7 @@ class CLI:
         else:
             fn(**args)
 
-cli = CLI("kedet")
+cli = CLI("backend")
 """
 Global `CLI` instance.
 """

@@ -13,7 +13,7 @@ import {
 } from "@/hooks";
 
 import { Icon } from "./icons";
-import { ClickTarget } from "./layouts";
+import { ClickTarget } from "../layouts/common";
 
 /**
 *   UI to toggle the theme.

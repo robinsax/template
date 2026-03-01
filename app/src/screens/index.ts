@@ -1,5 +1,5 @@
 /**
-*   Route-level components. 
+*   Top-level screens. 
 */
 export * from "./dashboard";
 export * from "./login";
@@ -8,4 +8,4 @@ export * from "./manage-users";
 export * from "./not-found";
 export * from "./privacy";
 export * from "./terms";
-export * from "./about-home";
+export * from "./landing";

@@ -115,7 +115,7 @@ class BaseMixin:
             model_cls = getattr(self, "__model__", None)
 
         if isinstance(model_cls, str):
-            from kedet import model # pylint: disable=import-outside-toplevel
+            from backend import model # pylint: disable=import-outside-toplevel
             model_cls = getattr(model, model_cls)
 
         if model_cls is None:

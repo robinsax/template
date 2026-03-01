@@ -12,7 +12,7 @@ import { OwnPersona } from "@/components/users";
 import { AppSidebar } from "./sidebar";
 import { LocaleSelect, ThemeToggle } from "./settings";
 import { Icon } from "./icons";
-import { Brand } from "./brand";
+import { Brand } from "../basic/branding";
 
 /**
 *   Background vignette UI. Subtly animated if `run` is `true`.

@@ -439,20 +439,6 @@
             }
         },
         {
-            "label": "Codegen: Update Campaign Brief Definitions",
-            "type": "shell",
-            "command": "bash",
-            "args": ["./scripts/dev/codegen-update-campaign-brief-defs.sh"],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [],
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
-            }
-        },
-        {
             "label": "Codegen: Collect EN Locale",
             "type": "shell",
             "command": "bash",

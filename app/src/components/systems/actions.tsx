@@ -14,7 +14,7 @@ import { Permission } from "@/models";
 import { I18nValueFn, useAuthzCheck, useI18n, useQueryParamBehavior } from "@/hooks";
 
 import { IconName, Icon } from "./icons";
-import { ClickTarget } from "./layouts";
+import { ClickTarget } from "../layout/common";
 
 // Enable state context.
 const enableStateContext = createContext<string[]>([]);

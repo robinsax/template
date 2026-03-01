@@ -57,7 +57,7 @@ def _run(
     root_url = root_url or "http://localhost:8500/api/v1"
 
     # Force config.
-    config.service_origin.set("https://kedet-integration-suite.com")
+    config.service_origin.set("https://integration-suite.com")
     config.integration_test_mode.set(True)
 
     context = StepsContext(root_url)
