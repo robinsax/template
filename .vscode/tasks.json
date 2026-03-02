@@ -457,7 +457,6 @@
             "type": "shell",
             "dependsOn": [
                 "Codegen: Update App Definitions",
-                "Codegen: Update Campaign Brief Definitions",
                 "Codegen: Collect EN Locale"
             ],
             "problemMatcher": [],

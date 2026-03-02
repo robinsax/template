@@ -3,7 +3,7 @@ import { Heading, Text, Button, Box, VStack, HStack } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 
 import { useCurrentUserOrNull, useI18n } from "@/hooks";
-import { Icon, SplashScreen } from "@/components/common";
+import { Icon, SplashScreen } from "@/components/design";
 
 export const NotFound = () => {
     const t = useI18n();
@@ -40,3 +40,5 @@ export const NotFound = () => {
         </SplashScreen>
     );
 };
+
+export default NotFound;

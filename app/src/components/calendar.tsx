@@ -14,7 +14,7 @@ import {
 
 import { useI18n } from "@/hooks";
 
-import { Icon } from "./icons";
+import { Icon } from "./design/icons";
 
 // Calendar.
 type CalendarDay = {

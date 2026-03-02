@@ -7,7 +7,7 @@ import { Navigate, Link, useSearchParams } from "react-router-dom";
 import {
     useLoginForm, usePasswordChangeForm, usePasswordResetForm
 } from "@/components/users";
-import { Brand, BlockCard, FormLayout, Icon } from "@/components/common";
+import { Brand, BlockCard, FormLayout, Icon } from "@/components/design";
 import { useCurrentUserOrNull, useI18n } from "@/hooks";
 
 export const Login = () => {
@@ -141,3 +141,5 @@ export const Login = () => {
         </VStack>
     );
 };
+
+export default Login;

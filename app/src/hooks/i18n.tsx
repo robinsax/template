@@ -3,15 +3,22 @@ import React, {
 } from "react";
 
 import en_US from "@common/locales/en_US.json";
-import fr_FR from "@common/locales/fr_FR.json";
 
-// t("English") t("French")
+// t("English")
 const locales = {
-    en_US: { messages: en_US, label: "English" },
-    fr_FR: { messages: fr_FR, label: "French" }
+    en_US: { messages: en_US, label: "English" }
 };
 
 export type I18nLocaleKey = keyof typeof locales;
+
+export const supportedLocales = Object.keys(locales).map(key => ({
+    key: key as I18nLocaleKey,
+    label: locales[key as I18nLocaleKey].label
+}));
+
+export const supportedLocaleKeys: I18nLocaleKey[] = Object.keys(locales).map(key => (
+    key as I18nLocaleKey
+));
 
 /**
 *   The set of supported locale keys.
@@ -108,25 +115,3 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
 *   Returns a {@link I18nFn} with the current locale loaded.
 */
 export const useI18n = (): I18nFn => useContext(i18nContext).t;
-
-/**
-*   Returns the current locale key and a setter to change it, which causes a live update
-*   to the given language.
-*/
-export const useLocale = () => {
-    const { locale, setLocale } = useContext(i18nContext);
-
-    return [locale, setLocale] as const;
-};
-
-/**
-*   Returns the set of available locale keys.
-*/
-export const useSupportedLocales = () => {
-    return useMemo(() => {
-        return Object.keys(locales).map(key => ({
-            key,
-            label: locales[key as I18nLocaleKey].label
-        })) as I18nLocale[];
-    }, []);
-};

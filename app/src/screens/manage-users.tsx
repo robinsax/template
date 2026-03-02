@@ -15,3 +15,5 @@ export const ManageUsers = () => {
         </InvalidationScope>
     );
 };
+
+export default ManageUsers;

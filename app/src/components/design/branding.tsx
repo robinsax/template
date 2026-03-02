@@ -20,7 +20,7 @@ export const Brand = ({ size }: { size?: "sm" | "lg" }) => {
                     fontSize={ size == "sm" ? "1.5rem" : "3rem" }
                     fontWeight="bold"
                 >
-                    { t("REPLACEME") }
+                    { t(config.appName) }
                 </Heading>
                 <Badge
                     colorScheme="blue" position="absolute"
@@ -31,7 +31,7 @@ export const Brand = ({ size }: { size?: "sm" | "lg" }) => {
                 </Badge>
             </Box>
             <Text variant="light" fontWeight="bold">
-                { t("by {owner}", { owner: t(config.platformOwnerName) }) }
+                { t("by {owner}", { owner: t(config.ownerName) }) }
             </Text>
         </VStack>
     );

@@ -14,7 +14,7 @@ import {
 } from "@/hooks";
 
 import { useEnableStateCheck } from "./actions";
-import { ClickTarget } from "../layout/common";
+import { ClickTarget } from "../design/common";
 
 export type UploadController = {
     multiple: boolean,

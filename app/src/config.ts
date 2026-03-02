@@ -10,11 +10,12 @@ const devMode = (
 );
 
 // t("REPLACEME");
-const platformOwnerName = "REPLACEME";
-const platformOwnerWebsite = "REPLACEME";
-
-const supportEmail = "REPLACEME";
+const appName = "REPLACEME";
+const ownerName = "REPLACEME";
+const ownerWebsite = "REPLACEME";
+const ownerSupportEmail = "REPLACEME";
 
 export default {
-    apiRootUrl, platformOwnerName, platformOwnerWebsite, devMode, supportEmail
+    apiRootUrl, ownerName, ownerWebsite, devMode, ownerSupportEmail,
+    appName
 };

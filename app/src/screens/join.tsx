@@ -45,3 +45,5 @@ export const Join = () => {
         </SplashScreen>
     );
 };
+
+export default Join;

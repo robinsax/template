@@ -31,6 +31,34 @@ export const mergeCallbacks = <T = never>(...callbacks: Callback<T>[]) => {
     ) as Callback<T>;
 };
 
+const _fallbackGlobalScope: Record<string, any> = {};
+export const getGlobalScope = <T>(): T => {
+    return (
+        typeof globalThis != "undefined" ? globalThis :
+        typeof window != "undefined" ? window :
+        typeof global != "undefined" ? global : _fallbackGlobalScope
+    ) as T;
+};
+
+export const deepEqual = (a: any, b: any): boolean => {
+    if (a === b) return true;
+
+    if (typeof a != "object" || typeof b != "object" || a == null || b == null) {
+        return false;
+    }
+
+    const keysA = Object.keys(a);
+    const keysB = Object.keys(b);
+    if (keysA.length != keysB.length) return false;
+
+    for (const key of keysA) {
+        if (!keysB.includes(key)) return false;
+        if (!deepEqual(a[key], b[key])) return false;
+    }
+
+    return true;
+};
+
 /**
 *   Suspends async execution for the specified number of milliseconds.
 */
@@ -167,53 +195,6 @@ export const formatByteSize = (size: number) => {
     return size.toFixed(1) + " " + units[unitIndex];
 };
 
-// Memo because checking fractions is expensive.
-const _aspectRatioMemo: Record<number, string> = {};
-
-/**
-*   Returns a formatted aspect ratio string for the given `aspectRatio`.
-*/
-export const formatAspectRatio = (
-    aspectRatio: number, errorTolerance: number = 0.01
-): string => {
-    if (_aspectRatioMemo[aspectRatio]) return _aspectRatioMemo[aspectRatio];
-
-    const gcd = (a: number, b: number) => {
-        while (b) {
-            [a, b] = [b, a % b];
-        }
-        return a;
-    };
-
-    let bestNumerator = 0;
-    let bestDenominator = 0;
-    let bestError = Infinity;
-
-    for (let numerator = 1; numerator <= 16; numerator++) {
-        for (let denominator = 1; denominator <= 16; denominator++) {
-            const ratio = numerator / denominator;
-            const error = Math.abs(aspectRatio - ratio);
-            if (error < bestError) {
-                bestError = error;
-                bestNumerator = numerator;
-                bestDenominator = denominator;
-            }
-        }
-    }
-
-    if (bestError < errorTolerance) {
-        const divisor = gcd(bestNumerator, bestDenominator);
-        const rounded = bestNumerator / divisor + ":" + bestDenominator / divisor;
-
-        return _aspectRatioMemo[aspectRatio] = (
-            bestError == 0 ? rounded : "~" + rounded
-        );
-    }
-    else {
-        return aspectRatio.toFixed(2);
-    }
-};
-
 /**
 *   Returns a minimal, human-friendly date string for the given `date`.
 */
@@ -239,10 +220,9 @@ export const smartDateFormat = (date: Date, truncateLongMonths: boolean = false)
 export class AppError extends Error {};
 
 /**
-*   Canonical error handler. Throws in dev mode and returns with a fallback value in
-*   production.
+*   Throws in dev mode and returns with a fallback value in production.
 */
-export const error = <T = unknown>(message: string, rv: T = null as unknown as T): T => {
+export const throwOrFallback = <T = unknown>(message: string, rv: T = null as unknown as T): T => {
     if (config.devMode) throw new AppError(message);
 
     console.error(message); // eslint-disable-line no-console
@@ -253,7 +233,7 @@ export const error = <T = unknown>(message: string, rv: T = null as unknown as T
 /**
 *   Returns whether the scope of the given `grant` contains the given `scope`.
 *
-*   "Contains" semantics are equivalent to `kedet/backend`.
+*   "Contains" semantics are equivalent to the backend.
 */
 export const grantContainsScope = (grant: AnyUserGrantModel, scope: AuthzScope) => {
     if (grant.scope_type == "global") {

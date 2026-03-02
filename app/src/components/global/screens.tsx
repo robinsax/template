@@ -3,45 +3,14 @@
 */
 import React, { ReactNode, UIEvent, useState, useCallback } from "react";
 import { Box, Flex, HStack, VStack, Spacer, useColorMode } from "@chakra-ui/react";
-import { AppShell } from "@saas-ui/react";
+import { AppShell, Persona } from "@saas-ui/react";
 
-import { vignetteGenerator, useHideScrollbars } from "@/theme";
+import { useHideScrollbars } from "@/theme";
 import { useCurrentUserOrNull, useContinuousTick, useI18n } from "@/hooks";
-import { OwnPersona } from "@/components/users";
+import { Icon, Brand } from "@/components/design";
 
 import { AppSidebar } from "./sidebar";
 import { LocaleSelect, ThemeToggle } from "./settings";
-import { Icon } from "./icons";
-import { Brand } from "../basic/branding";
-
-/**
-*   Background vignette UI. Subtly animated if `run` is `true`.
-*/
-const Vignettes = ({ run }: { run: boolean }) => {
-    const { colorMode } = useColorMode();
-
-    const value = useContinuousTick({
-        coef: 0.0001,
-        active: run
-    });
-
-    return (
-        <Box
-            position="fixed"
-            top={ 0 } left={ 0 } right={ 0 } bottom={ 0 }
-            zIndex={ -1 }
-        >
-            <style>
-                { "#vignette { " + vignetteGenerator(value, colorMode == "dark") + "}" }
-            </style>
-            <Box
-                id="vignette"
-                height="100vh"
-                width="100vw"
-            />
-        </Box>
-    );
-};
 
 /**
 *   Splash screen layout.
@@ -53,11 +22,10 @@ export const SplashScreen = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <AppShell>
-            <Vignettes run={ true }/>
             <VStack height="100vh">
                 <HStack p={ 4 } width="full" justifyContent="left" spacing={ 6 }>
                     { user && (
-                        <OwnPersona size="sm" avatarOnly/>
+                        <Persona size="sm" name={ user.name }/>
                     ) }
                 </HStack>
                 <Flex height="full" justifyContent="center" alignItems="center">
@@ -96,7 +64,6 @@ export const SidebarScreen = ({ children }: {
                 <AppSidebar/>
             }
         >
-            <Vignettes run={ false }/>
             <Box
                 flex={ 1 } px={ 16 } py={ 12 } overflowY="auto"
                 id="main-scroll-area"

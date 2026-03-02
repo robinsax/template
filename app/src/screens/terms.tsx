@@ -2,7 +2,7 @@ import React from "react";
 import { Heading } from "@chakra-ui/react";
 
 import { useI18n } from "@/hooks";
-import { SplashInfoScreen } from "@/components/common";
+import { SplashInfoScreen } from "@/components/design";
 
 export const Terms = () => {
     const t = useI18n();
@@ -18,3 +18,5 @@ export const Terms = () => {
         </SplashInfoScreen>
     );
 };
+
+export default Terms;

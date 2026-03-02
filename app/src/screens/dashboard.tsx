@@ -95,3 +95,5 @@ export const Dashboard = () => {
         </VStack>
     );
 };
+
+export default Dashboard;

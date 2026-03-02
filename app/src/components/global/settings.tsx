@@ -4,16 +4,12 @@
 import React from "react";
 import {
     HStack, Switch, Text, Popover, PopoverTrigger, PopoverContent, PopoverBody, Button,
-    VStack, PopoverArrow, useColorMode
+    VStack, PopoverArrow, Box, useColorMode
 } from "@chakra-ui/react";
 
-import {
-    I18nLocaleKey, useLocale, useSupportedLocales, useI18n, useCurrentUserOrNull, useAPI,
-    useAsyncCallback
-} from "@/hooks";
-
-import { Icon } from "./icons";
-import { ClickTarget } from "../layouts/common";
+import { useQuery, useMutation, useI18n, supportedLocales } from "@/hooks";
+import { queryLocalSettings, mutateLocalSettings } from "@/state";
+import { Icon } from "@/components/design";
 
 /**
 *   UI to toggle the theme.
@@ -37,24 +33,9 @@ export const ThemeToggle = () => {
 */
 export const LocaleSelect = () => {
     const t = useI18n();
-    const api = useAPI();
 
-    const user = useCurrentUserOrNull();
-
-    const [currentLocale, setLocale] = useLocale();
-
-    const availableLocales = useSupportedLocales();
-
-    const [onLocaleChange] = useAsyncCallback(async (locale: I18nLocaleKey) => {
-        setLocale(locale);
-        if (!user) return;
-
-        await api.users.id(user.id).put({
-            locale,
-            name: null,
-            avatar_id: null
-        });
-    }, [user]);
+    const [currentSettings] = useQuery(queryLocalSettings);
+    const [onSettingsChange] = useMutation(mutateLocalSettings);
 
     return (
         <Popover>
@@ -67,13 +48,12 @@ export const LocaleSelect = () => {
                 <PopoverArrow/>
                 <PopoverBody>
                     <VStack spacing={ 1 }>
-                        { availableLocales.map(locale => (
-                            <ClickTarget
+                        { supportedLocales.map(locale => (
+                            <Box
                                 width="full"
-                                showHighlight={ locale.key == currentLocale }
                                 p={ 2 }
                                 key={ locale.key }
-                                onClick={ () => onLocaleChange(locale.key) }
+                                onClick={ () => onSettingsChange({ locale: locale.key }) }
                             >
                                 <Text
                                     position="relative"
@@ -82,7 +62,7 @@ export const LocaleSelect = () => {
                                 >
                                     { t(locale.label) }
                                 </Text>
-                            </ClickTarget>
+                            </Box>
                         )) }
                     </VStack>
                 </PopoverBody>

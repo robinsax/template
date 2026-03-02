@@ -2,7 +2,7 @@ import React from "react";
 import { HStack, VStack, Text, Heading } from "@chakra-ui/react";
 
 import { I18nValueFn, useCurrentUserOrNull, useI18n } from "@/hooks";
-import { BlockCard, Brand, SplashScreen, Icon, IconName } from "@/components/common";
+import { SplashScreen } from "@/components/design";
 
 export const Landing = () => {
     const t = useI18n();
@@ -24,3 +24,5 @@ export const Landing = () => {
         </SplashScreen>
     );
 };
+
+export default Landing;

@@ -6,17 +6,15 @@ import {
     HStack, Spacer, Divider, VStack, Box, Popover, PopoverTrigger, PopoverContent,
     PopoverBody, PopoverArrow, Portal
 } from "@chakra-ui/react";
-import { NavGroup, NavItem, Sidebar, SidebarSection } from "@saas-ui/react";
+import { NavGroup, NavItem, Persona, Sidebar, SidebarSection } from "@saas-ui/react";
 import { Link, useLocation } from "react-router-dom";
 
 import { usePanelStylesFix } from "@/theme";
-import { useAuthzCheck, useI18n, useSavedState, useWindowListener } from "@/hooks";
-import { ClickTarget } from "@/components/common";
-import { OwnPersona } from "@/components/users";
+import { useAuthzCheck, useI18n, useWindowListener, useQuery, useMutation } from "@/hooks";
+import { mutateLocalSettings, queryLocalSettings } from "@/state";
+import { Icon, Brand } from "@/components/design";
 
 import { ThemeToggle, LocaleSelect } from "./settings";
-import { Brand } from "../layouts/brand";
-import { Icon } from "./icons";
 
 const COLLAPSE_BREAKPOINT = 1000;
 
@@ -27,25 +25,22 @@ export const AppSidebar = () => {
     const t = useI18n();
     const location = useLocation();
 
-    const [preferCollapsed, setPreferCollapsed] = useSavedState(
-        "sidebar-collapsed", false
-    );
+    const [localSettings] = useQuery(queryLocalSettings);
+    const [onSettingsChange] = useMutation(mutateLocalSettings);
+
     const [forceCollapsed, setForceCollapsed] = useState(false);
 
     useWindowListener("resize", () => {
         setForceCollapsed(window.innerWidth < COLLAPSE_BREAKPOINT);
     });
 
-    const manageClientAllowed = useAuthzCheck("manage_org", {
-        scopeless: true
-    });
     const manageUsersAllowed = useAuthzCheck("manage_iam", {
         scopeless: true
     });
 
     const panelStyles = usePanelStylesFix();
 
-    const collapsed = forceCollapsed || preferCollapsed;
+    const collapsed = forceCollapsed || (localSettings && localSettings.sidebarCollapsed);
 
     const settingsControls = (
         <>
@@ -75,17 +70,17 @@ export const AppSidebar = () => {
                     borderColor="lightBorder"
                     borderRadius="md"
                 >
-                    <ClickTarget
+                    <Box
                         width="full" height="full"
-                        onClick={ () => setPreferCollapsed(!preferCollapsed) }
+                        onClick={ () => onSettingsChange({ sidebarCollapsed: !collapsed }) }
                         display="flex"
                         alignItems="center" justifyContent="center"
                     >
                         <Icon
-                            name={ preferCollapsed ? "right" : "left" }
+                            name={ collapsed ? "right" : "left" }
                             size="0.5rem"
                         />
-                    </ClickTarget>
+                    </Box>
                 </Box>
             ) }
             <VStack
@@ -95,13 +90,9 @@ export const AppSidebar = () => {
                 spacing={ 4 }
                 sx={ { marginTop: "0 !important" } }
             >
-                <OwnPersona
-                    reverse
-                    avatarOnly={ collapsed }
+                <Persona
                     height="40px"
                     size="sm"
-                    withNotifications
-                    withClient
                 />
             </VStack>
             <Divider/>
@@ -109,45 +100,16 @@ export const AppSidebar = () => {
                 <NavItem
                     as={ Link }
                     isActive={ location.pathname == "/" }
-                    icon={ <Icon name="dashboard"/> }
                     to="/"
                 >
                     { t("Dashboard") }
                 </NavItem>
-                <NavItem
-                    as={ Link }
-                    isActive={ location.pathname == "/campaigns" }
-                    icon={ <Icon name="ad"/> }
-                    to="/campaigns"
-                >
-                    { t("Campaigns") }
-                </NavItem>
-                <NavItem
-                    as={ Link }
-                    isActive={ location.pathname == "/reports" }
-                    icon={ <Icon name="analytics"/> }
-                    to="/reports"
-                    mb={ 3 }
-                >
-                    { t("Reports") }
-                </NavItem>
-                { (manageClientAllowed || manageUsersAllowed) && (
+                { manageUsersAllowed && (
                     <NavGroup title={ t("Management") }>
-                        { manageClientAllowed && (
-                            <NavItem
-                                as={ Link }
-                                isActive={ location.pathname == "/management/clients" }
-                                icon={ <Icon name="manage"/> }
-                                to="/management/clients"
-                            >
-                                { t("Clients") }
-                            </NavItem>
-                        ) }
                         { manageUsersAllowed && (
                             <NavItem
                                 as={ Link }
                                 isActive={ location.pathname == "/management/users" }
-                                icon={ <Icon name="person"/> }
                                 to="/management/users"
                             >
                                 { t("Users") }
@@ -162,9 +124,7 @@ export const AppSidebar = () => {
                     { collapsed ? (
                         <Popover placement="right-end">
                             <PopoverTrigger>
-                                <ClickTarget p={ 2 }>
-                                    <Icon name="settings"/>
-                                </ClickTarget>
+                                <Icon name="settings"/>
                             </PopoverTrigger>
                             <Portal>
                                 <PopoverContent width="auto">

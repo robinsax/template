@@ -10,44 +10,11 @@ import { theme as saasTheme } from "@saas-ui/theme";
 import { TinyColor } from "@ctrl/tinycolor";
 
 // Specific to prevent circular import.
-import { Icon } from "./components/common/icons";
+import { Icon } from "./components/design/icons";
 
 import "@fontsource/lexend";
 import "@fontsource/manrope";
 import "@fontsource/ibm-plex-mono";
-
-/**
-*   Generator for the vignette gradients. Pass the current time as `t` to animate.
-*/
-export const vignetteGenerator = (t: number, dark: boolean) => {
-    const p = (Math.sin(t) + 1) * 0.5;
-    const q = 1 - p;
-
-    const c1o = 0.9 * p;
-    const c2o = 0.9 * q;
-    const c3o = 0.6 * p;
-
-    const g1d = (0.3 + (0.3 * p)) * 100;
-    const g2d = (0.15 + (0.15 * q)) * 100;
-
-    const colors = [
-        `rgba(255, 220, 128, ${ c1o })`,
-        `rgba(44, 165, 177, ${ c2o })`,
-        `rgba(251, 148, 115, ${ c3o })`
-    ];
-
-    const gradients = [
-        `linear-gradient(to top right, ${ colors[0]} 0%, transparent ${ g1d }%)`,
-        `linear-gradient(to bottom right, ${ colors[1]} 0%, transparent ${ g2d }%)`,
-        `linear-gradient(to left, ${ colors[2]}, transparent 60%)`
-    ];
-
-    return [
-        "background-image: " + gradients.join(", "),
-        "opacity: " + (dark ? 0.2 : 0.7),
-        ""
-    ].join(";");
-};
 
 // Chakra theme.
 const force = (value: string) => value + " !important";
