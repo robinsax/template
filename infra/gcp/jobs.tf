@@ -44,7 +44,7 @@ module "run_cli_job" {
   env_info = local.job_env_info
 
   name               = "run-cli-job"
-  entrypoint_command = "python3 kedet"
+  entrypoint_command = "python3 backend"
 
   env_vars = {
     POSTGRES_CLOUDSQL_URI = local.postgres_env_vars.POSTGRES_CLOUDSQL_URI

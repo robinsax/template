@@ -1,4 +1,4 @@
-# Kedet GCP Handbook
+# GCP Handbook
 
 # Introduction
 
@@ -12,27 +12,6 @@ This cloud infrastructure can be summarized:
 - CloudSQL for Postgres is the database backend.
   - The database instance is privately networked and only allows IAM connections.
 - Buckets are used for blob storage.
-
-![infra](../../doc/infra.png)
-
-## Packaging
-
-The infrastructure is managed using Terraform, packaged by topic:
-- `main.tf` - Core configuration and providers.
-- `variables.tf` - Input variable definitions.
-- `apis.tf` - GCP service API enablement.
-- `network.tf` - VPC, subnets, VPC connectors, and Cloud Armor WAF rules.
-- `database.tf` - Cloud SQL PostgreSQL instance and database configuration.
-- `services.tf` - Cloud Run service definitions and IAM setup.
-- `secrets.tf` - Secret management.
-- `jobs.tf` - Triggered Cloud Run jobs.
-- `bigquery.tf` - BigQuery datasets and tables for analytics storage.
-- `alerts.tf` - Monitoring, alerting, and logging configurations.
-
-### Reusable Modules
-
-- `modules/cloud-run` - Unifies service build, deployment, and SA assignment.
-- `modules/cloud-run-job` - Unifies job creation, SA assignment, and optionally automatic triggers.
 
 # Environment Setup
 
@@ -58,8 +37,6 @@ You now need to configure your DNS for the domain name specified during provisio
 
 The target IP address can be found by navigating [here](https://console.cloud.google.com/networking/addresses/list) and indentifying the Public IP for the environment.
 
-It will be named `kedet-<env name>-lb-ip`.
-
 Configure an A record for the domain to point to this IP.
 
 The SSL certificate will automatically be created by GCP some time after that DNS record ticks over (there will be a delay).
@@ -78,11 +55,11 @@ In Github, create an Environment for deployments (Repo > Settings > Environments
 
 Add a secret called `GCP_SA_KEY`, the value of which should be the contents of the deployer Service Account JSON that should now exist at `infra/gcp/<env name>.deployer.json` (copy-paste the contents of that file into the secret value).
 
-Identify the trunk branch you want to run deployments off of on push, e.g. `staging` branch for the Staging environment.
+Identify the trunk branch you want to run deployments off of on push, e.g. `test` branch for the test environment.
 
 Add the following "Deployed Branch" entries within the Github Environment:
-- The branch itself (e.g. `staging`)
-- The trunk branch below it if applicable (e.g. `dev` for `staging`) and `hotfix/*` OR
+- The branch itself (e.g. `test`)
+- The trunk branch below it if applicable (e.g. `dev` for `test`) and `hotfix/*` OR
 - For your lowest environment (e.g. `dev`), add `feat/*`, `bug/*`.
 
 ## Ongoing Ops

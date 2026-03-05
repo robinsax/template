@@ -21,14 +21,15 @@ variable "location" {
 
 variable "env_name" {
   type        = string
-  description = "Environment name (e.g., dev, staging, prod)"
+  description = "Environment name (e.g., dev, test, prod)"
   default     = "dev"
 }
 
 variable "name_prefix" {
   type        = string
   description = "Prefix for resource names"
-  default     = "kedet"
+  # TEMPLATE: Change this to your project name.
+  default     = "--SETME--"
 }
 
 variable "database_delete_protection" {

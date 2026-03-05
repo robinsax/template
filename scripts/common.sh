@@ -3,6 +3,8 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
+project_name=$(cat ./.project-name)
+
 ask_y_n() {
     local message=$1
 

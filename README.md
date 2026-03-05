@@ -1,3 +1,5 @@
+> __BEFORE STARTING__: `Ctrl` + `F` for `"TEMPLATE:"` and perform all described actions, then remove this note.
+
 # Project Template
 
 Before starting, install the following and ensure they are in your `PATH`:
@@ -140,15 +142,15 @@ This repo contains a variety of QC safeguards. Each described check has both a t
     - Task `Checks: Test Backend` validates pytest unit tests are passing.
     - Integration tests against the API are in place as described below.
 
-## Integration Tests
+## Flow Tests
 
-The `backend/integration_suite` module implements a step-based suite of integration tests
-that validate API behavior. This suite can be run with task `Checks: Integration Suite`.
+The `backend/flow_tests` module implements a step-based suite of integration tests
+that validate API behavior. This suite can be run with task `Checks: Backend Flow Tests`.
 
-To extend the integration suite:
-- Run task `Workspace: Integration Suite Dev`. This will create a Compose deployment isolated from the normal local deployment that is configured for integration testing, then give you a shell.
+To extend the flow tests:
+- Run task `Workspace: Flow Tests Dev`. This will create a Compose deployment isolated from the normal local deployment that is configured for integration testing, then give you a shell.
 - Implement a new step.
-- Run `python integration_suite run -s <step>` in the provided shell to run the chain of steps up to the `<step>` you are developing.
+- Run `python flow_tests run -s <step>` in the provided shell to run the chain of steps up to the `<step>` you are developing.
 
 ## Manual Testing on Local
 
@@ -164,11 +166,11 @@ CI/CD tooling is set up for a specific operational flow:
 - Feature branches are merged with squash commits into the `dev` branch, which contains the next release's working set of changes.
     - CD deploys a Dev environment from the `dev` branch.
     - The Dev environment should be configured to use mock ad platform backends.
-- Release candidates are merged from `dev` branch, with merge commits, into the `staging` branch.
-    - CD deploys a Staging environment from the `staging` branch where user acceptance testing can be performed.
+- Release candidates are merged from `dev` branch, with merge commits, into the `test` branch.
+    - CD deploys a test environment from the `test` branch where user acceptance testing can be performed.
     - Release candidate builds are automatically tagged by CD as `<next release version>.rc/<commit sha>`
-    - The Staging environment should be configured to use live ad platform backends, in sandbox/test mode where supported.
-- Releases are merged from `staging` branch, with merge commits, into the `main` branch.
+    - The test environment should be configured to use live ad platform backends, in sandbox/test mode where supported.
+- Releases are merged from `test` branch, with merge commits, into the `main` branch.
     - CD deploys a Production environment from the `main` branch.
     - Release builds are automatically tagged by CD as `<major version>.<minor version>`.
     - The Production environment should be configured to use live ad platform backends.

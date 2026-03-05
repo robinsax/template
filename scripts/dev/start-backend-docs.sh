@@ -7,6 +7,6 @@ source .venv/bin/activate
 
 pushd backend
 
-python3 -m pdoc kedet -p 7900
+python3 -m pdoc backend -p 7900
 
 popd

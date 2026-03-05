@@ -99,7 +99,7 @@ def user_create(
 @cli.verb(with_session=True)
 def user_role_assign(
     session: Session, email: str, role: str,
-    realm_id: Optional[str] = None
+    realm: Optional[str] = None
 ):
     """
     Assign a role to a user.
@@ -115,11 +115,12 @@ def user_role_assign(
     if not user:
         raise CLIError("User not found: " + email)
 
-    if realm_id:
+    realm_id = None
+    if realm:
         try:
-            realm_id = UUID(realm_id)
+            realm_id = UUID(realm)
         except ValueError:
-            raise CLIError("Invalid realm ID: " + realm_id) from None
+            raise CLIError("Invalid realm ID: " + realm) from None
 
     grant = UserRole(
         user_id=user.id,

@@ -31,5 +31,5 @@ networks:
     driver: bridge
 
 volumes:
-  kedet_db:
-  integration_suite_db:
+  db:
+  flow_tests_db:

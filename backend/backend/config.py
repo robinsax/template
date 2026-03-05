@@ -43,7 +43,7 @@ class ConfigValue(Generic[T]):
         """
         use_integration_test_value = (
             self.integration_test_value is not _sentinel and
-            config.integration_test_mode.get()
+            config.flow_test_mode.get()
         )
         if use_integration_test_value:
             return bool(self.integration_test_value)
@@ -64,7 +64,7 @@ class ConfigValue(Generic[T]):
         """
         use_integration_test_value = (
             self.integration_test_value is not _sentinel and
-            config.integration_test_mode.get()
+            config.flow_test_mode.get()
         )
         if use_integration_test_value:
             return self.integration_test_value
@@ -140,7 +140,7 @@ class Config:
     """
     The default locale to use.
     """
-    integration_test_mode = ConfigValue("integration_test_mode", bool, default=False)
+    flow_test_mode = ConfigValue("flow_test_mode", bool, default=False)
     """
     Whether to:
     - Force enable all ad platforms with a mock backend.

@@ -1,16 +1,16 @@
 """
-Known error types for integration suite runs.
+Known error types for test runs.
 """
 
-class IntegrationSuiteError(Exception):
+class TestError(Exception):
     pass
 
-class ContextCallFailed(IntegrationSuiteError):
+class ContextCallFailed(TestError):
     status_code: int
 
     def __init__(self, status_code: int, message: str):
         super().__init__(message)
         self.status_code = status_code
 
-class StepFailed(IntegrationSuiteError):
+class StepFailed(TestError):
     pass

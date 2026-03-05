@@ -15,7 +15,7 @@ COPY . /app
 ENV LOCALES_PATH=/app/common/locales
 ENV LANGUAGES_PATH=/app/common/languages.json
 
-# Set umask for integration suite volume mount sharing. No issue with including this
+# Set umask for flow tests volume mount sharing. No issue with including this
 # in production builds as they make no FS writes and have no volumes mounted.
 ENTRYPOINT ["/bin/sh", "-c", "umask 000 && exec \"$@\"", "sh"]
 CMD ["./entrypoint.sh"]

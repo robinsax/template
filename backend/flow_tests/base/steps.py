@@ -6,7 +6,7 @@ from collections import deque
 from dataclasses import dataclass
 from typing import Optional, Callable, Union
 
-from .errors import IntegrationSuiteError
+from .errors import TestError
 
 StepRef = Union[str, Callable]
 
@@ -117,7 +117,7 @@ def step(
     is_assert: Optional[bool] = None, is_branch: Optional[bool] = None
 ):
     """
-    Decorator for integration suite steps.
+    Decorator for flow test steps.
     """
     def decorator(fn):
         injected_outputs = {
@@ -161,7 +161,7 @@ def plan_steps( # pylint: disable=too-many-locals,too-many-statements
     Must be invoked in order with a shared context.
     """
     if final_step_name not in _steps:
-        raise IntegrationSuiteError(f"Unknown step: { final_step_name }")
+        raise TestError(f"Unknown step: { final_step_name }")
 
     # Collect all concrete needs.
     concrete_needs = set()

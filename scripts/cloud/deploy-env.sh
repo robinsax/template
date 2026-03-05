@@ -10,7 +10,7 @@ env_name=$1
 # Get project ID.
 project_id="$(read_tfvar_value $env_name project_id)"
 # Compute service account email.
-sa_email="kedet-deployer-$env_name@$project_id.iam.gserviceaccount.com"
+sa_email="$project_name-deployer-$env_name@$project_id.iam.gserviceaccount.com"
 # Decide key path.
 key_path="$(pwd)/infra/gcp/$env_name.deployer.json"
 
@@ -33,7 +33,7 @@ var_file="./envs/$env_name.tfvars"
 terraform init \
     -reconfigure \
     -var-file=$var_file \
-    -backend-config="bucket=kedet-$env_name-terraform"
+    -backend-config="bucket=$project_name-$env_name-terraform"
 
 terraform apply \
     -var-file=$var_file

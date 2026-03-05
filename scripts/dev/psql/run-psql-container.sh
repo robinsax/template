@@ -7,6 +7,6 @@ docker build -t psql:local .
 
 docker run \
     -it --rm \
-    --network kedet_local \
+    --network dev_local \
     -e POSTGRES_URI=postgresql://admin:admin@postgres:5432/main \
     psql:local

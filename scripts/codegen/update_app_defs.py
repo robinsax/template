@@ -7,8 +7,8 @@ from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
 from fastapi.routing import APIRoute
 
-from kedet import model, api
-from backend.model import Model, PERMISSIONS_MATRIX, ROLE_SCOPES, ROLE_USER_TYPES
+from backend import model, api
+from backend.model import Model, PERMISSIONS_MATRIX, ROLE_SCOPES
 from backend.service import StreamedUpload
 from backend.api import app as api_app
 
@@ -78,18 +78,6 @@ def write_models_ts(src_modules: list[ModuleType]):
             "roleScopes",
             ts_role_scopes,
             TSCode("Record<Role, AuthzScopeType[]>")
-        )
-    )
-
-    ts_role_user_types = TSObject()
-    for key, value in ROLE_USER_TYPES.items():
-        ts_role_user_types.add(key.value, TSString(value.value))
-
-    ts_scope.add(
-        TSConstDef(
-            "roleUserTypes",
-            ts_role_user_types,
-            TSCode("Record<Role, UserType>")
         )
     )
 
@@ -231,12 +219,12 @@ def write_endpoints_ts(app: FastAPI): # pylint: disable=too-many-statements
     return str(ts_scope)
 
 def update_models():
-    with open_file("./app/kedet/models/backend.ts", "w") as fh:
+    with open_file("./app/src/models/backend.ts", "w") as fh:
         fh.write(HEADER)
         fh.write("\n")
         fh.write(write_models_ts([model, api]))
 
-    with open_file("./app/kedet/hooks/api/binding.ts", "w") as fh:
+    with open_file("./app/src/api/binding.ts", "w") as fh:
         fh.write(HEADER)
         fh.write("\n")
         fh.write(write_endpoints_ts(api_app))

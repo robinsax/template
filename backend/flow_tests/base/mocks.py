@@ -1,5 +1,5 @@
 """
-Mock implementations required for integration suite runs.
+Mock implementations required for test runs.
 """
 from backend.mail import Mailer, MailContent
 

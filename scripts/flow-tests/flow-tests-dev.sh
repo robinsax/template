@@ -18,7 +18,7 @@ export POSTGRES_PORT=5433
 export POSTGRES_URI="postgresql://admin:admin@localhost:$POSTGRES_PORT/main"
 export API_PORT=8500
 export AUTH_TOKEN_HMAC_KEY="rjv40P742AP_16-Z2VOR3nJibqVrn9R6qyvEq3fwkBo="
-export INTEGRATION_TEST_MODE="true"
+export FLOW_TEST_MODE="true"
 
 # Prep API runtime.
 if [[ -d backend/.storage ]]; then
@@ -31,12 +31,12 @@ chmod 777 backend/.storage
 pushd infra/local
 
 docker compose \
-    -p integration_suite \
+    -p flow_tests \
     down \
     -v
 
 docker compose \
-    -p integration_suite \
+    -p flow_tests \
     -f docker-compose.services.yaml \
     up -d \
     --build \
@@ -59,7 +59,7 @@ popd
 pushd infra/local
 
 docker compose \
-    -p integration_suite \
+    -p flow_tests \
     down \
     -v
 

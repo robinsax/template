@@ -127,7 +127,7 @@ export const Login = () => {
                         as={ Link }
                         to={ "/home" }
                     >
-                        { t("What\"s Kedet?") }
+                        { t("What\"s this?") }
                     </Text>
                     <Spacer/>
                     <Text

@@ -1,4 +1,4 @@
-from .errors import IntegrationSuiteError, ContextCallFailed, StepFailed
+from .errors import TestError, ContextCallFailed, StepFailed
 from .context import StepsContext
 from .steps import (
     StepRef, StepNeedsAny, StepSubchains, step, any_of, subchains, output,

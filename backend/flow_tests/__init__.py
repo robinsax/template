@@ -25,13 +25,12 @@ from backend.service import CLI
 from backend.model import Notification
 
 from .base import (
-    StepsContext, IntegrationSuiteError, plan_steps, get_all_step_names,
-    get_step_description, load_mock_locations
+    StepsContext, TestError, plan_steps, get_all_step_names, get_step_description
 )
 from .fuzzy import seed_fuzzy
 from . import steps
 
-cli = CLI("integration_suite")
+cli = CLI("flow_tests")
 
 @cli.verb()
 def list_steps():
@@ -57,8 +56,8 @@ def _run(
     root_url = root_url or "http://localhost:8500/api/v1"
 
     # Force config.
-    config.service_origin.set("https://integration-suite.com")
-    config.integration_test_mode.set(True)
+    config.service_origin.set("https://flow-tests.com")
+    config.flow_test_mode.set(True)
 
     context = StepsContext(root_url)
 
@@ -152,7 +151,7 @@ def run(
     no_dump: bool = False, fuzzy_seed: Optional[int] = None
 ):
     """
-    Run the integration suite up to a step.
+    Run flow tests up to a step.
 
     Use --plan to only show the plan without executing.
     """
@@ -172,7 +171,7 @@ def run_asserts(root_url: Optional[str] = None, no_dump: bool = False):
         try:
             _run(step, root_url, no_dump=no_dump)
             passes += 1
-        except IntegrationSuiteError as err:
+        except TestError as err:
             fails.append((step, err))
 
     print("=== Summary ===")

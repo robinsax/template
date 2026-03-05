@@ -35,16 +35,16 @@ if [[ $use_gcp_storage == "true" ]]; then
 
     project_id=$(get_env_var "GCP_PROJECT_ID")
 
-    res_prefix="kedet-local"
+    res_prefix="$project_name-local"
     use_default_res_prefix=$(ask_y_n "Use $res_prefix resources?")
     if [[ $use_default_res_prefix == "true" ]]; then
-        res_prefix="kedet-local"
+        res_prefix="$project_name-local"
     else
         read -p "Resource prefix: " res_prefix
     fi
     
     sa_name="$res_prefix-sa"
-    sa_desc="Kedet Local Dev Integration"
+    sa_desc="Local Dev Integration"
     key_file="common/gcp-sa.json"
 
     sa_email=$(create_gcp_service_account $project_id $sa_name "$sa_desc")

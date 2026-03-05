@@ -6,7 +6,6 @@ set -o nounset
 export PYTHONPATH=./backend
 
 python scripts/codegen/update_app_defs.py
-python scripts/codegen/update_campaign_brief_defs.py
 python scripts/codegen/collect_en_locale.py
 
 if [ -n "$(git status --porcelain)" ]; then

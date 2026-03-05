@@ -35,17 +35,17 @@ if [[ $project_id == "" || $env_name == "" ]]; then
 fi
 
 # Set up SA and state bucket.
-sa_name="kedet-deployer-$env_name"
-sa_desc="Kedet Deployer - $env_name"
+sa_name="$project_name-deployer-$env_name"
+sa_desc="Deployer - $env_name"
 
 echo "Creating deployer service account $sa_name..."
 sa_email=$(create_gcp_service_account $project_id $sa_name "$sa_desc")
 
 echo "Creating Terraform state bucket..."
-create_gcp_bucket $project_id "kedet-$env_name-terraform"
+create_gcp_bucket $project_id "$project_name-$env_name-terraform"
 
 echo "Granting deployer service account access to Terraform bucket..."
-grant_gcp_bucket_sa_role "gs://kedet-$env_name-terraform" $sa_email roles/storage.admin
+grant_gcp_bucket_sa_role "gs://$project_name-$env_name-terraform" $sa_email roles/storage.admin
 
 echo "Assigning roles to deployer service account..."
 # Idempotent apply.
@@ -74,7 +74,7 @@ if [[ ! -f $tfvars_file ]]; then
 
     echo "project_id = \"$project_id\"" >> $tfvars_file
     echo "env_name = \"$env_name\"" >> $tfvars_file
-    echo "name_prefix = \"kedet\"" >> $tfvars_file
+    echo "name_prefix = \"$project_name\"" >> $tfvars_file
 
     read -p "Region: " region
     echo "region = \"$region\"" >> $tfvars_file
@@ -98,7 +98,7 @@ while read -r secret_info; do
     fi
 
     IFS=': ' read -r key desc <<< "$secret_info"
-    secret_name=kedet-$env_name-$key
+    secret_name=$project_name-$env_name-$key
 
     if [[ ${#desc} -gt 0 ]]; then
         # Remove trailing comma if present

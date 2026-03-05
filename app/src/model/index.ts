@@ -1,5 +1,5 @@
 /**
-*   Data model definitions, the majority of which are code generated from `kedet/backend`
+*   Data model definitions, the majority of which are code generated from `backend`
 *   type definitions 
 */
 export * from "./backend";
@@ -22,7 +22,7 @@ export const ctas = cTAs;
 export type ModelState = State;
 
 /**
-*   Authorization scope representation equivalent to the one in `kedet/backend`.
+*   Authorization scope representation equivalent to the one in `backend`.
 */
 export type AuthzScope = {
     clientId: string | null,

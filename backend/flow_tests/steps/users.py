@@ -41,7 +41,7 @@ def _invite_user(context: StepsContext, user_type: UserType):
     email = (
         str(make_next_int()) +
         str(make_num(1000000)) +
-        "@integration-suite.com"
+        "@flow_tests.com"
     )
     name = make_name(2)
 
@@ -98,7 +98,7 @@ def platform_owner_user(context: StepsContext):
     email = (
         str(make_next_int()) +
         str(make_num(1000000)) +
-        "@integration-suite.com"
+        "@flow_tests.com"
     )
     name = make_name(2)
     password = make_valid_password()

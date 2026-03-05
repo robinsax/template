@@ -47,21 +47,10 @@
             }
         },
         {
-            "label": "Workspace: Configure Local Ad Platform Connections",
+            "label": "Workspace: Flow Tests Dev",
             "type": "shell",
             "command": "bash",
-            "args": ["./scripts/dev/configure-local-platforms.sh"],
-            "problemMatcher": [],
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
-            }
-        },
-        {
-            "label": "Workspace: Integration Suite Dev",
-            "type": "shell",
-            "command": "bash",
-            "args": ["./scripts/integration-suite/integration-suite-dev.sh"],
+            "args": ["./scripts/flow-tests/flow-tests-dev.sh"],
             "options": {
                 "cwd": "${workspaceFolder}"
             },
@@ -117,7 +106,7 @@
             "label": "Local: Start API",
             "type": "shell",
             "command": "bash",
-            "args": ["./scripts/dev/local-start-api.sh"],
+            "args": ["./scripts/dev/local-start-service.sh api"],
             "options": {
                 "cwd": "${workspaceFolder}",
                 "env": {
@@ -127,49 +116,6 @@
                     "LOAD_DOTENVS": "${workspaceFolder}/.env;${workspaceFolder}/.env.platforms",
                     "ENCRYPTION_KEY": "xn7MwEMY1l7G9dItXwzn5F6NK80WrSuv_n2lSKXDwHc=",
                     "AUTH_TOKEN_HMAC_KEY": "rjv40P742AP_16-Z2VOR3nJibqVrn9R6qyvEq3fwkBo=",
-                    "DEV_MODE": "true"
-                }
-            },
-            "problemMatcher": [],
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
-            }
-        },
-        {
-            "label": "Local: Start Tasks",
-            "type": "shell",
-            "command": "bash",
-            "args": ["./scripts/dev/local-start-tasks.sh"],
-            "options": {
-                "cwd": "${workspaceFolder}",
-                "env": {
-                    "SERVICE_ORIGIN": "http://localhost",
-                    "POSTGRES_URI": "postgresql://admin:admin@localhost:5432/main",
-                    "LOAD_DOTENVS": "${workspaceFolder}/.env;${workspaceFolder}/.env.platforms",
-                    "ENCRYPTION_KEY": "xn7MwEMY1l7G9dItXwzn5F6NK80WrSuv_n2lSKXDwHc=",
-                    "AUTH_TOKEN_HMAC_KEY": "rjv40P742AP_16-Z2VOR3nJibqVrn9R6qyvEq3fwkBo=",
-                    "DEV_MODE": "true"
-                }
-            },
-            "problemMatcher": [],
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
-            }
-        },
-        {
-            "label": "Local: Start Streams",
-            "type": "shell",
-            "command": "bash",
-            "args": ["./scripts/dev/local-start-streams.sh"],
-            "options": {
-                "cwd": "${workspaceFolder}",
-                "env": {
-                    "POSTGRES_URI": "postgresql://admin:admin@localhost:5432/main",
-                    "SERVICE_ORIGIN": "http://localhost",
-                    "SERVICE_PORT": "8002",
-                    "LOAD_DOTENVS": "${workspaceFolder}/.env",
                     "DEV_MODE": "true"
                 }
             },
@@ -203,8 +149,6 @@
             "dependsOn": [
                 "Local: Start Dependencies",
                 "Local: Start API",
-                "Local: Start Tasks",
-                "Local: Start Streams",
                 "Local: Start App"
             ],
             "problemMatcher": [],
@@ -261,50 +205,6 @@
                 "--no-deps",
                 "--build",
                 "app"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}/infra/local"
-            },
-            "problemMatcher": [],
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
-            }
-        },
-        {
-            "label": "Local Containerized: Replace Streams",
-            "type": "shell",
-            "command": "docker-compose",
-            "args": [
-                "-f",
-                "docker-compose.services.yaml",
-                "up",
-                "-d",
-                "--no-deps",
-                "--build",
-                "streams"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}/infra/local"
-            },
-            "problemMatcher": [],
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
-            }
-        },
-        {
-            "label": "Local Containerized: Replace Tasks",
-            "type": "shell",
-            "command": "docker-compose",
-            "args": [
-                "-f",
-                "docker-compose.services.yaml",
-                "up",
-                "-d",
-                "--no-deps",
-                "--build",
-                "tasks"
             ],
             "options": {
                 "cwd": "${workspaceFolder}/infra/local"
@@ -395,28 +295,13 @@
             }
         },
         {
-            "label": "Local Init: Load Locations",
-            "type": "shell",
-            "command": "bash",
-            "args": ["./scripts/dev/load-locations.sh"],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [],
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
-            }
-        },
-        {
             "label": "Local Init: Run All",
             "type": "shell",
             "dependsOrder": "sequence",
             "dependsOn": [
                 "Local: Drop Schema",
                 "Local: Migrate to HEAD",
-                "Local Init: Make Dev Admin",
-                "Local Init: Load Locations"
+                "Local Init: Make Dev Admin"
             ],
             "problemMatcher": [],
             "presentation": {
@@ -550,10 +435,10 @@
             }
         },
         {
-            "label": "Checks: Integration Suite",
+            "label": "Checks: Flow Tests",
             "type": "shell",
             "command": "bash",
-            "args": ["./scripts/integration-suite/run-integration-suite.sh"],
+            "args": ["./scripts/flow-tests/run-flow-tests.sh"],
             "options": {
                 "cwd": "${workspaceFolder}"
             },
@@ -573,7 +458,7 @@
                 "Checks: Test Backend",
                 "Checks: Test App",
                 "Checks: Verify App Build",
-                "Checks: Integration Suite"
+                "Checks: Flow Tests"
             ],
             "problemMatcher": [],
             "presentation": {
@@ -586,48 +471,6 @@
             "type": "shell",
             "command": "bash",
             "args": ["./scripts/cloud/deploy-env.sh", "${input:cloud_env_name}"],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [],
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
-            }
-        },
-        {
-            "label": "Cloud: Pull Ad Platform Token",
-            "type": "shell",
-            "command": "bash",
-            "args": ["./scripts/cloud/pull-ap-token.sh", "${input:cloud_env_name}"],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [],
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
-            }
-        },
-        {
-            "label": "Cloud: Sideload Ad Platform OAuth Token",
-            "type": "shell",
-            "command": "bash",
-            "args": ["./scripts/cloud/sideload-ap-token.sh", "${input:cloud_env_name}"],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [],
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
-            }
-        },
-        {
-            "label": "Cloud: Trigger Channel Orchestration",
-            "type": "shell",
-            "command": "bash",
-            "args": ["./scripts/cloud/orchestrate-channel.sh", "${input:cloud_env_name}"],
             "options": {
                 "cwd": "${workspaceFolder}"
             },
@@ -670,20 +513,6 @@
             "type": "shell",
             "command": "bash",
             "args": ["./scripts/cloud/trigger-env-job.sh", "${input:cloud_env_name}", "create-admin-job"],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [],
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
-            }
-        },
-        {
-            "label": "Cloud Init: Load Locations",
-            "type": "shell",
-            "command": "bash",
-            "args": ["./scripts/cloud/trigger-env-job.sh", "${input:cloud_env_name}", "location-load-job"],
             "options": {
                 "cwd": "${workspaceFolder}"
             },

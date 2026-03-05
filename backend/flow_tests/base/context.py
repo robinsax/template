@@ -22,7 +22,7 @@ from backend.api import app as backend_api
 from backend.tasks.notifier import send_notification_emails
 
 from .mocks import MockMailer
-from .errors import IntegrationSuiteError, ContextCallFailed, StepFailed
+from .errors import TestError, ContextCallFailed, StepFailed
 from .steps import StepInfo, StepRef, StepNeedsAny
 
 APIReturn = Optional[Union[Model, list[Model], Response]]
@@ -30,7 +30,7 @@ StepOutput = dict[str, Any]
 
 class StepsContext:
     """
-    Context object for integration suite steps. Provides all necessary utilities for
+    Context object for flow test steps. Provides all necessary utilities for
     performing steps, and captures the state of step chains during execution.
     """
     root_url: str
@@ -105,7 +105,7 @@ class StepsContext:
         try:
             step_output = step_info.fn(self, **injected_values)
         except Exception as err:
-            raise IntegrationSuiteError(f"Step { name } failed") from err
+            raise TestError(f"Step { name } failed") from err
 
         self._current_subchain = None
 
@@ -166,11 +166,11 @@ class StepsContext:
                 return check_output
 
             if key not in check_output:
-                raise IntegrationSuiteError("No output for key: " + key)
+                raise TestError("No output for key: " + key)
 
             return check_output[key]
 
-        raise IntegrationSuiteError("No outputs for: " + ", ".join(step_names))
+        raise TestError("No outputs for: " + ", ".join(step_names))
 
     def get_session(self) -> Session:
         """
