@@ -15,7 +15,7 @@ from backend.service import (
     Unauthorized, Invalid, get_current_auth_key, get_session, get_current_user
 )
 
-from .app import app
+from .base import app
 
 # Auth keys.
 class AuthParams(Model):

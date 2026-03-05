@@ -4,7 +4,7 @@ Base file storage type definitions.
 from typing import IO
 from sqlalchemy.orm import Session
 
-from backend.model import Upload, UploadType, AuthzScope
+from backend.model import Upload, UploadType, Realm
 
 class StorageError(Exception):
     pass
@@ -43,11 +43,11 @@ class StorageBackend:
         raise NotImplementedError()
 
     def upload(
-        self, session: Session, authz_scope: AuthzScope,
-        upload_type: UploadType, filename: str, data: IO[bytes]
+        self, session: Session, realm: Realm, upload_type: UploadType,
+        filename: str, data: IO[bytes]
     ) -> Upload:
         """
         Store the file data for the given handle `data`, and create a corresponding
-        `Upload` with the given `upload_type`, `filename`, and `authz_scope`.
+        `Upload` with the given `upload_type`, `filename`, and `realm`.
         """
         raise NotImplementedError()

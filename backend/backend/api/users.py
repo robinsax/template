@@ -1,32 +1,24 @@
 """
 User access, invite, and management endpoints.
-
-The user creation flow is:
-- A `User` with *manage IAM* permission at any scope invites a new `User`.
-- The inviting `User` grants any desired roles to the new `User`.
-- The new `User` and an associated invite-specific `AuthKey` are created.
-- A link is sent to the invited email to exercise the invite and claim the `User`.
-- The invited `User` exercises the invite and claims the `User`.
 """
 import re
-import uuid
+from uuid import UUID
 from typing import Optional
 from fastapi import Request, Depends
 from sqlalchemy.orm import Session
 
 from backend.logic import get_supported_locales
 from backend.model import (
-    Model, Permission, User, UserType, UserModel, Audit, State, Upload, UploadType,
-    BasicAuditEvent, Notification, NotificationType, NotificationModel,
-    AuthKeyRestriction, AuthKey, MAX_USER_NAME_LENGTH, MAX_USER_EMAIL_LENGTH,
-    current_datetime
+    Model, Permission, User, UserModel, Audit, BasicAuditEvent, Notification,
+    NotificationType, NotificationModel, AuthKeyRestriction, AuthKey,
+    MAX_USER_NAME_LENGTH, MAX_USER_EMAIL_LENGTH, current_datetime
 )
 from backend.service import (
     Invalid, Unauthorized, get_current_user, assert_scopeless_authz, assert_authz,
     get_session
 )
 
-from .app import app
+from .base import app
 from .common import StateUpdateParams, assert_authz, state_update_handler
 
 # Validators.
@@ -75,17 +67,16 @@ def _validate_user_email(user_email: str):
 # User access.
 @app.get("/users")
 def get_users(
-    req: Request, session: Session = Depends(get_session)
+    session: Session = Depends(get_session),
+    cur_user: User = Depends(get_current_user)
 ) -> list[UserModel]:
     """
     Return all users.
 
-    Requires *manage IAM* permission at any scope.
+    Requires *manage users* permission at any scope.
     """
-    user = get_current_user(req, session)
-
     # Necessarily scopeless to allow discovery for novel grant creation.
-    assert_scopeless_authz(user, Permission.MANAGE_IAM)
+    assert_scopeless_authz(cur_user, Permission.MANAGE_USERS)
 
     users = User.get_all(session)
 
@@ -93,42 +84,40 @@ def get_users(
 
 @app.get("/users/{user_id:uuid}")
 def get_user(
-    user_id: uuid.UUID, req: Request, session: Session = Depends(get_session)
+    user_id: UUID, session: Session = Depends(get_session),
+    cur_user: User = Depends(get_current_user)
 ) -> UserModel:
     """
     Return the user with `user_id`.
 
-    Requires *manage IAM* permission at any scope if the user is not the requester.
+    Requires *manage users* permission at any scope if the user is not the requester.
     """
-    cur_user = get_current_user(req, session)
-
     user = User.get(session, user_id)
     if not user:
         raise Invalid("invalid_user")
 
     if user.id != cur_user.id:
-        assert_scopeless_authz(cur_user, Permission.MANAGE_IAM)
+        assert_scopeless_authz(cur_user, Permission.MANAGE_USERS)
 
     return user.to_model()
 
-# User invite flow.
-class UserInviteParams(Model):
+# User creation flow.
+class UserCreateParams(Model):
     """
-    Invitation request JSON body.
+    User creation request JSON body.
     """
     name: str
     email: str
     locale: str
-    type: UserType
 
 @app.post("/users")
-def invite_user(
-    req: Request, create: UserInviteParams, session: Session = Depends(get_session)
+def create_user(
+    create: UserCreateParams, session: Session = Depends(get_session),
+    cur_user: User = Depends(get_current_user)
 ) -> UserModel:
     """
-    Create a new user and send them an invitation to claim their account via email.
+    Create a new user and send them an a confirmation email.
     """
-    cur_user = get_current_user(req, session)
 
     _validate_user_name(create.name)
     _validate_user_email(create.email)
@@ -137,10 +126,7 @@ def invite_user(
         raise Invalid("already_exists")
 
     # Scope will be checked later, on grant creation.
-    assert_scopeless_authz(cur_user, Permission.MANAGE_IAM)
-
-    if cur_user.type == UserType.CLIENT and create.type != UserType.CLIENT:
-        raise Unauthorized("unpermitted_type")
+    assert_scopeless_authz(cur_user, Permission.MANAGE_USERS)
 
     if create.locale not in get_supported_locales():
         raise Invalid("invalid_locale")
@@ -148,9 +134,7 @@ def invite_user(
     user = User(
         name=create.name,
         email=create.email,
-        locale=create.locale,
-        type=create.type,
-        state=State.ACTIVE
+        locale=create.locale
     )
 
     session.add(user)
@@ -159,42 +143,40 @@ def invite_user(
 
     Audit.create(session, cur_user, user, BasicAuditEvent.CREATE)
 
-    # Note the (restricted) auth key for this invite will be generated when the
+    # Note the (restricted) auth key for this user will be generated when the
     # notification is dispatched via email.
-    Notification.create(session, NotificationType.INVITED, user, source_user=cur_user)
+    Notification.create(session, NotificationType.CONFIRM_EMAIL, user, source_user=cur_user)
     session.commit()
 
     return user.to_model()
 
-class UserClaimParams(Model):
+class UserConfirmParams(Model):
     """
-    User claim request JSON body.
+    User confirm request JSON body.
     """
-    invite_token: str
+    confirm_token: str
     password: str
 
-@app.post("/invites")
-def claim_user(
-    params: UserClaimParams, session: Session = Depends(get_session)
+@app.post("/users/confirmations")
+def confirm_user(
+    params: UserConfirmParams, session: Session = Depends(get_session)
 ) -> UserModel:
     """
-    Claim a user account and set a password using the invite with `invite_id`.
+    Confirm a user account and set a password using the confirm token.
     """
-    invite_key = AuthKey.get_for_token(
-        session, params.invite_token,
-        allowed_restriction=AuthKeyRestriction.INVITATION
+    confirm_key = AuthKey.get_for_token(
+        session, params.confirm_token,
+        allowed_restriction=AuthKeyRestriction.EMAIL_CONFIRM
     )
-    if not invite_key:
-        raise Invalid("invalid_invite")
+    if not confirm_key:
+        raise Invalid("invalid_token")
 
-    user = invite_key.user
-    if user.is_claimed:
-        raise Invalid("invalid_invite")
+    user = confirm_key.user
 
     _validate_password(params.password)
 
     user.set_password(params.password)
-    invite_key.revoke()
+    confirm_key.revoke()
 
     session.commit()
     session.refresh(user)
@@ -213,7 +195,7 @@ class UserPasswordUpdateParams(Model):
 
 @app.put("/users/{user_id:uuid}/password")
 def update_user_password(
-    user_id: uuid.UUID, update: UserPasswordUpdateParams,
+    user_id: UUID, update: UserPasswordUpdateParams,
     session: Session = Depends(get_session)
 ) -> UserModel:
     """
@@ -257,8 +239,9 @@ class UserUpdateParams(Model):
 
 @app.put("/users/{user_id:uuid}")
 def update_user(
-    user_id: uuid.UUID, req: Request, update: UserUpdateParams,
-    session: Session = Depends(get_session)
+    user_id: UUID, update: UserUpdateParams,
+    session: Session = Depends(get_session),
+    cur_user: User = Depends(get_current_user)
 ) -> UserModel:
     """
     Update the user with `user_id`.
@@ -266,7 +249,6 @@ def update_user(
     Requires  *manage IAM* permission containing user"s minimum authorization scope if
     the user is not the requester.
     """
-    cur_user = get_current_user(req, session)
 
     # Validate target and authz.
     user = User.get(session, user_id)
@@ -276,17 +258,7 @@ def update_user(
     if cur_user.id != user.id:
         required_authz_scope = user.get_minimum_iam_authz_scope()
 
-        assert_authz(cur_user, required_authz_scope, Permission.MANAGE_IAM)
-
-    # Update avatar.
-    if update.avatar_id:
-        upload = Upload.get_qualified(session, UploadType.AVATARS, update.avatar_id)
-        if not upload:
-            raise Invalid("invalid_avatar")
-
-        # Avatars are uploaded with empty scope, no authz check needed
-
-        user.avatar_id = upload.id
+        assert_authz(cur_user, required_authz_scope, Permission.MANAGE_USERS)
 
     # Update name and locale.
     if update.name:
@@ -310,7 +282,7 @@ def update_user(
 
 @app.put("/users/{user_id:uuid}/state")
 def update_user_state(
-    user_id: uuid.UUID, req: Request, update: StateUpdateParams,
+    user_id: UUID, req: Request, update: StateUpdateParams,
     session: Session = Depends(get_session)
 ) -> UserModel:
     """
@@ -327,7 +299,7 @@ def update_user_state(
 
     user = state_update_handler(
         session, cur_user, user, user.get_minimum_iam_authz_scope(), update,
-        require_permission=Permission.MANAGE_IAM
+        require_permission=Permission.MANAGE_USERS
     )
 
     return user.to_model()
@@ -335,7 +307,8 @@ def update_user_state(
 # Notifications.
 @app.get("/users/{user_id:uuid}/notifications")
 def get_notifications(
-    req: Request, user_id: uuid.UUID, session: Session = Depends(get_session)
+    req: Request, user_id: UUID, session: Session = Depends(get_session),
+    cur_user: User = Depends(get_current_user)
 ) -> list[NotificationModel]:
     """
     Return notifications for the given user. Returns only unseen notifications unless
@@ -344,13 +317,11 @@ def get_notifications(
     Requires that either the user is the requester or the user has *manage IAM* permission
     at the user"s minimum authorization scope.
     """
-    user = get_current_user(req, session)
-
     # Assert authz.
-    if user.id != user_id:
-        required_authz_scope = user.get_minimum_iam_authz_scope()
+    if cur_user.id != user_id:
+        required_authz_scope = cur_user.get_minimum_iam_authz_scope()
 
-        assert_authz(user, required_authz_scope, Permission.MANAGE_IAM)
+        assert_authz(cur_user, required_authz_scope, Permission.MANAGE_USERS)
 
     include_seen = bool(req.query_params.get("all"))
     notifications = Notification.get_all_for_user(session, user_id, include_seen)
@@ -358,12 +329,13 @@ def get_notifications(
     return [notification.to_model() for notification in notifications]
 
 class NotificationsUpdateParams(Model):
-    seen_ids: list[uuid.UUID]
+    seen_ids: list[UUID]
 
 @app.put("/users/{user_id:uuid}/notifications")
 def update_notifications(
-    user_id: uuid.UUID, req: Request, update: NotificationsUpdateParams,
-    session: Session = Depends(get_session)
+    user_id: UUID, update: NotificationsUpdateParams,
+    session: Session = Depends(get_session),
+    cur_user: User = Depends(get_current_user)
 ) -> None:
     """
     Update notifications.
@@ -372,10 +344,8 @@ def update_notifications(
 
     Requires that the user is the requester.
     """
-    user = get_current_user(req, session)
-
     # Assert authz.
-    if user.id != user_id:
+    if cur_user.id != user_id:
         raise Unauthorized("unauthorized")
 
     notifications = Notification.get_all_for_user(session, user_id)

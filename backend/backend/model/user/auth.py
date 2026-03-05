@@ -1,21 +1,20 @@
 """
 Authentication keys.
 """
-import uuid
 import hmac
 import base64
 import secrets
 import hashlib
+from uuid import UUID
 from enum import Enum
-from typing import Optional
 from datetime import datetime
-from sqlalchemy import ForeignKey, UUID, Column, String, DateTime, Index, and_
+from sqlalchemy import Index, and_
 from sqlalchemy.orm import Session, Mapped, relationship, joinedload
 
 from backend.config import ConfigError, config
 
-from ..base import Base, BaseMixin, EnumMixin, Model
-from ..common import current_datetime, enum_len
+from ..base import Mapper, Model, EnumMixin, column
+from ..common import current_datetime
 from .user import User
 
 # HMAC digests for tokens.
@@ -40,8 +39,7 @@ class AuthKeyRestriction(EnumMixin, Enum):
     """
     Restrictions that can be applied to an authentication key.
     """
-    ASSET_GET = "asset_get"
-    INVITATION = "invitation"
+    EMAIL_CONFIRM = "email_confirm"
     PASSWORD_RESET = "password_reset"
 
 class AuthKeyModel(Model):
@@ -51,10 +49,10 @@ class AuthKeyModel(Model):
     user_id: str
     created_at: datetime
     expires_at: datetime
-    revoked_at: Optional[datetime] = None
-    restriction: Optional[AuthKeyRestriction] = None
+    revoked_at: datetime | None = None
+    restriction: AuthKeyRestriction | None = None
 
-class AuthKey(Base, BaseMixin):
+class AuthKey(Mapper):
     """
     An expiring, revokable, and refreshable authentication key.
 
@@ -69,32 +67,29 @@ class AuthKey(Base, BaseMixin):
     __tablename__ = "auth_keys"
     __model__ = AuthKeyModel
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    token_digest = Column(String(length=112), nullable=False)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
-    created_at = Column(DateTime(timezone=True), default=current_datetime)
-    expires_at = Column(DateTime(timezone=True), nullable=False)
-    revoked_at = Column(DateTime(timezone=True), nullable=True)
-    _restriction = Column(
-        "restriction", String(length=enum_len(AuthKeyRestriction)), nullable=True
-    )
+    id: Mapped[UUID] = column(pk=True)
+    user_id: Mapped[UUID] = column(fk="users.id")
+    token_digest: Mapped[str] = column(str_len=112)
+    created_at: Mapped[datetime] = column(dt=True, default_now=True)
+    expires_at: Mapped[datetime | None] = column(dt=True)
+    restriction: Mapped[AuthKeyRestriction | None] = column(AuthKeyRestriction)
 
     # Joined load user since the whole point is to access them.
-    user: Mapped[User] = relationship("User", lazy="joined")
+    user: Mapped[User] = relationship(lazy="joined")
 
     __table_args__ = (
         # Supporting get_for_token.
         Index(
-            "ix_auth_keys_user_id_token_digest_expires_at_revoked_at",
-            user_id, token_digest, expires_at, revoked_at
+            "ix_auth_keys_user_id_token_digest_expires_at",
+            user_id, token_digest, expires_at
         ),
     )
 
     @classmethod
     def get_for_token(
         cls, session: Session, token: str, *,
-        allowed_restriction: Optional[AuthKeyRestriction] = None
-    ) -> Optional["AuthKey"]:
+        allowed_restriction: AuthKeyRestriction | None = None
+    ) -> "AuthKey" | None:
         """
         Return the `AuthKey` for the given token if one that is not expired
         or revoked exists.
@@ -113,15 +108,14 @@ class AuthKey(Base, BaseMixin):
             return None
 
         clauses = [
-            cls.revoked_at.is_(None),
             cls.expires_at > current_datetime(),
             cls.user_id == token_user_id,
             cls.token_digest == token_digest
         ]
         if allowed_restriction:
-            clauses.append(cls._restriction == allowed_restriction.value)
+            clauses.append(cls.restriction == allowed_restriction)
         else:
-            clauses.append(cls._restriction.is_(None))
+            clauses.append(cls.restriction.is_(None))
 
         return session.query(cls)\
             .options(joinedload(cls.user).selectinload(User.grants))\
@@ -129,28 +123,11 @@ class AuthKey(Base, BaseMixin):
             .first()
 
     @property
-    def restriction(self) -> Optional[AuthKeyRestriction]:
-        """
-        The restriction for this key, if any.
-        """
-        if not self._restriction:
-            return None
-
-        return AuthKeyRestriction(self._restriction)
-
-    @restriction.setter
-    def restriction(self, value: Optional[AuthKeyRestriction]):
-        """
-        Set the restriction for this key.
-        """
-        self._restriction = value.value if value else None
-
-    @property
     def is_valid(self) -> bool:
         """
         Whether this key is valid.
         """
-        return self.expires_at > current_datetime() and not self.revoked_at
+        return self.expires_at > current_datetime()
 
     def generate_token(self) -> str:
         """
@@ -176,4 +153,4 @@ class AuthKey(Base, BaseMixin):
         """
         Revoke this key.
         """
-        self.revoked_at = current_datetime()
+        self.expires_at = current_datetime()

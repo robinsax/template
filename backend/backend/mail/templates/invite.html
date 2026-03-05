@@ -1,8 +1,0 @@
-{% extends "base.html" %}
-
-{% block subject %}{{ t("You've been invited to Kedet!") }}{% endblock %}
-
-{% block content %}
-{{ t("Use this link to set up your account:") }}
-{{ origin }}/join?{{ url_params }}
-{% endblock %}

@@ -8,8 +8,7 @@ from sqlalchemy.orm import Session
 from google.cloud.storage import Client
 
 from backend.config import config
-from backend.model import Upload, UploadType, AuthzScope, UploadImageMetadataModel
-from backend.logic import get_image_dimensions
+from backend.model import Upload, UploadType, Realm
 
 from .base import StorageBackend, StorageError
 
@@ -26,16 +25,13 @@ class GoogleCloudStorageBackend(StorageBackend):
         """
         Get the bucket name for the given `upload_type`.
         """
-        if upload_type == UploadType.CAMPAIGN_ASSETS:
-            return config.google_bucket_creative.get()
-
-        return config.google_bucket_platform.get()
+        return config.google_bucket_default.get()
 
     def direct_read(self, filename: str) -> IO[bytes]:
         """
         Read the file data for the given `filename`.
         """
-        bucket = self.client.get_bucket(self._bucket_name(UploadType.PLATFORM_DATA))
+        bucket = self.client.get_bucket(self._bucket_name(UploadType.DEFAULT))
         blob = bucket.blob(filename)
 
         if not blob.exists():
@@ -59,13 +55,13 @@ class GoogleCloudStorageBackend(StorageBackend):
         """
         Upload the file data for the given `filename`.
         """
-        bucket = self.client.get_bucket(self._bucket_name(UploadType.PLATFORM_DATA))
+        bucket = self.client.get_bucket(self._bucket_name(UploadType.DEFAULT))
         blob = bucket.blob(filename)
         blob.upload_from_file(data)
 
-    def upload( # pylint: disable=too-many-locals
-        self, session: Session, authz_scope: AuthzScope,
-        upload_type: UploadType, filename: str, data: IO[bytes]
+    def upload(
+        self, session: Session, realm: Realm, upload_type: UploadType,
+        filename: str, data: IO[bytes]
     ) -> Upload:
         """
         Upload the file data for the given `upload_type`, `filename`, and `data`.
@@ -78,13 +74,6 @@ class GoogleCloudStorageBackend(StorageBackend):
 
         content_type, _ = mimetypes.guess_type(filename)
         size = blob.size
-        image_metadata = None
-        if content_type.startswith("image/"):
-            width, height = get_image_dimensions(data)
-
-            image_metadata = UploadImageMetadataModel(width=width, height=height)
-            if content_type == "image/jpg":
-                content_type = "image/jpeg"
 
         upload = Upload(
             id=upload_id,
@@ -92,12 +81,10 @@ class GoogleCloudStorageBackend(StorageBackend):
             filename=filename,
             content_type=content_type,
             size=size,
-            client_id=authz_scope.client_id,
-            business_id=authz_scope.business_id,
-            image_metadata=image_metadata
+            realm_id=realm.id
         )
         session.add(upload)
-        session.commit()
+        session.flush()
         session.refresh(upload)
 
         return upload

@@ -2,7 +2,7 @@
 Common HTTP service authentication and authorization helpers.
 """
 from typing import Optional
-from fastapi import Request
+from fastapi import Request, Depends
 from sqlalchemy.orm import Session
 
 from backend.model import (
@@ -10,6 +10,7 @@ from backend.model import (
 )
 from backend.logic import check_authz, check_scopeless_authz, check_grant_set_authz
 
+from ..database import get_session
 from .exc import Unauthorized
 
 def get_current_auth_key(
@@ -31,7 +32,7 @@ def get_current_auth_key(
 
     return key
 
-def get_current_user(req: Request, session: Session) -> User:
+def get_current_user(req: Request, session: Session = Depends(get_session)) -> User:
     """
     Return the `User` to which the `AuthKey` provided in the request belongs, if it was
     valid.

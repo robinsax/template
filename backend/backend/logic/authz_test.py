@@ -1,4 +1,4 @@
-import uuid
+from uuid import uuid4
 
 from backend.logic import (
     is_role_more_permissive_than, is_role_at_least_as_permissive_as, scope_contains_scope,
@@ -8,30 +8,27 @@ from backend.model import Role, UserGrant, AuthzScope, UserType
 
 def test_role_permissiveness_checks():
     # Difference.
-    assert is_role_more_permissive_than(Role.ADMIN, Role.MEMBER)
+    assert is_role_more_permissive_than(Role.ADMIN, Role.USER)
     assert not is_role_more_permissive_than(Role.ADMIN, Role.ADMIN)
 
-    assert is_role_at_least_as_permissive_as(Role.ADMIN, Role.MEMBER)
-    assert not is_role_at_least_as_permissive_as(Role.MEMBER, Role.ADMIN)
-
-    assert is_role_more_permissive_than(Role.MANAGER, Role.MEMBER)
-    assert not is_role_more_permissive_than(Role.MEMBER, Role.MANAGER)
+    assert is_role_at_least_as_permissive_as(Role.ADMIN, Role.USER)
+    assert not is_role_at_least_as_permissive_as(Role.USER, Role.ADMIN)
 
     # Equality.
-    assert not is_role_more_permissive_than(Role.MANAGER, Role.MANAGER)
-    assert is_role_at_least_as_permissive_as(Role.MANAGER, Role.MANAGER)
+    assert not is_role_more_permissive_than(Role.USER, Role.USER)
+    assert is_role_at_least_as_permissive_as(Role.ADMIN, Role.ADMIN)
 
 def test_scoping_checks():
     global_scope = AuthzScope()
-    client_a_scope = AuthzScope(client_id=uuid.uuid4())
-    client_b_scope = AuthzScope(client_id=uuid.uuid4())
+    client_a_scope = AuthzScope(client_id=uuid4())
+    client_b_scope = AuthzScope(client_id=uuid4())
     business_a_scope = AuthzScope(
         client_id=client_a_scope.client_id,
-        business_id=uuid.uuid4()
+        business_id=uuid4()
     )
     business_b_scope = AuthzScope(
         client_id=client_b_scope.client_id,
-        business_id=uuid.uuid4()
+        business_id=uuid4()
     )
 
     # All permutations.
@@ -102,7 +99,7 @@ def test_grant_validity_checks():
     assert not valid
 
     # Re-granting more permissive role at child scope is valid.
-    client_a_id = uuid.uuid4()
+    client_a_id = uuid4()
     grants = [
         UserGrant(
             role=Role.MEMBER,
@@ -111,7 +108,7 @@ def test_grant_validity_checks():
         )
     ]
     valid, redundant = would_grant_be_valid(
-        AuthzScope(client_id=client_a_id, business_id=uuid.uuid4()),
+        AuthzScope(client_id=client_a_id, business_id=uuid4()),
         Role.MANAGER,
         UserType.CLIENT,
         grants
@@ -124,7 +121,7 @@ def test_grant_validity_checks():
         UserGrant(
             role=Role.MEMBER,
             client_id=client_a_id,
-            business_id=uuid.uuid4()
+            business_id=uuid4()
         )
     ]
     valid, redundant = would_grant_be_valid(
@@ -141,7 +138,7 @@ def test_grant_validity_checks():
         UserGrant(
             role=Role.MANAGER,
             client_id=client_a_id,
-            business_id=uuid.uuid4()
+            business_id=uuid4()
         )
     ]
     valid, redundant = would_grant_be_valid(

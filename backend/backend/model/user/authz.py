@@ -1,13 +1,18 @@
 """
-Authorization enums and constants.
+User grant definition - the central in-database authorization object.
 """
-import uuid
-from enum import Enum
-from dataclasses import dataclass
-from typing import Optional
-from sqlalchemy import Column, UUID
+from uuid import UUID
+from datetime import datetime
+from typing import TYPE_CHECKING
+from sqlalchemy import Index, and_
+from sqlalchemy.orm import Mapped, Session, relationship
 
-from ..base import EnumMixin
+from ..base import Mapper, Model, column
+from ..audit import AuditMixin
+
+if TYPE_CHECKING:
+    from ..realm import RealmModel, Realm
+    from .user import User
 
 class Role(EnumMixin, Enum):
     """
@@ -24,50 +29,83 @@ class Permission(EnumMixin, Enum):
     # IAM / organization management.
     MANAGE_USERS = "manage_users"
 
-class AuthzScopeType(EnumMixin, Enum):
+class UserRoleModel(Model):
     """
-    Levels of `AuthzScope`s.
+    Default `Model` for `UserGrant`s.
     """
-    GLOBAL = "global"
-    TENANT = "tenant"
+    id: str
+    user_id: str
+    realm: "RealmModel" | None
+    role: Role
 
-@dataclass
-class AuthzScope:
+class UserRole(Mapper, AuditMixin):
     """
-    Represents a scope for authorization checks. Represents the global scope
-    when containing all none values.
+    Grants a `User` a `Role` at an authorization scope.
+
+    If `realm_id` is not set the grant is global.
+
+    Uses soft-deletion for revokes to retain history. If you `session.query()` this
+    mapper, you must check this case.
     """
-    tenant_id: Optional[uuid.UUID] = None
+    __model__ = UserRoleModel
+    __tablename__ = "user_roles"
 
-    @property
-    def scope_type(self) -> AuthzScopeType:
-        """
-        The scope type for this scope.
-        """
-        if self.tenant_id is None:
-            return AuthzScopeType.GLOBAL
-        return AuthzScopeType.TENANT
+    id: Mapped[UUID] = column(pk=True)
+    realm_id: Mapped[UUID | None] = column(fk="realms.id")
+    user_id: Mapped[UUID] = column(fk="users.id", index=True)
+    deleted_at: Mapped[datetime | None] = column(dt=True)
+    role: Mapped[Role] = column(Role)
 
-    def is_same(self, other: "AuthzScope") -> bool:
-        """
-        Whether this scope is the same as the other scope.
-        """
-        return self.tenant_id == other.tenant_id
+    realm: Mapped["Realm"] = relationship()
+    user: Mapped["User"] = relationship(back_populates="grants")
 
-AUTHZ_SCOPE_TYPE_ORDER = [
-    AuthzScopeType.GLOBAL,
-    AuthzScopeType.TENANT
-]
-"""
-Downwards ordering of `AuthzScopeType`s.
-"""
+    __table_args__ = (
+        # Supporting `get_for_user`.
+        Index("ix_user_grant_user_id_deleted_at", user_id, deleted_at),
+    )
+
+    @classmethod
+    def get_for_user(cls, session: Session, user_id: UUID):
+        """
+        Return all grants for `user_id` that are not soft-deleted.
+        """
+        return session.query(cls)\
+            .filter(and_(
+                cls.deleted_at.is_(None),
+                cls.user_id == user_id
+            ))\
+            .all()
+
+    @classmethod
+    def get_all_for_realm(
+        cls, session: Session, realm_id: UUID,
+        roles: list[Role] | None = None
+    ) -> list["UserGrant"]:
+        """
+        Return all grants on the given `realm_id` that
+        are not soft-deleted.
+
+        Can additionally filter to specific `roles`.
+        """
+        clauses = [
+            cls.deleted_at.is_(None),
+            # AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA CTE
+            cls.realm_id == realm_id
+        ]
+        if roles:
+            clauses.append(cls.role.in_(roles))
+
+        return session.query(cls)\
+            .filter(and_(*clauses))\
+            .all()
 
 ROLE_SCOPES = {
-    Role.ADMIN: [AuthzScopeType.GLOBAL],
-    Role.USER: [AuthzScopeType.TENANT]
+    Role.ADMIN: [None],
+    Role.USER: [None]
 }
 """
-Defines the `AuthzScopeType`s at which each `Role` is grantable.
+Defines the `RealmType`s at which each `Role` is grantable. `None` represents
+application global roles.
 """
 
 PERMISSIONS_MATRIX = {
@@ -77,18 +115,3 @@ PERMISSIONS_MATRIX = {
 """
 Defines the set of permissions granted, within the grant scope, by each role.
 """
-
-class AuthzScopedMixin:
-    """
-    Mixin for models that are scoped to an authorization context.
-    """
-    tenant_id = Column(UUID(as_uuid=True), nullable=True)
-
-    @property
-    def authz_scope(self) -> AuthzScope:
-        """
-        The `AuthzScope` within which this upload exists.
-        """
-        return AuthzScope(
-            tenant_id=self.tenant_id
-        )

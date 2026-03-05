@@ -2,7 +2,7 @@
 Misc. utilities.
 """
 import re
-import uuid
+from uuid import UUID
 from typing import Union
 
 BASE_62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
@@ -27,12 +27,12 @@ def base62_encode(num: int) -> str:
         chars.append(BASE_62[rem])
     return "".join(reversed(chars))
 
-def id_to_app_url_form(value: Union[str, uuid.UUID]) -> str:
+def id_to_app_url_form(value: Union[str, UUID]) -> str:
     """
     Encodes a UUID into a URL-friendly base62 string.
     """
-    if not isinstance(value, uuid.UUID):
-        value = uuid.UUID(value)
+    if not isinstance(value, UUID):
+        value = UUID(value)
 
     num = int.from_bytes(value.bytes, byteorder="big", signed=False)
 

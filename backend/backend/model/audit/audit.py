@@ -1,20 +1,15 @@
 """
 Audit mapper.
 """
-import uuid
+from uuid import UUID
 from enum import Enum
 from datetime import datetime
 from typing import TYPE_CHECKING, Optional, Union, Any
-from sqlalchemy import (
-    Column, UUID, String, ForeignKey, DateTime, Index, and_, or_, select, exists
-)
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import Column, Index, and_, or_, select, exists
 from sqlalchemy.orm import Session, Mapped, relationship
 
-from ..base import Base, BaseMixin, EnumMixin, Model, MAX_TABLENAME_LEN
-from ..common import (
-    current_datetime, model_to_column_repr, dict_to_column_repr
-)
+from ..base import Mapper, Model, EnumMixin, Model, MAX_TABLENAME_LEN, column
+from ..common import model_to_column_repr, dict_to_column_repr
 
 if TYPE_CHECKING:
     from ..user import User, UserModel
@@ -55,7 +50,7 @@ class AuditStandaloneModel(Model):
     target_type: str
     target_summary: Any
 
-class Audit(Base, BaseMixin):
+class Audit(Mapper):
     """
     Audit record.
 
@@ -67,18 +62,15 @@ class Audit(Base, BaseMixin):
     __model__ = AuditModel
     __tablename__ = "audits"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
-    occurred_at = Column(
-        DateTime(timezone=True), nullable=False, index=True, default=current_datetime
-    )
-    target_type = Column(String(length=MAX_TABLENAME_LEN), nullable=False)
-    target_id = Column(UUID(as_uuid=True), nullable=False)
-    # Note we can"t use enum_len here because this is a generic.
-    _event = Column("event", String(length=MAX_AUDIT_EVENT_LEN), nullable=False)
-    _params = Column("params", JSONB, nullable=True)
+    id: Mapped[UUID] = column(pk=True)
+    user_id: Mapped[UUID] = column(fk="users.id")
+    occurred_at: Mapped[datetime] = column(dt=True, default_now=True, index=True)
+    target_type: Mapped[str] = column(str_len=MAX_TABLENAME_LEN)
+    target_id: Mapped[UUID] = column()
+    _event: Mapped[str] = column(name="event", str_len=MAX_AUDIT_EVENT_LEN, nullable=False)
+    params: Mapped[dict | None] = column()
 
-    user: Mapped["User"] = relationship("User")
+    user: Mapped["User"] = relationship()
 
     __table_args__ = (
         Index("ix_audit_target", target_type, target_id),
@@ -154,7 +146,7 @@ class Audit(Base, BaseMixin):
 
     @classmethod
     def get_latest_for_targets_in_businesses(
-        cls, session: Session, business_ids: list[uuid.UUID],
+        cls, session: Session, business_ids: list[UUID],
         target_cls_list: list[tuple["AuditMixin", Column]],
         limit: Optional[int] = None
     ) -> list["Audit"]:

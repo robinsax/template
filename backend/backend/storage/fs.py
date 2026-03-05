@@ -10,8 +10,7 @@ from typing import IO
 from sqlalchemy.orm import Session
 
 from backend.config import config
-from backend.model import Upload, UploadType, AuthzScope, UploadImageMetadataModel
-from backend.logic import get_image_dimensions
+from backend.model import Upload, UploadType, Realm
 
 from .base import StorageBackend, StorageError
 
@@ -50,7 +49,7 @@ class FileSystemBackend(StorageBackend):
         """
         Read the file data for the given `filename`.
         """
-        file_path = self._get_path(UploadType.PLATFORM_DATA, filename)
+        file_path = self._get_path(UploadType.DEFAULT, filename)
 
         return open(file_path, "rb")
 
@@ -66,14 +65,14 @@ class FileSystemBackend(StorageBackend):
         """
         Upload the file data for the given `filename`.
         """
-        file_path = self._get_path(UploadType.PLATFORM_DATA, filename, create=True)
+        file_path = self._get_path(UploadType.DEFAULT, filename, create=True)
         with open(file_path, "wb") as fh:
             while chunk := data.read(8192):
                 fh.write(chunk)
 
-    def upload( # pylint: disable=too-many-locals
-        self, session: Session, authz_scope: AuthzScope,
-        upload_type: UploadType, filename: str, data: IO[bytes]
+    def upload(
+        self, session: Session, realm: Realm, upload_type: UploadType,
+        filename: str, data: IO[bytes]
     ) -> Upload:
         """
         Upload the file data for the given `upload_type`, `filename`, and `data`.
@@ -87,14 +86,6 @@ class FileSystemBackend(StorageBackend):
 
         content_type, _ = mimetypes.guess_type(filename)
         size = os.path.getsize(file_path)
-        image_metadata = None
-        if content_type.startswith("image/"):
-            with open(file_path, "rb") as fh:
-                width, height = get_image_dimensions(fh)
-
-            image_metadata = UploadImageMetadataModel(width=width, height=height)
-            if content_type == "image/jpg":
-                content_type = "image/jpeg"
 
         upload = Upload(
             id=upload_id,
@@ -102,12 +93,10 @@ class FileSystemBackend(StorageBackend):
             filename=filename,
             content_type=content_type,
             size=size,
-            client_id=authz_scope.client_id,
-            business_id=authz_scope.business_id,
-            image_metadata=image_metadata
+            realm_id=realm.id
         )
         session.add(upload)
-        session.commit()
+        session.flush()
         session.refresh(upload)
 
         return upload

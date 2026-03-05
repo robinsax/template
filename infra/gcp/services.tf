@@ -137,56 +137,11 @@ locals {
     GOOGLE_MAPS_API_KEY = "${local.env_name_prefix}-gmaps-api-key"
   }
 
-  # Ad platform secrets and config.
-  ad_platform_secret_env_vars = {
-    GOOGLE_ADS_DEV_TOKEN   = "${local.env_name_prefix}-google-ads-dev-token"
-    GOOGLE_CLIENT_ID       = "${local.env_name_prefix}-google-client-id"
-    GOOGLE_CLIENT_SECRET   = "${local.env_name_prefix}-google-client-secret"
-    META_APP_ID            = "${local.env_name_prefix}-meta-app-id"
-    META_APP_SECRET        = "${local.env_name_prefix}-meta-app-secret"
-    META_LOGIN_CONFIG_ID   = "${local.env_name_prefix}-meta-login-config-id"
-    SNAPCHAT_CLIENT_ID     = "${local.env_name_prefix}-snapchat-client-id"
-    SNAPCHAT_CLIENT_SECRET = "${local.env_name_prefix}-snapchat-client-secret"
-    TIKTOK_APP_ID          = "${local.env_name_prefix}-tiktok-app-id"
-    TIKTOK_APP_SECRET      = "${local.env_name_prefix}-tiktok-app-secret"
-    AMAZON_CLIENT_ID       = "${local.env_name_prefix}-amazon-client-id"
-    AMAZON_CLIENT_SECRET   = "${local.env_name_prefix}-amazon-client-secret"
-    PINTEREST_APP_ID       = "${local.env_name_prefix}-pinterest-app-id"
-    PINTEREST_APP_SECRET   = "${local.env_name_prefix}-pinterest-app-secret"
-  }
-
-  ad_platform_env_vars = {
-    GOOGLE_DV360_USE_MOCK_BACKEND = var.service_config.google_dv360_use_mock_backend
-    META_USE_MOCK_BACKEND         = var.service_config.meta_use_mock_backend
-    SNAPCHAT_USE_MOCK_BACKEND     = var.service_config.snapchat_use_mock_backend
-    TIKTOK_USE_MOCK_BACKEND       = var.service_config.tiktok_use_mock_backend
-    AMAZON_USE_MOCK_BACKEND       = var.service_config.amazon_use_mock_backend
-    PINTEREST_USE_MOCK_BACKEND    = var.service_config.pinterest_use_mock_backend
-  }
-
   # Storage environment variables.
   storage_env_vars = {
     STORAGE_BACKEND        = "google",
     GOOGLE_BUCKET_PLATFORM = "${local.env_name_prefix}-platform-data",
     GOOGLE_BUCKET_CREATIVE = "${local.env_name_prefix}-creative-data",
-  }
-
-  # Analytics backend environment variables.
-  analytics_env_vars = {
-    ANALYTICS_BACKEND   = "bigquery",
-    BIGQUERY_PROJECT_ID = var.project_id,
-    BIGQUERY_DATASET_ID = local.bq_dataset_id
-    BIGQUERY_TABLE_NAME = local.analytics_table_name
-  }
-
-  # AI environment variables.
-  ai_env_vars = {
-    AI_PROVIDER           = "gemini",
-    GEMINI_GCP_PROJECT_ID = var.project_id,
-    # https://cloud.google.com/gemini/docs/locations
-    GEMINI_GCP_LOCATION = "us-west1",
-    # Vertex AI uses different model names than Gemini Studio.
-    IMAGEN_MODEL = "imagen-4.0-generate-001"
   }
 }
 
@@ -221,39 +176,14 @@ module "api" {
   use_http2 = true
 
   secret_env_vars = merge(
-    local.common_secret_env_vars,
-    local.ad_platform_secret_env_vars
+    local.common_secret_env_vars
   )
 
   env_vars = merge(
     local.service_env_vars,
     local.postgres_env_vars,
-    local.storage_env_vars,
-    local.analytics_env_vars,
-    local.ai_env_vars,
-    local.ad_platform_env_vars
+    local.storage_env_vars
   )
-}
-
-# Streaming service.
-module "streams" {
-  depends_on = [module.api]
-
-  source   = "./modules/cloud-run"
-  env_info = local.cloud_run_env_info
-
-  use_http2 = true
-
-  env_vars = merge(
-    local.service_env_vars,
-    local.postgres_env_vars,
-    local.storage_env_vars,
-  )
-
-  secret_env_vars = local.common_secret_env_vars
-
-  service_name = "streams"
-  build_dir    = "backend"
 }
 
 # Tasks service.
@@ -270,7 +200,6 @@ module "tasks" {
 
   secret_env_vars = merge(
     local.common_secret_env_vars,
-    local.ad_platform_secret_env_vars,
     local.mail_secret_env_vars
   )
 
@@ -278,9 +207,6 @@ module "tasks" {
     local.service_env_vars,
     local.postgres_env_vars,
     local.storage_env_vars,
-    local.analytics_env_vars,
-    local.ai_env_vars,
-    local.ad_platform_env_vars,
     local.mail_env_vars
   )
 

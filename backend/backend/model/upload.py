@@ -3,16 +3,13 @@ In-database representation of uploaded files.
 
 Files themselves are stored by the configured `StorageBackend`,
 """
-import uuid
+from uuid import UUID
 from enum import Enum
-from typing import Optional
-from sqlalchemy import Column, UUID, String, Integer, and_
-from sqlalchemy.orm import Session
+from sqlalchemy import and_
+from sqlalchemy.orm import Session, Mapped
 
-from .base import Base, BaseMixin, EnumMixin, Model
-from .common import EnumType
+from .base import EnumMixin, Model, Mapper, column
 from .audit import AuditMixin
-from .user import AuthzScopedMixin
 
 class UploadType(EnumMixin, Enum):
     """
@@ -26,33 +23,30 @@ class UploadModel(Model):
     Default `Model` for `Upload`s.
     """
     id: str
-    client_id: Optional[str]
-    business_id: Optional[str]
     type: UploadType
+    realm_id: str
     filename: str
     content_type: str
     size: int
 
-class Upload(Base, BaseMixin, AuthzScopedMixin, AuditMixin):
+class Upload(Mapper, AuditMixin):
     """
     Record of an uploaded file.
-    
-    Uploads are authorization-scoped and authorization must be checked before exposing
-    them.
     """
     __tablename__ = "uploads"
     __model__ = UploadModel
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    filename = Column(String(length=255), nullable=False)
-    content_type = Column(String(length=60), nullable=False)
-    size = Column(Integer, nullable=False)
-    type = Column(EnumType(UploadType), nullable=False)
+    id: Mapped[UUID] = column(pk=True)
+    realm_id: Mapped[UUID] = column(fk="realms.id")
+    filename: Mapped[str] = column(str_len=255)
+    content_type: Mapped[str] = column(str_len=60)
+    size: Mapped[int] = column()
+    type: Mapped[UploadType] = column(UploadType)
 
     @classmethod
     def get_qualified(
-        cls, session: Session, upload_type: UploadType, upload_id: uuid.UUID
-    ) -> Optional["Upload"]:
+        cls, session: Session, upload_type: UploadType, upload_id: UUID
+    ) -> "Upload" | None:
         """
         Query an upload by `id` and `upload_type`.
         """

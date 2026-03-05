@@ -210,10 +210,6 @@ class Config:
     """
     The HMAC key for authentication tokens.
     """
-    google_maps_api_key = ConfigValue("google_maps_api_key")
-    """
-    The API key for Google Maps.
-    """
 
     # Mailer.
     mailer = ConfigValue("mailer", default="dummy")
@@ -238,43 +234,6 @@ class Config:
     Password for the SMTP backend.
     """
 
-    # AI provision.
-    ai_provider = ConfigValue("ai_provider")
-    """
-    The `AIProvider` implementation to use.
-    """
-    # AI provision - Gemini.
-    gemini_dev_api_key = ConfigValue("gemini_dev_api_key")
-    """
-    The Gemini developer API key to use.
-    """
-    gemini_gcp_project_id = ConfigValue("gemini_gcp_project_id")
-    """
-    The GCP project ID to use for Gemini, only applicable outside of Dev mode.
-    """
-    gemini_gcp_location = ConfigValue("gemini_gcp_location")
-    """
-    The GCP location to use for Gemini, only applicable outside of Dev mode.
-    """
-    gemini_model = ConfigValue("gemini_model", default="gemini-2.5-flash")
-    """
-    The Google Gemini model to use.
-    """
-    gemini_image_model = ConfigValue(
-        "gemini_image_model",
-        default="gemini-2.5-flash-image"
-    )
-    """
-    The Google Gemini image model to use.
-    """
-    imagen_model = ConfigValue(
-        "imagen_model",
-        default="models/imagen-4.0-generate-001"
-    )
-    """
-    The Google Imagen model to use.
-    """
-
     # Storage backends.
     storage_backend = ConfigValue(
         "storage_backend",
@@ -290,188 +249,10 @@ class Config:
     The root directory for filesystem storage, if that is the desired storage backend.
     """
     # Storage backends - Google.
-    google_bucket_platform = ConfigValue("google_bucket_platform")
+    google_bucket_default = ConfigValue("google_bucket_default")
     """
-    The name of the GCP bucket to use for platform data, if Google is the configured
+    The name of the GCP bucket to use for data by default, if Google is the configured
     storage backend.
-    """
-    google_bucket_creative = ConfigValue("google_bucket_creative")
-    """
-    The name of the GCP bucket to use for creatives data, if Google is the configured
-    storage backend.
-    """
-
-    # Analytics backends.
-    analytics_backend = ConfigValue("analytics_backend", default="dummy")
-    """
-    The `AnalyticsBackend` implementation to use.
-    """
-    # Analytics backends - BigQuery.
-    bigquery_project_id = ConfigValue("bigquery_project_id")
-    """
-    The GCP project ID to use for BigQuery.
-    """
-    bigquery_dataset_id = ConfigValue("bigquery_dataset_id")
-    """
-    The BigQuery dataset ID to use.
-    """
-    bigquery_table_name = ConfigValue("bigquery_table_name")
-    """
-    The BigQuery table name to use.
-    """
-
-    # Ad platforms - Google.
-    google_client_id = ConfigValue(
-        "google_client_id",
-        integration_test_value="dummy"
-    )
-    """
-    The client ID for the Google Ads & DV360 platforms.
-    """
-    google_client_secret = ConfigValue(
-        "google_client_secret",
-        integration_test_value="dummy"
-    )
-    """
-    The client secret for the Google Ads & DV360 platforms.
-    """
-    google_ads_dev_token = ConfigValue(
-        "google_ads_dev_token",
-        integration_test_value=""
-    )
-    """
-    The developer token for the Google Ads platform.
-    """
-    google_dv360_use_mock_backend = ConfigValue(
-        "google_dv360_use_mock_backend", bool,
-        default=False,
-        integration_test_value=True
-    )
-    """
-    Whether to use a mock Google DV360 backend.
-    """
-    # Ad platforms - Meta.
-    meta_app_id = ConfigValue(
-        "meta_app_id",
-        integration_test_value="dummy"
-    )
-    """
-    The app ID for the Meta platform.
-    """
-    meta_app_secret = ConfigValue(
-        "meta_app_secret",
-        integration_test_value="dummy"
-    )
-    """
-    The app secret for the Meta platform.
-    """
-    meta_login_config_id = ConfigValue("meta_login_config_id", default="")
-    """
-    The login configuration ID for OAuth flows.
-
-    Only required in non-mock deployments.
-    """
-    meta_use_mock_backend = ConfigValue(
-        "meta_use_mock_backend", bool,
-        default=False,
-        integration_test_value=True
-    )
-    """
-    Whether to use a mock Meta backend.
-    """
-    # Ad platforms - Snapchat.
-    snapchat_client_id = ConfigValue(
-        "snapchat_client_id",
-        integration_test_value="dummy"
-    )
-    """
-    The Confidential OAuth 2.0 Client ID for the Snapchat platform.
-    """
-    snapchat_client_secret = ConfigValue(
-        "snapchat_client_secret",
-        integration_test_value="dummy"
-    )
-    """
-    The Confidential OAuth 2.0 Client Secret for the Snapchat platform.
-    """
-    snapchat_use_mock_backend = ConfigValue(
-        "snapchat_use_mock_backend", bool,
-        default=False,
-        integration_test_value=True
-    )
-    """
-    Whether to use a mock Snapchat backend.
-    """
-    # Ad platforms - TikTok.
-    tiktok_app_id = ConfigValue(
-        "tiktok_app_id",
-        integration_test_value="dummy"
-    )
-    """
-    The app ID for the TikTok platform.
-    """
-    tiktok_app_secret = ConfigValue(
-        "tiktok_app_secret",
-        integration_test_value="dummy"
-    )
-    """
-    The app secret for the TikTok platform.
-    """
-    tiktok_use_mock_backend = ConfigValue(
-        "tiktok_use_mock_backend", bool,
-        default=False,
-        integration_test_value=True
-    )
-    """
-    Whether to use a mock TikTok backend.
-    """
-    # Ad platforms - Amazon.
-    amazon_client_id = ConfigValue(
-        "amazon_client_id",
-        integration_test_value="dummy"
-    )
-    """
-    The Confidential OAuth 2.0 Client ID for the Amazon platform.
-    """
-    amazon_client_secret = ConfigValue(
-        "amazon_client_secret",
-        integration_test_value="dummy"
-    )
-    """
-    The Confidential OAuth 2.0 Client Secret for the Amazon platform.
-    """
-    amazon_use_mock_backend = ConfigValue(
-        "amazon_use_mock_backend", bool,
-        default=False,
-        integration_test_value=True
-    )
-    """
-    Whether to use a mock Amazon backend.
-    """
-    # Ad platforms - Pinterest.
-    pinterest_app_id = ConfigValue(
-        "pinterest_app_id",
-        integration_test_value="mock"
-    )
-    """
-    The ID of the registered Pinterest App.
-
-    If set to `mock`, the OAuth flow will be mocked.
-    """
-    pinterest_app_secret = ConfigValue(
-        "pinterest_app_secret",
-        integration_test_value="dummy"
-    )
-    """
-    The generated OAuth secret of the registed Pinterest App.
-    """
-    pinterest_use_mock_backend = ConfigValue(
-        "pinterest_use_mock_backend", bool,
-        default=False,
-        integration_test_value=True
-    )
-    """
-    Whether to use a mock Pinterest backend.
     """
 
 def _create_config():

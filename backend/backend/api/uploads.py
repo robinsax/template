@@ -2,30 +2,29 @@
 File upload and upload retrieval endpoints. File uploads are subject to authorization,
 which is why these endpoints exist, rather than directly exposing a bucket or equivalent.
 '''
-import uuid
+from uuid import UUID
 from fastapi import Depends, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
 from backend.model import (
-    Campaign, UploadType, Upload, UploadModel, User, Audit, AuthzScope, Permission,
+    UploadType, Upload, UploadModel, User, Audit, AuthzScope, Permission,
     BasicAuditEvent, AuthKey, AuthKeyRestriction
 )
 from backend.storage import StorageBackend, get_storage_backend
-from backend.logic import resize_image
 from backend.service import (
     Unauthorized, StreamedUpload, Invalid, get_streamed_upload, get_current_user,
     assert_authz, get_session, managed_chunk_byte_stream
 )
 
-from .app import app
+from .base import app
 
 # Platform uploads.
 AVATAR_SIZE = (512, 512)
 
 @app.get('/uploads/{upload_type}/{upload_id:uuid}')
 def get_upload(
-    req: Request, upload_type: str, upload_id: uuid.UUID,
+    req: Request, upload_type: str, upload_id: UUID,
     storage: StorageBackend = Depends(get_storage_backend),
     session: Session = Depends(get_session)
 ) -> StreamingResponse:
@@ -63,11 +62,6 @@ def get_upload(
     upload = Upload.get_qualified(session, upload_type, upload_id)
     if not upload:
         raise Invalid('invalid_upload')
-
-    # Avatars and thumbnails are uploaded with empty scope
-    # and accessible to all authenticated users
-    if upload_type not in (UploadType.AVATARS, UploadType.THUMBNAILS):
-        assert_authz(user, upload.authz_scope)
 
     filename = upload.filename.encode('ascii', 'ignore').decode('ascii')
 

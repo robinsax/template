@@ -13,16 +13,14 @@ as the API representation.
 E.g.:
 
 ```py
-from .base import Base, BaseMixin, Model
-
 class ThingModel(Model):
     # ...
 
-class Thing(Base, BaseMixin):
+class Thing(Mapper):
     __model__ = ThingModel
     __tablename__ = "things"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[UUID] = pk_column()
     # ...
 ```
 
@@ -33,106 +31,44 @@ model constructs of which the app should be aware must be imported to here.
 """
 import inspect
 
-from .base import Base, BaseMixin, EnumMixin, Model
-from .common import State, StateMixin, current_datetime, get_fernet_encryption
+from .base import Mapper, Model, EnumMixin
+from .common import current_datetime, get_fernet_encryption
 from .audit import (
     AuditSummaryModel, Audit, AuditModel, AuditMixin, BasicAuditEvent,
     AuditStandaloneModel
 )
 from .user import (
-    User, UserModel, AuthKey, AuthKeyModel, UserType, Role, Permission,
-    AuthzScopeType, AuthzScope, UserGrant, UserGrantModel, UserGrantClientModel,
-    UserGrantBusinessModel, AuthKeyRestriction, ROLE_SCOPES, ROLE_USER_TYPES,
-    AUTHZ_SCOPE_TYPE_ORDER, PERMISSIONS_MATRIX, MANAGER_ROLES, CLIENT_MANAGER_ROLES,
+    User, UserModel, AuthKey, AuthKeyModel, Role, Permission, UserRole,
+    UserRoleModel, AuthKeyRestriction, ROLE_SCOPES, PERMISSIONS_MATRIX,
     MAX_USER_NAME_LENGTH, MAX_USER_EMAIL_LENGTH
 )
-from .upload import (
-    Upload, UploadModel, UploadType, UploadImageMetadataModel, UploadVideoMetadataModel,
-    UploadMediaMetadataModel
-)
-from .organization import (
-    IOrganization, ClientModel, Client, BusinessModel, Business, BusinessMetaModel,
-    OrganizationUserGrantModel, Industry, OrganizationSummaryModel,
-    ORGANIZATION_NAME_MAX_LEN
-)
-from .campaign import (
-    CampaignBriefModel, Device, BrandSafety, Gender, AgeRange, RelationshipInterest,
-    RelationshipStatus, LocationPresence, TargetAudience, Objective,
-    CampaignChannelModel, CampaignChannel, CampaignChannelStatus,
-    CampaignLocationModel, CampaignLocation, Asset, AssetModel, AssetType,
-    AssetAssignmentMixin, AdSlotAssetAssignment, SlotPoolAssetAssignment,
-    SlotPoolAssetAssignmentModel, LocationAssetAssignment, CampaignValidationError,
-    CampaignValidationWarning, CampaignValidationModel, CampaignChannelValidationModel,
-    LocationAdAssignment, AdSlotAssetAssignmentModel, CampaignSummaryModel,
-    CampaignChannelLocationValidationError, CampaignChannelLocationValidationModel,
-    SlotAssetValidationModel, SlotAssetValidationError, CampaignChannelValidationError,
-    CampaignModel, Campaign, CampaignStatus, CampaignAuditEvent, Ad, AdModel,
-    AdSlotModel, CampaignReviewModel, CampaignReview, CampaignReviewDecision,
-    BudgetAllocation, AdValidationError, AdValidationModel, CampaignChannelReview,
-    CampaignChannelReviewModel, CampaignChannelReviewDecision,
-    CampaignChannelOrchestrationRun, CampaignChannelOrchestrationRunModel,
-    CampaignChannelOrchestrationStep, CampaignChannelOrchestrationRunStepsModel,
-    CampaignChannelOrchestrationRunType, CampaignChannelValidationWarning,
-    CampaignChannelSpendModel, CampaignAnalysis, CampaignAnalysisModel,
-    CampaignAnalysisPriority, CampaignAnalysisFinding, CampaignAnalysisFindingModel,
-    CampaignAnalysisFindingType, CampaignAnalysisSource, CampaignAnalysisSummaryModel,
-    CampaignAnalysisSentiment, Finding, AIFindingDataModel,
-    CampaignChannelBudgetExtension, CampaignChannelBudgetExtensionModel,
-    StandaloneCampaignAnalysisFindingModel,
-    CampaignChannelBudgetExtensionAllocationModel, OPTIONAL_BRIEF_FIELDS,
-    MAX_CAMPAIGN_LOCATIONS, CAMPAIGN_NAME_MAX_LEN
-)
-from .ai_chat import (
-    AIChat, AIChatMessage, AIChatModel, AIChatMessageModel, AIChatMessageRole,
-    AIChatStateModel, AIChatSuggestionModel
-)
-from .location import (
-    Location, LocationModel, LocationType, LocationTaxonomyModel,
-    LocationWithFeatureModel
-)
-from .platform import (
-    AdChannelModel, AdPlatformModel, AdSpecModel, SlotSpecModel, LocationSupportModel,
-    SpendConstraintsModel, BriefConstraintsModel, TextSlotSpecModel,
-    ImageSlotSpecModel, VideoSlotSpecModel, MediaSlotSpecOptionModel, MediaSlotSpecModel,
-    AnySlotSpecModel, URLSlotSpecModel, CTA, CTASlotSpecModel, BriefValuesConstraintType,
-    BriefValuesConstraintModel, AdPlatformOAuthToken, AdPlatformOAuthTokenModel,
-    OAuthPKCEVerifier, AdSpecCompositeGroupModel, AdChannelRecommendationsModel
-)
-from .comment import (
-    Comment, CommentModel, CommentTreeModel, CommentReaction, CommentReactionType,
-    MAX_COMMENT_LENGTH
-)
+from .realm import Realm, RealmModel, RealmType
+from .upload import Upload, UploadModel, UploadType
 from .notification import (
     Notification, NotificationModel, NotificationType, NotificationEmailStatus
-)
-from .reports import (
-    EmbeddedReport, EmbeddedReportModel, EMBEDDED_REPORT_NAME_MAX_LEN
 )
 
 # Handle circular refs in Pydantic models.
 _rebuild: list[type[Model]] = [
     AuditModel, UploadModel, UserModel, AuditSummaryModel, UserGrantModel,
-    BriefConstraintsModel, CommentTreeModel, SlotSpecModel, TextSlotSpecModel,
-    ImageSlotSpecModel, VideoSlotSpecModel, MediaSlotSpecModel, URLSlotSpecModel,
-    CTASlotSpecModel, SlotAssetValidationModel, EmbeddedReportModel, AuditStandaloneModel,
-    StandaloneCampaignAnalysisFindingModel
+    AuditStandaloneModel, RealmModel
 ]
 for model_cls in _rebuild:
     model_cls.model_rebuild()
 
-def mappers() -> list[type[BaseMixin]]:
+def mappers() -> list[type[Mapper]]:
     """
     Return all SQLAlchemy mapper types.
     """
     return [
         symbol for symbol in globals().values() if (
             inspect.isclass(symbol) and
-            issubclass(symbol, BaseMixin) and
-            symbol is not BaseMixin
+            issubclass(symbol, Mapper) and
+            symbol is not Mapper
         )
     ]
 
-def mapper_for_tablename(tablename: str) -> type[BaseMixin]:
+def mapper_for_tablename(tablename: str) -> type[Mapper]:
     """
     Return the SQLAlchemy mapper type for the given `tablename`.
     """

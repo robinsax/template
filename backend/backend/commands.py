@@ -1,10 +1,10 @@
 """
 General CLI commands.
 """
-import uuid
 import json
 import base64
 import secrets
+from uuid import UUID
 from getpass import getpass
 from datetime import timedelta
 from typing import Optional, Union
@@ -17,14 +17,7 @@ from sqlalchemy.orm import Session, InstrumentedAttribute
 from backend.config import config
 from backend.service import CLIError, cli, tasks as tasks_registry
 from backend.model import (
-    User, UserGrant, Role, UserType, State, Audit, BasicAuditEvent, CampaignChannel,
-    CampaignChannelOrchestrationRunType, AdPlatformOAuthToken, Campaign, Client,
-    AuthzScope, mappers
-)
-from backend.channels import AdPlatformTokenSideloadMixin, get_ad_platform
-from backend.logic import update_locations_database
-from backend.tasks import (
-    run_campaign_analysis, publish_campaign_channel, poll_campaign_channel_reviews
+    User, UserGrant, Role, Audit, BasicAuditEvent, AuthzScope, mappers
 )
 
 # Entrypoints.
@@ -33,7 +26,7 @@ def serve(service: str):
     """
     Serve the given HTTP service on the configured port, with hot reloading in dev mode.
     """
-    if service not in ("api", "streams"):
+    if service not in ("api",):
         raise CLIError("unknown service: " + service)
 
     uvicorn.run(
@@ -85,67 +78,28 @@ def keys_decrypt_token(token: str, encryption_key: str = ""):
 
 @cli.verb(with_session=True)
 def user_create(
-    session: Session, *, name: str, email: str, password: str,
-    owner: bool = False
+    session: Session, *, name: str, email: str, password: str
 ):
     """
     Create a user.
     """
     user = User(
         name=name,
-        email=email,
-        type=UserType.PLATFORM_OWNER if owner else UserType.CLIENT,
-        state=State.ACTIVE
+        email=email
     )
     user.set_password(password)
 
     session.add(user)
-    session.commit()
+    session.flush()
     session.refresh(user)
 
     Audit.create(session, user, user, BasicAuditEvent.CREATE)
     session.commit()
 
 @cli.verb(with_session=True)
-def user_update(
-    session: Session, email: str, *,
-    name: Optional[str] = None,
-    user_type: Optional[str] = None,
-    password: Optional[str] = None
-):
-    """
-    Update an existing user.
-    
-    Can update name, type (client/platform_owner), and/or password.
-    """
-    user = User.get_by_email(session, email)
-    if not user:
-        raise CLIError("User not found: " + email)
-
-    if name:
-        user.name = name
-
-    if user_type:
-        try:
-            user.type = UserType(user_type)
-        except ValueError:
-            raise CLIError(
-                f"Invalid user type: {user_type}. Must be "client" or "platform_owner"."
-            ) from None
-
-    if password:
-        user.set_password(password)
-
-    session.commit()
-    session.refresh(user)
-
-    Audit.create(session, user, user, BasicAuditEvent.UPDATE)
-    session.commit()
-
-@cli.verb(with_session=True)
 def user_role_assign(
     session: Session, email: str, role: str,
-    client: Optional[str] = None # pylint: disable=redefined-outer-name
+    realm_id: Optional[str] = None
 ):
     """
     Assign a role to a user.
@@ -161,46 +115,21 @@ def user_role_assign(
     if not user:
         raise CLIError("User not found: " + email)
 
-    client_id = None
-    if client:
+    if realm_id:
         try:
-            client_id = uuid.UUID(client)
+            realm_id = UUID(realm_id)
         except ValueError:
-            raise CLIError("Invalid client ID: " + client) from None
-
-        client = Client.get(session, client_id)
-        if not client:
-            raise CLIError("Client not found: " + client)
+            raise CLIError("Invalid realm ID: " + realm_id) from None
 
     grant = UserGrant(
         user_id=user.id,
-        client_id=client_id,
+        realm_id=realm_id,
         role=role
     )
     session.add(grant)
     session.commit()
 
     Audit.create(session, user, grant, BasicAuditEvent.CREATE)
-    session.commit()
-
-@cli.verb(with_session=True, short_names={ "oid": "ad_platform_oauth_id" })
-def synchronize_oauth(session: Session, ad_platform_oauth_id: str):
-    """
-    Run synchronization for an OAuth token.
-    """
-    try:
-        ad_platform_oauth_id = uuid.UUID(ad_platform_oauth_id)
-    except ValueError:
-        raise CLIError("Invalid ad platform OAuth ID: " + ad_platform_oauth_id) from None
-
-    oauth_token = AdPlatformOAuthToken.get(session, ad_platform_oauth_id)
-    if not oauth_token:
-        raise CLIError("Ad platform OAuth not found: " + str(ad_platform_oauth_id))
-
-    ad_platform = get_ad_platform(oauth_token.platform_key)
-
-    ad_platform.synchronize_oauth(oauth_token)
-
     session.commit()
 
 @cli.verb()
@@ -221,180 +150,6 @@ def tasks_run(session: Session, task_name: str):
         raise CLIError("Unknown task: " + task_name)
 
     task(session)
-
-@cli.verb(with_session=True)
-def locations_update(session: Session):
-    """
-    Update the locations database.
-    """
-    update_locations_database(session)
-
-# Ad platform orchestration.
-def _get_campaign_channel(session: Session, campaign_channel_id: str) -> CampaignChannel:
-    """
-    Get the campaign channel with the given `campaign_channel_id`.
-    """
-    try:
-        campaign_channel_id = uuid.UUID(campaign_channel_id)
-    except ValueError:
-        raise CLIError("Invalid campaign channel ID: " + campaign_channel_id) from None
-
-    campaign_channel = CampaignChannel.get(session, campaign_channel_id)
-    if not campaign_channel:
-        raise CLIError("Campaign channel not found: " + str(campaign_channel_id))
-
-    return campaign_channel
-
-@cli.verb(with_session=True, short_names={ "cid": "campaign_channel_id" })
-def ap_call(
-    session: Session, *, campaign_channel_id: str, action: str
-):
-    """
-    Call an ad platform orchestration action.
-    """
-    campaign_channel = _get_campaign_channel(session, campaign_channel_id)
-
-    actions_run_types = {
-        "publish": CampaignChannelOrchestrationRunType.PUBLISH,
-        "poll_review": CampaignChannelOrchestrationRunType.POLL_REVIEW
-    }
-    action = actions_run_types.get(action)
-
-    if action == CampaignChannelOrchestrationRunType.PUBLISH:
-        publish_campaign_channel(session, campaign_channel, allow_invalid=True)
-    elif action == CampaignChannelOrchestrationRunType.POLL_REVIEW:
-        poll_campaign_channel_reviews(session, campaign_channel)
-    else:
-        raise CLIError("Unknown action")
-
-@cli.verb(with_session=True, short_names={ "cid": "campaign_channel_id" })
-def ap_state(session: Session, *, campaign_channel_id: str):
-    """
-    Output campaign channel publish state to standard out as JSON.
-    """
-    campaign_channel = _get_campaign_channel(session, campaign_channel_id)
-
-    print(json.dumps(campaign_channel.publish_state.model_dump(), indent=2))
-
-@cli.verb(
-    with_session=True,
-    short_names={ "cid": "client_id", "bid": "business_id", "k": "platform_key" }
-)
-def ap_token(
-    session: Session, *, client_id: str, platform_key: str, business_id: str = ""
-):
-    """
-    Output an encrypted ad platform OAuth token.
-    """
-    authz_scope = AuthzScope(
-        client_id=uuid.UUID(client_id),
-        business_id=uuid.UUID(business_id) if business_id else None
-    )
-    oauth = AdPlatformOAuthToken.get_for_scope_platform(
-        session, authz_scope, platform_key
-    )
-    if not oauth:
-        raise CLIError("Ad platform OAuth not found")
-
-    print("=== ENCRYPTED TOKEN ===")
-    print(oauth.encrypted_token)
-    print("=======================")
-
-    print("=== METADATA ===")
-    print(json.dumps(oauth._integration_metadata)) # pylint: disable=protected-access
-    print("================")
-
-@cli.verb(
-    with_session=True,
-    short_names={ "cid": "client_id", "bid": "business_id", "k": "platform_key" }
-)
-def ap_token_overwrite(
-    session: Session, *, client_id: str, platform_key: str, business_id: str = ""
-):
-    """
-    Overwrite an existing ad platform OAuth token and associated metadata.
-    """
-    authz_scope = AuthzScope(
-        client_id=uuid.UUID(client_id),
-        business_id=uuid.UUID(business_id) if business_id else None
-    )
-    oauth = AdPlatformOAuthToken.get_for_scope_platform(
-        session, authz_scope, platform_key
-    )
-    if not oauth:
-        raise CLIError("Target ad platform OAuth not found")
-
-    raw_token = input("Raw token: ")
-    metadata_file_path = input("Integration metadata JSON file path: ")
-    if metadata_file_path:
-        with open(metadata_file_path, "r", encoding="utf-8") as fh:
-            metadata = json.load(fh)
-
-        oauth._integration_metadata = metadata # pylint: disable=protected-access
-
-    oauth.set_token_from_cleartext(raw_token)
-    session.commit()
-
-@cli.verb(
-    with_session=True,
-    short_names={
-        "cid": "client_id", "bid": "business_id", "k": "platform_key",
-        "at": "access_token", "uid": "user_id"
-    }
-)
-def ap_token_sideload(
-    session: Session, *, client_id: str, platform_key: str, access_token: str,
-    user_id: str, business_id: str = "",
-):
-    """
-    Sideload a net-new platform OAuth token.
-    """
-    authz_scope = AuthzScope(
-        client_id=uuid.UUID(client_id),
-        business_id=uuid.UUID(business_id) if business_id else None
-    )
-    oauth = AdPlatformOAuthToken.get_for_scope_platform(
-        session, authz_scope, platform_key
-    )
-    if oauth:
-        raise CLIError("Would duplicate existing token")
-
-    platform = get_ad_platform(platform_key)
-    if not isinstance(platform, AdPlatformTokenSideloadMixin):
-        raise CLIError("Cannot sideload this platform")
-
-    refresh_token, integration_metadata = platform.exercise_oauth_sideload(
-        access_token
-    )
-
-    oauth = AdPlatformOAuthToken(
-        client_id=authz_scope.client_id,
-        business_id=authz_scope.business_id,
-        user_id=uuid.UUID(user_id),
-        platform_key=platform_key,
-        integration_metadata=integration_metadata
-    )
-    oauth.set_token_from_cleartext(refresh_token)
-
-    session.add(oauth)
-    session.commit()
-
-# Analysis.
-@cli.verb(with_session=True, short_names={ "cid": "campaign_id" })
-def run_analysis(session: Session, *, campaign_id: str):
-    """
-    Run analysis for a specific campaign.
-    """
-    try:
-        campaign_id = uuid.UUID(campaign_id)
-    except ValueError:
-        raise CLIError("Invalid campaign ID: " + campaign_id) from None
-
-    campaign = Campaign.get(session, campaign_id)
-    if not campaign:
-        raise CLIError("Campaign not found: " + str(campaign_id))
-
-    run_campaign_analysis(session, campaign)
 
 # HTTP client.
 def _user_prompt_login(root_url: str):
@@ -565,7 +320,7 @@ def dev_timetravel( # pylint: disable=too-many-locals
                         (value != None, ( # pylint: disable=singleton-comparison
                             func.jsonb_set(
                                 expr,
-                                f"{{"{key}"}}",
+                                f'{{"{key}"}}',
                                 func.to_jsonb(
                                     cast(value, TIMESTAMP(timezone=True)) -
                                     text(f"interval \"{jsonb_delta}\"")

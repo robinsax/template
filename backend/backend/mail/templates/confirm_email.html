@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+
+{% block subject %}{{ t("Confirm your email address") }}{% endblock %}
+
+{% block content %}
+{{ t("Use this link to confirm your email address:") }}
+{{ origin }}/confirm?{{ url_params }}
+{% endblock %}
