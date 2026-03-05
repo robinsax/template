@@ -8,13 +8,13 @@ import React, {
 import { Input, useToast } from "@chakra-ui/react";
 
 import { useGrowOnHover } from "@/theme";
-import { UploadModel, Permission } from "@/models";
+import { UploadModel, Permission } from "@/model";
 import {
-    APICallOptions, useAsyncCallback, useFetchedUpload, useAuthzCheck, useI18n
+    APICallOptions, useAuthzCheck, useI18n
 } from "@/hooks";
+import { Clickable } from "@/components/design";
 
 import { useEnableStateCheck } from "./actions";
-import { ClickTarget } from "../design/common";
 
 export type UploadController = {
     multiple: boolean,
@@ -192,9 +192,9 @@ export const UploadMenuTrigger = ({ children, hidden, enableState, permission }:
             <label { ...labelProps }>{ children(dropWorking || working) }</label>
         ) : (
             <label { ...labelProps }>
-                <ClickTarget onClick={ openMenu }>
+                <Clickable onClick={ openMenu }>
                     { children(dropWorking || working) }
-                </ClickTarget>
+                </Clickable>
             </label>
         )
     );

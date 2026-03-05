@@ -6,10 +6,11 @@ import React, {
     ReactNode, ComponentType, Fragment, createContext, useMemo, useState, useContext,
     useEffect
 } from "react";
-import { VStack, Input, Box, Text, Flex, Spinner } from "@chakra-ui/react";
+import { VStack, Input, Box, Text, Flex } from "@chakra-ui/react";
 
 import { I18nFn, I18nValueFn, useI18n } from "@/hooks";
-import { BaseModel } from "@/models";
+import { BaseModel } from "@/model";
+import { LoadIndicator } from "@/components/design";
 
 // Spec.
 /**
@@ -145,7 +146,7 @@ export const createListSystem = <T extends BaseModel>({
                     children
                 ) : (
                     <Flex minH="10rem" justifyContent="center" alignItems="center">
-                        <Spinner/>
+                        <LoadIndicator/>
                     </Flex>
                 )}
             </context.Provider>

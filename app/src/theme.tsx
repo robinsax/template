@@ -503,25 +503,6 @@ export const useThemeColor = (themeKey: ThemeColor) => {
     }, [colorMode, themeKey]);
 };
 
-/**
-*   Returns a style object that makes the element grow on hover.
-*/
-export const useGrowOnHover = () => {
-    return useMemo(() => {
-        return {
-            transition: "all 0.1s ease-in-out",
-            _hover: {
-                transform: "scale(1.03) translateZ(0)",
-                willChange: "transform"
-            }
-        };
-    }, []);
-};
-
-export const useBoxShadow = () => {
-    return boxShadow;
-};
-
 export const useDarkTheme = () => {
     const { colorMode } = useColorMode();
 

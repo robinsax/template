@@ -15,16 +15,13 @@ import React, {
     useContext, useEffect, useCallback
 } from "react";
 import {
-    Alert, Button, Input, Spinner, FormControl, FormLabel, FormErrorMessage, Textarea
+    Alert, Button, Input, FormControl, FormLabel, FormErrorMessage, Textarea
 } from "@chakra-ui/react";
 import { Select, SelectButton, SelectList } from "@saas-ui/react";
 
-import { error } from "@/util";
-import {
-    APIError, I18nValueFn, QueryKey, useI18n, useAsyncCallback, useInvalidate
-} from "@/hooks";
-
-import { IconName, Icon } from "./icons";
+import { throwOrFallback } from "@/util";
+import { APIError, I18nValueFn, useI18n } from "@/hooks";
+import { IconName, Icon, LoadIndicator } from "@/components/design";
 
 // Spec types.
 export type FormSelectOption<V extends string> = {
@@ -116,7 +113,7 @@ export type FormFieldSpecs<T, F extends keyof T> = {
 export type FormSubmitFn<T, F extends keyof T> = (
     (
         values: Pick<T, F>, setError: (error: string | null) => void
-    ) => Promise<void> | void
+    ) => void
 );
 
 /**
@@ -172,7 +169,7 @@ export type FormController<T, F extends keyof T = keyof T> = {
     /**
     *   Submits the form.
     */
-    submit: () => Promise<void>,
+    onSubmit: () => void,
     /**
     *   Whether the form is currently submitting.
     */
@@ -209,10 +206,6 @@ export type FormProviderProps<T, F extends keyof T = keyof T> = {
     *   Invoked with the {@link FormController} when the it"s ready.
     */
     onReady?: (context: FormController<T, F>) => void,
-    /**
-    *   When passed, the form will call `useInvalidate()` each time it submits.
-    */
-    invalidateOnSubmit?: QueryKey[],
     /**
     *   When passed, the form will automatically submit each time a value changes.
     */
@@ -325,17 +318,18 @@ export const createFormSystem = <T, F extends keyof T = keyof T>({
     const useForm = () => useContext(context);
 
     const FormProvider = ({
-        children, target, onSubmit, onReady, invalidateOnSubmit, submitOnChange
+        children, target, onSubmit, onReady, submitOnChange
     }: FormProviderProps<T, F>) => {
         const t = useI18n();
-        const invalidate = useInvalidate();
 
         const [errors, setError, clearError] = useErrors(fieldsSpec);
         const [values, setValue] = useValues(fieldsSpec, clearError, target);
+        const [working, setWorking] = useState(false);
 
         // Submit handling.
-        const [submit, working] = useAsyncCallback(async () => {
-            if (!onSubmit) return error("no onSubmit");
+        const onSubmitWrapped = useCallback(() => {
+            if (!onSubmit) return throwOrFallback("no onSubmit");
+            setWorking(true);
 
             let hasError = false;
             for (const name in fieldsSpec) {
@@ -355,13 +349,7 @@ export const createFormSystem = <T, F extends keyof T = keyof T>({
             if (hasError) return;
     
             try {
-                await onSubmit(values, error => setError(null, error));
-
-                if (invalidateOnSubmit) {
-                    invalidate({
-                        queryKeys: invalidateOnSubmit
-                    });
-                }
+                onSubmit(values, error => setError(null, error));
             } catch (err) {
                 if (!(err instanceof APIError)) {
                     throw err;
@@ -370,18 +358,20 @@ export const createFormSystem = <T, F extends keyof T = keyof T>({
                 const errorLabel = errorsSpec[err.detail];
     
                 setError(null, errorLabel ? errorLabel(t) : t("An error occurred."));
+            } finally {
+                setWorking(false);
             }
         }, [errors, values]);
 
         // Collect controller.
         const form = useMemo<FormController<T, F>>(() => ({
             errors, setError, values, setValue,
-            target: target || null, working, submit
-        }), [errors, setError, values, setValue, target, working, submit]);
+            target: target || null, working, onSubmit: onSubmitWrapped
+        }), [errors, setError, values, setValue, target, working, onSubmitWrapped]);
 
         // Submit on change.
         useEffect(() => {
-            if (submitOnChange) submit();
+            if (submitOnChange) onSubmitWrapped();
         }, [values]);
 
         // Make controller available to parent.
@@ -403,7 +393,7 @@ export const createFormSystem = <T, F extends keyof T = keyof T>({
         const t = useI18n();
 
         const {
-            target, values, setValue, setError, errors, submit
+            target, values, setValue, setError, errors, onSubmit
         } = useForm();
 
         const options = useMemo(() => {
@@ -431,8 +421,8 @@ export const createFormSystem = <T, F extends keyof T = keyof T>({
         const onEnter = useCallback((event: KeyboardEvent) => {
             if (event.key != "Enter") return;
 
-            submit();
-        }, [submit]);
+            onSubmit();
+        }, [onSubmit]);
 
         return (
             "Component" in spec ? (
@@ -541,17 +531,17 @@ export const createFormSystem = <T, F extends keyof T = keyof T>({
     const FormSubmit = ({ label, iconName }: FormSubmitProps<T>) => {
         const t = useI18n();
 
-        const { working, target, submit } = useForm();
+        const { working, target, onSubmit } = useForm();
 
         return (
             <Button
                 isLoading={ working }
                 width="full"
                 leftIcon={ iconName ? <Icon name={ iconName }/> : undefined }
-                onClick={ submit }
+                onClick={ onSubmit }
             >
                 { working ? (
-                    <Spinner/>
+                    <LoadIndicator/>
                 ) : (
                     label ? label(t, target || null) : t("Save")
                 ) }

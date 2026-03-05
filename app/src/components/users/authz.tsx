@@ -5,7 +5,7 @@ import React, { useMemo } from "react";
 import { ListItem, UnorderedList, Box, Text } from "@chakra-ui/react";
 
 import config from "@/config";
-import { Role, Permission, UserType, permissionsMatrix } from "@/models";
+import { Role, Permission, UserType, permissionsMatrix } from "@/model";
 import { I18nFn, I18nValueFn, useI18n } from "@/hooks";
 
 // Definitions.

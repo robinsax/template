@@ -2,11 +2,12 @@
 *   Route-level screen layouts. 
 */
 import React, { ReactNode, UIEvent, useState, useCallback } from "react";
-import { Box, Flex, HStack, VStack, Spacer, useColorMode } from "@chakra-ui/react";
+import { Box, Flex, HStack, VStack, Spacer } from "@chakra-ui/react";
 import { AppShell, Persona } from "@saas-ui/react";
 
 import { useHideScrollbars } from "@/theme";
-import { useCurrentUserOrNull, useContinuousTick, useI18n } from "@/hooks";
+import { useI18n, useQuery } from "@/hooks";
+import { queryCurrentUser } from "@/state";
 import { Icon, Brand } from "@/components/design";
 
 import { AppSidebar } from "./sidebar";
@@ -18,7 +19,7 @@ import { LocaleSelect, ThemeToggle } from "./settings";
 export const SplashScreen = ({ children }: { children: React.ReactNode }) => {
     const t = useI18n();
 
-    const user = useCurrentUserOrNull();
+    const [user] = useQuery(queryCurrentUser);
 
     return (
         <AppShell>

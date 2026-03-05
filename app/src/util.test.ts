@@ -1,6 +1,6 @@
 import {
     UserGrantModel, UserGrantClientModel, UserGrantBusinessModel, AuthzScope
-} from "@/models";
+} from "@/model";
 
 import { grantContainsScope } from "./util";
 

@@ -3,7 +3,6 @@
 *   type definitions 
 */
 export * from "./backend";
-export * from "./schemas";
 
 import {
     State, BusinessModel, ClientModel, OrganizationUserGrantModel, VideoSlotSpecModel,

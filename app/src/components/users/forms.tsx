@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 
 import config from "@/config";
 import { mergeCallbacks } from "@/util";
-import { UserInviteParams, UserModel, UserType, UserUpdateParams } from "@/models";
+import { UserInviteParams, UserModel, UserType, UserUpdateParams } from "@/model";
 import {
     LoginCredentials, I18nValueFn, I18nFn, useAuthControl, useAPI, useI18n,
     useCurrentUser, useCurrentUserOrNull, useSupportedLocales,

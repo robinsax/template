@@ -3,7 +3,7 @@
 */
 import React, { ReactNode, createContext, useContext, useMemo } from "react";
 
-import { Permission, AuthzScope, permissionsMatrix, UserModel } from "@/models";
+import { Permission, AuthzScope, permissionsMatrix, UserModel } from "@/model";
 import { grantContainsScope, isUserWithinManageScopeOf } from "@/util";
 
 import { useCurrentUser } from "./auth";

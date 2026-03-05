@@ -2,7 +2,7 @@
 
 # Introduction
 
-This document is intended to serve as a reference for managing GCP deployments of Kedet.
+This document is intended to serve as a reference for managing GCP deployments.
 
 ## Architecture
 

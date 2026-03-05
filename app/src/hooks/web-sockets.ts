@@ -7,7 +7,7 @@ import config from "@/config";
 import {
     AIChatMessageWSParams, AIChatMessageWSResp, AIChatStartWSParams, AIChatStartWSResp,
     AIChatSyncWSResp, AuthWSParams
-} from "@/models";
+} from "@/model";
 
 import { useCurrentAuthToken } from "./auth";
 

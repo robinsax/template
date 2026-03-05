@@ -3,26 +3,17 @@ Reusable functionality for model modules.
 """
 import uuid
 from enum import Enum
-from typing import Callable, TypeVar, Generic, Type, Union, Any, get_origin, get_args
+from typing import Callable, TypeVar, Type, Union, Any, get_origin, get_args
 from datetime import datetime, timezone, timedelta
-from sqlalchemy import Column, and_
-from sqlalchemy.orm import Session
 from pydantic.fields import FieldInfo
 from cryptography.fernet import Fernet
+from sqlalchemy import Enum as SQLAlchemyEnum
 
 from backend.config import config
 
-from .base import EnumMixin, BaseMixin, Model
+from .base import Model
 
-class State(EnumMixin, Enum):
-    """
-    Canonical deactivation pattern for soft-deletion.
-    """
-    ACTIVE = "active"
-    INACTIVE = "inactive"
-    """
-    The object is inactive and all operations against it should fail.
-    """
+EnumType = SQLAlchemyEnum
 
 M = TypeVar("M", bound=Model)
 class ModelEqMixin:
@@ -93,66 +84,6 @@ class ModelGracefulEnumReconstructMixin:
 
         data = new_data
         return cls.model_validate(data, **kwargs)
-
-class StateMixin:
-    """
-    Opt-in mixin for SQLAlchemy mappers that have a `State` column.
-    """
-    _state: Column[str]
-
-    @property
-    def state(self) -> State:
-        """
-        The state for this instance.
-        """
-        return State(self._state)
-
-    @state.setter
-    def state(self, value: State):
-        """
-        Set the state for this instance.
-        """
-        self._state = value.value
-
-    @property
-    def is_inactive(self) -> bool:
-        """
-        Return `True` if this instance is inactive.
-        """
-        return self.state != State.ACTIVE
-
-T = TypeVar("T", bound=BaseMixin)
-class SoftDeleteMixin(Generic[T]):
-    """
-    Opt-in mixin for SQLAlchemy mappers that support soft-deletion.
-
-    Must come before `BaseMixin` in the MRO.
-
-    E.g.:
-    ```py
-    class Thing(Base, SoftDeleteMixin, BaseMixin):
-        # ...
-    ```
-    """
-    deleted: Column[bool]
-
-    @classmethod
-    def get(cls: Type[T], session: Session, get_id: uuid.UUID) -> T:
-        """
-        Query an instance that is not soft-deleted by the canonical `id` PK.
-        """
-        return session.query(cls)\
-            .filter(and_(
-                cls.deleted.is_(False),
-                cls.id == get_id
-            ))\
-            .first()
-
-    def soft_delete(self):
-        """
-        Soft-delete this instance.
-        """
-        self.deleted = True
 
 def get_fernet_encryption():
     """
@@ -226,12 +157,3 @@ def model_from_column_repr(model_cls: Type[Model], data: dict) -> Model:
         return model_cls.model_validate_as_column(model_input)
 
     return model_cls.model_validate(model_input)
-
-def enum_len(*enums: EnumMixin) -> int:
-    """
-    Return the required size for an enum column.
-    """
-    return max(
-        max(len(value.value) for value in enum)
-        for enum in enums
-    )

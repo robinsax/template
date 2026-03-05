@@ -2,17 +2,17 @@
 *   Button components with extended functionality.
 */
 import React, {
-    ReactElement, ReactNode, useCallback, useState, useMemo, useContext, 
-    createContext, MouseEvent
+    ReactElement, ReactNode, MouseEvent, useCallback, useState, useMemo,
+    useContext, createContext
 } from "react";
 import {
     Modal, ModalOverlay, ModalContent, ModalBody, Button, VStack, Heading, Input,
-    HStack, Text, Tooltip, PlacementWithLogical, Spinner, useDisclosure
+    HStack, Text, Tooltip, PlacementWithLogical, useDisclosure
 } from "@chakra-ui/react";
 
-import { Permission } from "@/models";
+import { Permission } from "@/model";
 import { I18nValueFn, useAuthzCheck, useI18n, useQueryParamBehavior } from "@/hooks";
-import { IconName, Icon } from "@/components/design";
+import { IconName, Icon, Clickable, LoadIndicator } from "@/components/design";
 
 // Enable state context.
 const enableStateContext = createContext<string[]>([]);
@@ -248,7 +248,7 @@ export type ActionIconProps = {
     onClick?: (e: MouseEvent) => void,
     working?: boolean,
     disabled?: boolean,
-    showHighlight?: boolean
+    active?: boolean
 };
 
 /**
@@ -256,32 +256,32 @@ export type ActionIconProps = {
 */
 export const ActionIcon = ({
     tooltip, tooltipPlacement, iconName, onClick, working, permission, enableState,
-    disabled, showHighlight
+    disabled, active
 }: ActionIconProps) => {
     const t = useI18n();
 
     const allowed = useAuthzCheck(permission);
     const enabled = useEnableStateCheck(enableState || null);
 
-    const active = !disabled && allowed && enabled;
+    const finalEnabled = !disabled && allowed && enabled;
 
     const inner = (
-        <ClickTarget
+        <Clickable
             p={ 2 }
-            showHighlight={ showHighlight }
-            disableHighlight={ !active }
+            active={ finalEnabled && active }
+            disableActive={ !active }
             cursor={ active ? "pointer" : "not-allowed" }
-            // Prevent working state from resizing us vertically.
+            // Prevent working state from resizing vertically.
             height="32px"
             onClick={ active ? onClick : undefined }
             opacity={ active ? 1 : 0.5 }
         >
             { working ? (
-                <Spinner size="xs"/>
+                <LoadIndicator/>
             ) : (
                 <Icon name={ iconName }/>
             ) }
-        </ClickTarget>
+        </Clickable>
     );
 
     return (

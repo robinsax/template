@@ -1,23 +1,16 @@
 /**
 *   Notifications UI.
 */
-import React, {
-    ReactNode, MouseEvent, createContext, useCallback, useContext, useEffect, useMemo,
-    useState
-} from "react";
+import React, { useMemo, useState } from "react";
 import { VStack, Spinner, HStack, Text, Spacer, Box, Tooltip } from "@chakra-ui/react";
 import { formatDistanceToNow } from "date-fns";
 
-import { idToUrlForm } from "@/util";
-import { NotificationModel, NotificationType } from "@/models";
+import { NotificationModel, NotificationType } from "@/model";
 import {
-    I18nValueFn, InvalidationScope, useAsyncCallback, useAPI, useCurrentUserOrNull,
-    useFetchedState, useI18n
+    I18nValueFn, useI18n, useMutation, useQuery
 } from "@/hooks";
-import { useGrowOnHover } from "@/theme";
-import { Icon, ClickTargetLink, ClickTarget } from "@/components/common";
-
-import { UserPersona } from "./personas";
+import { mutateClearNotifications, queryNotifications } from "@/state";
+import { Icon, ClickableLink, Clickable } from "@/components/design";
 
 // Presentations per type.
 type NotificationPresentation = {
@@ -27,163 +20,9 @@ type NotificationPresentation = {
 
 const notificationPresentations: Record<NotificationType, NotificationPresentation> = {
     invited: {
-        label: t => t("invited you to Kedet. Welcome!"),
-        link: null
-    },
-    campaign_created: {
-        label: (t, meta) => (
-            (meta && meta.campaign_name) ?
-                t("created campaign {name}", {
-                    name: meta.campaign_name
-                })
-            :
-                t("created a new campaign")
-        ),
-        link: notification => (
-            `/campaigns/${idToUrlForm(notification.target_id as string)}`
-        )
-    },
-    campaign_submitted: {
-        label: (t, meta) => t("submitted {ref} for review", {
-            ref: (meta && meta.campaign_name) ? meta.campaign_name : t("a campaign")
-        }),
-        link: notification => (
-            `/campaigns/${idToUrlForm(notification.target_id as string)}/review`
-        )
-    },
-    campaign_changes_requested: {
-        label: (t, meta) => t("requested changes to {ref}", {
-            ref: (meta && meta.campaign_name) ? meta.campaign_name : t("a campaign")
-        }),
-        link: notification => (
-            `/campaigns/${idToUrlForm(notification.target_id as string)}/review`
-        )
-    },
-    campaign_approved: {
-        label: (t, meta) => t("approved {ref}", {
-            ref: (meta && meta.campaign_name) ? meta.campaign_name : t("a campaign")
-        }),
-        link: notification => (
-            `/campaigns/${idToUrlForm(notification.target_id as string)}/review`
-        )
-    },
-    campaign_published: {
-        label: (t, meta) => t("published {ref}", {
-            ref: (meta && meta.campaign_name) ? meta.campaign_name : t("a campaign")
-        }),
-        link: notification => (
-            `/campaigns/${idToUrlForm(notification.target_id as string)}/review`
-        )
-    },
-    campaign_channel_approved: {
-        label: (t, meta) => t("{ref} was approved by {chanRef}", {
-            ref: (meta && meta.campaign_name) ? meta.campaign_name : t("A campaign"),
-            chanRef: (meta && meta.channel) ? meta.channel : t("a channel")
-        }),
-        link: notification => (
-            `/campaigns/${idToUrlForm(notification.target_id as string)}/stage`
-        )
-    },
-    campaign_channel_rejected: {
-        label: (t, meta) => t("{ref} was rejected by {chanRef}", {
-            ref: (meta && meta.campaign_name) ? meta.campaign_name : t("A campaign"),
-            chanRef: (meta && meta.channel) ? meta.channel : t("a channel")
-        }),
-        link: notification => (
-            `/campaigns/${idToUrlForm(notification.target_id as string)}/stage`
-        )
-    },
-    comment_reply: {
-        label: (t, meta) => (
-            (meta && meta.campaign_name) ?
-                t("replied to your comment on {ref}", {
-                    ref: meta.campaign_name
-                })
-            :
-                t("replied to your comment")
-        ),
-        link: notification => (
-            `/campaigns/${idToUrlForm(notification.target_id as string)}/review`
-        )
-    },
-    password_reset: {
-        label: t => t("requested a password reset"),
+        label: t => t("invited you. Welcome!"),
         link: null
     }
-};
-
-// Context.
-type NotificationContext = {
-    notifications: NotificationModel[] | null,
-    all: boolean,
-    onDismiss: (ids: string[]) => void,
-    setAll: (all: boolean) => void
-};
-
-const context = createContext<NotificationContext>(
-    null as unknown as NotificationContext
-);
-
-export const useNotifications = () => {
-    const { notifications } = useContext(context);
-
-    return notifications;
-};
-
-export const useNotificationsShowAll = () => {
-    const { all, setAll } = useContext(context);
-
-    return [all, setAll] as const;
-};
-
-export const useDismissNotifications = () => {
-    const { onDismiss } = useContext(context);
-
-    return onDismiss;
-};
-
-/**
-*   Provides polled notification for the current user.
-*/
-export const NotificationsProvider = ({ children }: { children: ReactNode }) => {
-    const api = useAPI();
-
-    const currentUser = useCurrentUserOrNull();
-
-    const [all, setAll] = useState(false);
-
-    const [notifications, invalidateNotifications] = useFetchedState(
-        !currentUser ? null :
-            api => api.users.id(currentUser.id).notifications.get(
-                all ? { query: { all: "true" } } : undefined
-            ),
-        { pollInterval: 120000 }
-    );
-
-    useEffect(() => {
-        invalidateNotifications();
-    }, [all, !!currentUser]);
-
-    const [onDismiss] = useAsyncCallback(async (ids: string[]) => {
-        if (!currentUser || !notifications) return;
-
-        await api.users.id(currentUser.id).notifications.put({
-            seen_ids: ids
-        });
-
-        invalidateNotifications();
-    }, [notifications]);
-
-    return (
-        <InvalidationScope
-            invalidate={ invalidateNotifications }
-            queryKey="notifications"
-        >
-            <context.Provider value={ { notifications, all, onDismiss, setAll } }>
-                {children}
-            </context.Provider>
-        </InvalidationScope>
-    );
 };
 
 /**
@@ -192,38 +31,25 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
 const NotificationItem = ({ notification }: { notification: NotificationModel }) => {
     const t = useI18n();
 
-    const onDismiss = useDismissNotifications();
-
-    const growStyles = useGrowOnHover();
-
     const [hovered, setHovered] = useState(false);
 
     const { link, label } = notificationPresentations[notification.type];
 
-    const onClickDismiss = useCallback((event: MouseEvent) => {
-        event.stopPropagation();
-        event.preventDefault();
-        onDismiss([notification.id]);
-    }, [notification, onDismiss]);
+    const [onDismiss] = useMutation(mutateClearNotifications);
 
     return (
-        <ClickTargetLink
-            disableHighlight={ !link }
+        <ClickableLink
+            disableActive={ !link }
             width="full"
             position="relative"
             p={ 1 } pr={ 2 }
             href={ link ? link(notification) : undefined }
-            { ...growStyles }
             onMouseEnter={ () => setHovered(true) }
             onMouseLeave={ () => setHovered(false) }
         >
             <HStack width="full">
                 { notification.user && (
-                    <UserPersona
-                        for={ notification.user }
-                        size="xs"
-                        avatarOnly
-                    />
+                    notification.user.name
                 ) }
                 <VStack spacing={ 0 } alignItems="left">
                     <Text fontSize="xs">
@@ -244,16 +70,16 @@ const NotificationItem = ({ notification }: { notification: NotificationModel })
                     top="50%" transform="translateY(-50%)" right="0px"
                 >
                     <Tooltip label={ t("Dismiss") }>
-                        <ClickTarget
+                        <Clickable
                             p={ 1 }
-                            onClick={ onClickDismiss }
+                            onClick={ () => onDismiss({ ids: [notification.id] }) }
                         >
                             <Icon name="delete"/>
-                        </ClickTarget>
+                        </Clickable>
                     </Tooltip>
                 </Box>
             ) }
-        </ClickTargetLink>
+        </ClickableLink>
     );
 };
 
@@ -265,7 +91,7 @@ export const NotificationsList = ({ limit }: {
 }) => {
     const t = useI18n();
 
-    const { notifications } = useContext(context);
+    const [notifications] = useQuery(queryNotifications, { includeSeen: false });
 
     const [showSet, remaining] = useMemo(() => {
         if (!notifications) return [null, 0];
@@ -318,7 +144,7 @@ export const NotificationsList = ({ limit }: {
 *   Notifications indicator. Only renders when there are notifications.
 */
 export const NotificationsIndicator = () => {
-    const { notifications } = useContext(context);
+    const [notifications] = useQuery(queryNotifications, { includeSeen: false });
 
     return notifications && notifications.length > 0 && (
         <HStack

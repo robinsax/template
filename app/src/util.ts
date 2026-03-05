@@ -5,7 +5,7 @@ import { parse as uuidParse, stringify as uuidStringify } from "uuid";
 import { format } from "date-fns";
 
 import config from "@/config";
-import { AnyUserGrantModel, AuthzScope, UserModel, permissionsMatrix } from "@/models";
+import { AnyUserGrantModel, AuthzScope, UserModel, permissionsMatrix } from "@/model";
 
 // Misc.
 /**
@@ -31,16 +31,7 @@ export const mergeCallbacks = <T = never>(...callbacks: Callback<T>[]) => {
     ) as Callback<T>;
 };
 
-const _fallbackGlobalScope: Record<string, any> = {};
-export const getGlobalScope = <T>(): T => {
-    return (
-        typeof globalThis != "undefined" ? globalThis :
-        typeof window != "undefined" ? window :
-        typeof global != "undefined" ? global : _fallbackGlobalScope
-    ) as T;
-};
-
-export const deepEqual = (a: any, b: any): boolean => {
+export const deepEqual = (a: unknown, b: unknown): boolean => {
     if (a === b) return true;
 
     if (typeof a != "object" || typeof b != "object" || a == null || b == null) {
@@ -53,7 +44,7 @@ export const deepEqual = (a: any, b: any): boolean => {
 
     for (const key of keysA) {
         if (!keysB.includes(key)) return false;
-        if (!deepEqual(a[key], b[key])) return false;
+        if (!deepEqual((a as Record<string, unknown>)[key], (b as Record<string, unknown>)[key])) return false;
     }
 
     return true;

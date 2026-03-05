@@ -1,9 +1,12 @@
-import { I18nLocaleKey, MutationContext, supportedLocaleKeys } from "@/hooks";
+import { I18nLocaleKey } from "@/hooks";
+
+import { MutationContext } from "./base";
+import { AuthParams } from "@/model";
 
 export type LocalSettings = {
     sidebarCollapsed: boolean,
     locale: I18nLocaleKey
-}
+};
 
 export const queryLocalSettings = (): LocalSettings => {
     const stored = localStorage.getItem("localSettings");
@@ -16,25 +19,50 @@ export const queryLocalSettings = (): LocalSettings => {
     };
 };
 
-export const mutateLocalSettings = (context: MutationContext, settings: Partial<LocalSettings>) => {
+export const mutateLocalSettings = (
+    context: MutationContext, settings: Partial<LocalSettings>
+) => {
     const current = queryLocalSettings();
     const updated = { ...current, ...settings };
 
     localStorage.setItem("localSettings", JSON.stringify(updated));
 
-    context.invalidate([queryLocalSettings]);
+    context.invalidate(queryLocalSettings);
 };
 
-export const queryAuthToken = (): string | null => {
-    return localStorage.getItem("authToken");
+export type StoredAuthState = {
+    token: string,
+    userId: string
 };
 
-export const mutateAuthToken = (context: MutationContext, token: string | null) => {
-    if (token) {
-        localStorage.setItem("authToken", token);
+export const queryAuthState = (): StoredAuthState | null => {
+    if (!localStorage.hasItem("authState")) return null;
+
+    return JSON.parse(localStorage.getItem("authState") as string);
+};
+
+export const mutateAuthState = (
+    context: MutationContext, newState: StoredAuthState | null
+) => {
+    if (newState) {
+        localStorage.setItem("authState", JSON.stringify(newState));
     } else {
-        localStorage.removeItem("authToken");
+        localStorage.removeItem("authState");
     }
 
-    context.invalidate([]);
+    context.invalidate(queryAuthState);
+};
+
+export const mutateAuthStateLogIn = async (
+    context: MutationContext, creds: Omit<AuthParams, "restriction">
+) => {
+    const resp = await context.api.auth.post({
+        ...creds,
+        restriction: null
+    });
+
+    mutateAuthState(context, {
+        token: resp.token,
+        userId: resp.auth.user_id
+    });
 };

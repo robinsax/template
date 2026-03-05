@@ -17,26 +17,15 @@ if TYPE_CHECKING:
 MAX_USER_NAME_LENGTH = 30
 MAX_USER_EMAIL_LENGTH = 60
 
-class UserType(EnumMixin, Enum):
-    """
-    User account type representing whether this user belongs to a client team or the
-    platform owner team.
-    """
-    CLIENT = "client"
-    PLATFORM_OWNER = "platform_owner"
-
 class UserModel(Model):
     """
     Default `Model` for `User`s.
     """
     id: str
     name: str
-    type: UserType
     state: State
     email: str
     is_claimed: bool
-    avatar_id: Optional[str]
-    avatar: Optional["UploadModel"]
     grants: list["UserGrantModel"]
     locale: Optional[str]
 

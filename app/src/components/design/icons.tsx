@@ -7,7 +7,8 @@
 import React, { SVGAttributes, useMemo } from "react";
 import { MdDarkMode } from "react-icons/md";
 import {
-    FaChevronUp, FaChevronDown, FaGlobeAmericas, FaChevronLeft, FaChevronRight, FaCog
+    FaChevronUp, FaChevronDown, FaGlobeAmericas, FaChevronLeft, FaChevronRight, FaCog,
+    FaTrash, FaBell, FaInfoCircle
 } from "react-icons/fa";
 import { BiSolidError } from "react-icons/bi";
 
@@ -23,7 +24,10 @@ const icons = {
     right: FaChevronRight,
     settings: FaCog,
     globe: FaGlobeAmericas,
-    error: BiSolidError
+    error: BiSolidError,
+    delete: FaTrash,
+    notifications: FaBell,
+    info: FaInfoCircle
 };
 
 /**

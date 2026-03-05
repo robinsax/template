@@ -7,7 +7,7 @@ import {
     PopoverContent, PopoverBody, PopoverArrow, Portal, Alert, Heading
 } from "@chakra-ui/react";
 
-import { AuthzScope, UserGrantModel, UserModel } from "@/models";
+import { AuthzScope, UserGrantModel, UserModel } from "@/model";
 import { mergeCallbacks } from "@/util";
 import {
     I18nValueFn, useAuthzCheck, useAsyncCallback, useI18n, useAPI, useInvalidate,
