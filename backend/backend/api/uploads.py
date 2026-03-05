@@ -5,16 +5,17 @@ which is why these endpoints exist, rather than directly exposing a bucket or eq
 from uuid import UUID
 from fastapi import Depends, Request
 from fastapi.responses import StreamingResponse
+from google.cloud.exceptions import Unauthorized
 from sqlalchemy.orm import Session
 
 from backend.model import (
-    UploadType, Upload, UploadModel, User, Audit, AuthzScope, Permission,
+    UploadType, Upload, UploadModel, User, Audit, Realm, Permission,
     BasicAuditEvent, AuthKey, AuthKeyRestriction
 )
 from backend.storage import StorageBackend, get_storage_backend
 from backend.service import (
-    Unauthorized, StreamedUpload, Invalid, get_streamed_upload, get_current_user,
-    assert_authz, get_session, managed_chunk_byte_stream
+    StreamedUpload, Invalid, get_streamed_upload, get_current_user, assert_authz,
+    get_session, managed_chunk_byte_stream
 )
 
 from .base import app
@@ -33,35 +34,19 @@ def get_upload(
 
     Requires a grant containing the upload's authorization scope.
     '''
-    query_token = req.query_params.get('token')
-    if query_token:
-        # Resolve "asset get" token authentication.
-        access_token = AuthKey.get_for_token(
-            session, query_token,
-            allowed_restriction=AuthKeyRestriction.ASSET_GET
-        )
-        if not access_token or not access_token.is_valid:
-            raise Unauthorized('invalid_token')
-
-        user = access_token.user
-        if user.is_inactive:
-            raise Unauthorized('inactive_user')
-    else:
-        # Resolve normal authentication.
-        user = get_current_user(req, session)
+    user = get_current_user(req, session)
 
     try:
         upload_type = UploadType(upload_type)
     except ValueError:
         raise Invalid('invalid_upload_type') from None
 
-    # Ensure "asset get" tokens are only used for campaign assets.
-    if query_token and upload_type != UploadType.CAMPAIGN_ASSETS:
-        raise Invalid('invalid_auth_method')
-
     upload = Upload.get_qualified(session, upload_type, upload_id)
     if not upload:
         raise Invalid('invalid_upload')
+
+    realm = Realm.get(upload.realm_id)
+    assert_authz(user, realm)
 
     filename = upload.filename.encode('ascii', 'ignore').decode('ascii')
 
@@ -72,7 +57,7 @@ def get_upload(
     )
 
 def _create_upload(
-    session: Session, storage: StorageBackend, user: User, authz_scope: AuthzScope,
+    session: Session, storage: StorageBackend, user: User, realm: Realm,
     upload_type: UploadType, upload_data: StreamedUpload
 ):
     '''
@@ -83,22 +68,7 @@ def _create_upload(
     file_io = upload_data.io
     filename = upload_data.filename
 
-    upload = storage.upload(session, authz_scope, upload_type, filename, file_io)
-
-    # Create downscaled thumbnail for avatars.
-    if upload_type == UploadType.AVATARS:
-        file_io = resize_image(
-            file_io,
-            size=AVATAR_SIZE,
-            out_format='JPEG'
-        )
-
-        thumbnail = storage.upload(
-            session, authz_scope, UploadType.THUMBNAILS, 'avatar.jpg', file_io
-        )
-        upload.thumbnail_id = thumbnail.id
-
-        Audit.create(session, user, thumbnail, BasicAuditEvent.CREATE)
+    upload = storage.upload(session, realm, upload_type, filename, file_io)
 
     Audit.create(session, user, upload, BasicAuditEvent.CREATE)
     session.commit()
@@ -113,22 +83,23 @@ def upload_file(
     storage: StorageBackend = Depends(get_storage_backend)
 ) -> UploadModel:
     '''
-    Upload an asset to be assigned for a `Asset` later.
-
-    Requires permission to *manage creatives* at the campaign's business's authorization
-    scope.
+    Upload a file.
     '''
     user = get_current_user(req, session)
 
-    campaign = Campaign.get(session, campaign_id)
-    if not campaign:
-        raise Invalid('invalid_campaign')
+    try:
+        upload_type = UploadType(upload_type)
+    except ValueError:
+        raise Invalid('invalid_upload_type') from None
 
-    assert_authz(user, campaign.business_authz_scope, Permission.MANAGE_CREATIVES)
+    # TEMPLATE: This will certainly need update to project use case.
+    if not user.roles:
+        raise Invalid("no_roles")
+    realm = user.roles[0].realm
 
-    upload = _create_upload(
-        session, storage, user, campaign.business_authz_scope,
-        UploadType.CAMPAIGN_ASSETS, upload
+    assert_authz(user, realm)
+
+    record = _create_upload(
+        session, storage, user, realm, upload_type, upload
     )
-
-    return upload.to_model()
+    return record.to_model()

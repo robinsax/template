@@ -1,13 +1,14 @@
 """
 User grant definition - the central in-database authorization object.
 """
+from enum import Enum
 from uuid import UUID
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 from sqlalchemy import Index, and_
 from sqlalchemy.orm import Mapped, Session, relationship
 
-from ..base import Mapper, Model, column
+from ..base import Mapper, Model, EnumMixin, column
 from ..audit import AuditMixin
 
 if TYPE_CHECKING:
@@ -27,15 +28,15 @@ class Permission(EnumMixin, Enum):
     Specific permissions against which authorization checks are performed.
     """
     # IAM / organization management.
-    MANAGE_USERS = "manage_users"
+    IAM = "IAM"
 
 class UserRoleModel(Model):
     """
-    Default `Model` for `UserGrant`s.
+    Default `Model` for `UserRole`s.
     """
     id: str
     user_id: str
-    realm: "RealmModel" | None
+    realm: Optional["RealmModel"]
     role: Role
 
 class UserRole(Mapper, AuditMixin):
@@ -57,7 +58,7 @@ class UserRole(Mapper, AuditMixin):
     role: Mapped[Role] = column(Role)
 
     realm: Mapped["Realm"] = relationship()
-    user: Mapped["User"] = relationship(back_populates="grants")
+    user: Mapped["User"] = relationship(back_populates="roles")
 
     __table_args__ = (
         # Supporting `get_for_user`.
@@ -80,7 +81,7 @@ class UserRole(Mapper, AuditMixin):
     def get_all_for_realm(
         cls, session: Session, realm_id: UUID,
         roles: list[Role] | None = None
-    ) -> list["UserGrant"]:
+    ) -> list["UserRole"]:
         """
         Return all grants on the given `realm_id` that
         are not soft-deleted.

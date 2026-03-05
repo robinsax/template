@@ -6,9 +6,9 @@ from fastapi import Request, Depends
 from sqlalchemy.orm import Session
 
 from backend.model import (
-    AuthKey, AuthKeyRestriction, User, AuthzScope, Permission, Role
+    AuthKey, AuthKeyRestriction, User, Permission, Role, Realm
 )
-from backend.logic import check_authz, check_scopeless_authz, check_grant_set_authz
+from backend.logic import check_authz, check_scopeless_authz, check_role_assign_authz
 
 from ..database import get_session
 from .exc import Unauthorized
@@ -39,49 +39,49 @@ def get_current_user(req: Request, session: Session = Depends(get_session)) -> U
     """
     key = get_current_auth_key(req, session)
     if not key:
-        raise Unauthorized("invalid_auth")
+        raise Unauthorized("authenticate")
 
     return key.user
 
 def assert_authz(
-    user: User, authz_scope: AuthzScope, permission: Permission = None
+    user: User, realm: Realm, permission: Permission | None = None
 ):
     """
-    Throw `Unauthorized` if `check_authz` fails. Use this for authorization checks
+    Raise `Unauthorized` if `check_authz` fails. Use this for authorization checks
     in endpoints.
     """
-    check = check_authz(user, authz_scope, permission)
+    check = check_authz(user, realm, permission)
     if not check:
-        raise Unauthorized("invalid_authz")
+        raise Unauthorized("unauthorized")
 
 def assert_authz_any(
-    user: User, authz_scope: AuthzScope, permissions: list[Permission]
+    user: User, realm: Realm, permissions: list[Permission]
 ):
     """
-    Throw `Unauthorized` if `check_authz` fails for every one of the given permissions.
+    Raise `Unauthorized` if `check_authz` fails for every one of the given permissions.
     Use to check whether the user has one of several permissions in endpoints.
     """
     for permission in permissions:
-        check = check_authz(user, authz_scope, permission)
+        check = check_authz(user, realm, permission)
         if check:
             return
 
-    raise Unauthorized("invalid_authz")
+    raise Unauthorized("unauthorized")
 
 def assert_scopeless_authz(user: User, permission: Permission):
     """
-    Throw `Unauthorized` if `check_scopeless_authz` fails. Use this for scopeless
+    Raise `Unauthorized` if `check_scopeless_authz` fails. Use this for scopeless
     authorization checks in endpoints.
     """
     check = check_scopeless_authz(user, permission)
     if not check:
-        raise Unauthorized("invalid_authz")
+        raise Unauthorized("unauthorized")
 
-def assert_grant_set_authz(user: User, authz_scope: AuthzScope, role: Role):
+def assert_role_assign_authz(user: User, realm: Realm, role: Role):
     """
-    Throw `Unauthorized` if `check_grant_set_authz` fails. Use this for grant set
+    Raise `Unauthorized` if `check_role_assign_authz` fails. Use this for grant set
     authorization checks in endpoints.
     """
-    check = check_grant_set_authz(user, authz_scope, role)
+    check = check_role_assign_authz(user, realm, role)
     if not check:
-        raise Unauthorized("invalid_authz")
+        raise Unauthorized("unauthorized")

@@ -2,7 +2,7 @@
 HTTP service setup and common functionalities.
 """
 from .auth import (
-    assert_authz, assert_authz_any, assert_scopeless_authz, assert_grant_set_authz,
+    assert_authz, assert_authz_any, assert_scopeless_authz, assert_role_assign_authz,
     get_current_auth_key, get_current_user
 )
 from .exc import Unauthorized, Invalid

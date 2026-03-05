@@ -4,8 +4,8 @@ Filesystem storage backend.
 Serves as a reference implementation and is useful for local development.
 """
 import os
-import uuid
 import mimetypes
+from uuid import uuid4
 from typing import IO
 from sqlalchemy.orm import Session
 
@@ -61,15 +61,6 @@ class FileSystemBackend(StorageBackend):
 
         return open(file_path, "rb")
 
-    def direct_upload(self, filename: str, data: IO[bytes]):
-        """
-        Upload the file data for the given `filename`.
-        """
-        file_path = self._get_path(UploadType.DEFAULT, filename, create=True)
-        with open(file_path, "wb") as fh:
-            while chunk := data.read(8192):
-                fh.write(chunk)
-
     def upload(
         self, session: Session, realm: Realm, upload_type: UploadType,
         filename: str, data: IO[bytes]
@@ -77,7 +68,7 @@ class FileSystemBackend(StorageBackend):
         """
         Upload the file data for the given `upload_type`, `filename`, and `data`.
         """
-        upload_id = uuid.uuid4()
+        upload_id = uuid4()
 
         file_path = self._get_path(upload_type, str(upload_id), create=True)
         with open(file_path, "wb") as fh:

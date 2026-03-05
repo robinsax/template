@@ -2,9 +2,9 @@
 Context machinery for step chain executions.
 """
 import os
-import uuid
 import copy
 import json
+from uuid import uuid4
 from datetime import datetime
 from contextlib import contextmanager
 from urllib.parse import urlencode
@@ -326,7 +326,7 @@ class StepsContext:
 
         No file is created and the path can safely be appended with an extension.
         """
-        return os.path.join(".testdata", str(uuid.uuid4()))
+        return os.path.join(".testdata", str(uuid4()))
 
     def cli(self, args: list[str]):
         """
@@ -362,7 +362,7 @@ class StepsContext:
     @contextmanager
     def expect_unauthorized(self) -> Generator:
         """
-        Context manager that will cause a step error if the with body *doesn"t* raise
+        Context manager that will cause a step error if the with body *doesn't* raise
         a `ContextCallFailed` with a 401 status code.
         """
         try:
@@ -376,7 +376,7 @@ class StepsContext:
     @contextmanager
     def expect_invalid(self) -> Generator:
         """
-        Context manager that will cause a step error if the with body *doesn"t* raise
+        Context manager that will cause a step error if the with body *doesn't* raise
         a `ContextCallFailed` with a 400 status code.
         """
         try:

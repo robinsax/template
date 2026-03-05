@@ -18,7 +18,7 @@ and file storage backends. This works as follows:
 import logging
 import warnings
 
-# Suppress annoying warnings that we don"t care about.
+# Suppress annoying warnings that we don't care about.
 logging.getLogger("tzlocal").setLevel(logging.WARNING)
 logging.getLogger("google.cloud.storage._opentelemetry_tracing")\
     .setLevel(logging.WARNING)
@@ -30,8 +30,7 @@ from backend.service import configure_logging
 configure_logging()
 
 from . import (
-    config, model, api, storage, mail, ai, channels, logic, service, streams, commands,
-    tasks
+    config, model, api, storage, mail, logic, service, commands, tasks
 )
 
 from types import ModuleType

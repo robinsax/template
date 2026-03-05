@@ -3,6 +3,8 @@ In-database representation of uploaded files.
 
 Files themselves are stored by the configured `StorageBackend`,
 """
+from __future__ import annotations
+
 from uuid import UUID
 from enum import Enum
 from sqlalchemy import and_

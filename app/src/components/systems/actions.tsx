@@ -161,7 +161,7 @@ export const ModalButton = ({
         behaviorQueryParam || "never", "true", onOpen, onClose
     );
 
-    // Use query parameter binding if passed, otherwise don"t.
+    // Use query parameter binding if passed, otherwise don't.
     const onCloseFinal = useCallback(() => {
         if (behaviorQueryParam) onCloseModal();
         else onClose();

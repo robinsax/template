@@ -4,7 +4,9 @@ Base machinery for SQLAlchemy mappers, Pydantic models, and enums.
 from uuid import UUID, uuid4
 from typing import Any, Type, TypeVar, Union, get_args, get_origin
 from pydantic import BaseModel
-from sqlalchemy import Column, Enum as SQLAEnum, UUID, ForeignKey, String, DateTime
+from sqlalchemy import (
+    TypeDecorator, Column, Enum as SQLAEnum, UUID, ForeignKey, String, DateTime
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Session, Mapped, Query, DeclarativeBase, mapped_column
 from sqlalchemy.inspection import inspect
@@ -176,8 +178,9 @@ class Mapper(DeclarativeBase):
 
 def column(
     target: Any | None = None, *, name: str | None = None, pk: bool = False, 
-    fk: str | None = None, dt: bool = False, default_now: bool = False,
-    str_len: int | None = None, index: bool = False, unique: bool = False
+    fk: str | None = None, raw_jsonb: bool = False, dt: bool = False,
+    default_now: bool = False, str_len: int | None = None, index: bool = False,
+    unique: bool = False
 ) -> Mapped[Any]:
     """
     Column containing an inferred value with some configuration.
@@ -200,8 +203,10 @@ def column(
             args.extend([ColumnJSONBModel(target)])
         else:
             raise ValueError("Unknown column configuration.")
+    elif raw_jsonb:
+        args.extend([JSONB])
     elif fk:
-        args.extend([UUID(as_uuid=True), ForeignKey(target)])
+        args.extend([UUID(as_uuid=True), ForeignKey(fk)])
     elif dt:
         args.extend([DateTime(timezone=True)])
         if default_now:

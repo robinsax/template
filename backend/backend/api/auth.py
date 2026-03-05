@@ -54,11 +54,6 @@ def provision_auth_key(
     - `null`
         - Unrestricted, general purpose authentication.
         - Token must be passed in the `Authorization` header.
-    - `asset_get`
-        - Usable to get asset media from the /uploads/campaign_assets/<id> endpoint or
-          the streaming API.
-        - Provided in a query parameter when doing so.
-        - Short lifespan.
     - `password_reset`
         - Usable to change your own password.
         - Both an existing unrestricted key, and `password`, must be provided.
@@ -127,7 +122,7 @@ def refresh_auth_key(
     """
     key = get_current_auth_key(req, session)
     if not key:
-        raise Unauthorized("invalid_auth")
+        raise Unauthorized("authenticate")
 
     key.refresh(
         current_datetime() + timedelta(hours=config.auth_key_expiry_hours.get())
@@ -147,7 +142,7 @@ def revoke_auth_key(
     """
     key = get_current_auth_key(req, session)
     if not key:
-        raise Unauthorized("invalid_auth")
+        raise Unauthorized("authenticate")
 
     key.revoke()
     session.commit()

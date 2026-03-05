@@ -148,7 +148,7 @@ export const createAPIClientBase = (): APIClientBase => {
             if (params.body instanceof File) {
                 const file = params.body;
 
-                // Use XHR because fetch ReadableStream requires ALPN which isn"t
+                // Use XHR because fetch ReadableStream requires ALPN which isn't
                 // possible on localhost, and split configs suck.
                 const xhr = new XMLHttpRequest();
                 xhr.open(params.method, url);

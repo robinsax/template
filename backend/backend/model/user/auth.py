@@ -1,6 +1,8 @@
 """
 Authentication keys.
 """
+from __future__ import annotations
+
 import hmac
 import base64
 import secrets
@@ -102,7 +104,7 @@ class AuthKey(Mapper):
         try:
             token_user_id, token_secret = token.split("@")
 
-            token_user_id = uuid.UUID(bytes=base64.urlsafe_b64decode(token_user_id))
+            token_user_id = UUID(bytes=base64.urlsafe_b64decode(token_user_id))
             token_digest = _generate_token_digest(token_secret.encode("utf-8"))
         except: # pylint: disable=bare-except
             return None

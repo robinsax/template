@@ -1,8 +1,8 @@
 """
 Google Cloud Storage storage backend.
 """
-import uuid
 import mimetypes
+from uuid import uuid4
 from typing import IO
 from sqlalchemy.orm import Session
 from google.cloud.storage import Client
@@ -51,14 +51,6 @@ class GoogleCloudStorageBackend(StorageBackend):
 
         return blob.open("rb")
 
-    def direct_upload(self, filename: str, data: IO[bytes]):
-        """
-        Upload the file data for the given `filename`.
-        """
-        bucket = self.client.get_bucket(self._bucket_name(UploadType.DEFAULT))
-        blob = bucket.blob(filename)
-        blob.upload_from_file(data)
-
     def upload(
         self, session: Session, realm: Realm, upload_type: UploadType,
         filename: str, data: IO[bytes]
@@ -66,7 +58,7 @@ class GoogleCloudStorageBackend(StorageBackend):
         """
         Upload the file data for the given `upload_type`, `filename`, and `data`.
         """
-        upload_id = uuid.uuid4()
+        upload_id = uuid4()
 
         bucket = self.client.get_bucket(self._bucket_name(upload_type))
         blob = bucket.blob(str(upload_id))

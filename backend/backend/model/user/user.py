@@ -1,5 +1,6 @@
 import bcrypt
 from uuid import UUID
+from datetime import datetime
 from typing import TYPE_CHECKING
 from sqlalchemy.orm import Mapped, Session, Query, relationship, selectinload
 
@@ -7,7 +8,8 @@ from ..base import Mapper, Model, column
 from ..audit import AuditMixin
 
 if TYPE_CHECKING:
-    from .grant import UserRole, UserRoleModel
+    from ..realm import Realm
+    from .authz import UserRole, UserRoleModel
 
 MAX_USER_NAME_LENGTH = 30
 MAX_USER_EMAIL_LENGTH = 60
@@ -35,7 +37,8 @@ class User(Mapper, AuditMixin):
     email: Mapped[str] = column(str_len=MAX_USER_EMAIL_LENGTH, unique=True, index=True)
     name: Mapped[str] = column(str_len=MAX_USER_NAME_LENGTH)
     password_digest: Mapped[str | None] = column(str_len=60)
-    locale: Mapped[Str] = column(str_len=5)
+    locale: Mapped[str] = column(str_len=5)
+    deactivated_at: Mapped[datetime | None] = column(dt=True)
 
     roles: Mapped[list["UserRole"]] = relationship(
         primaryjoin="and_(User.id == UserRole.user_id, UserRole.deleted_at.is_(None))",
@@ -65,6 +68,10 @@ class User(Mapper, AuditMixin):
         """
         return session.query(cls).filter(cls.email == email).first()
 
+    @property
+    def is_inactive(self) -> bool:
+        return self.deactivated_at is not None
+
     def set_password(self, password: str):
         """
         Set the password digest from the given plaintext password.
@@ -84,3 +91,12 @@ class User(Mapper, AuditMixin):
             password.encode("utf-8"),
             self.password_digest.encode("utf-8")
         )
+
+    def get_roles_containing_realm(self, realm: "Realm") -> list["UserRole"]:
+        """
+        Return the `UserRole`s for this user that contain the given `realm`.
+        """
+        return [
+            role for role in self.roles
+            if role.realm.contains_realm(realm)
+        ]

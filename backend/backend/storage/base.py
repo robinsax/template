@@ -34,14 +34,6 @@ class StorageBackend:
         """
         raise NotImplementedError()
 
-    def direct_upload(self, filename: str, data: IO[bytes]):
-        """
-        Store `data` associated to `filename`.
-
-        Should not be used by normal application logic.
-        """
-        raise NotImplementedError()
-
     def upload(
         self, session: Session, realm: Realm, upload_type: UploadType,
         filename: str, data: IO[bytes]

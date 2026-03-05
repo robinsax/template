@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from uuid import UUID
 from enum import Enum
 from typing import TypeVar, Type
@@ -58,7 +60,7 @@ class Notification(Mapper):
     email_status: Mapped[NotificationEmailStatus] = column(
         NotificationEmailStatus, index=True
     )
-    cosmetic_metadata: Mapped[dict | None] = column()
+    cosmetic_metadata: Mapped[dict | None] = column(raw_jsonb=True)
     target_type: Mapped[str | None] = column(str_len=MAX_TABLENAME_LEN)
     target_id: Mapped[UUID | None] = column()
 
@@ -175,7 +177,7 @@ class Notification(Mapper):
     def get_target_or_die(self, session: Session, expect_cls: Type[TTarget]) -> TTarget:
         """
         Return the target. Raises if the target is not of the expected class or if the
-        target doesn"t exist.
+        target doesn't exist.
         """
         target = self.get_target(session, expect_cls)
         if not target:

@@ -35,7 +35,7 @@ def mail_renderer(notification_type: NotificationType):
 
 def get_renderer(notification_type: NotificationType):
     """
-    Return the renderer function for `notification_type`, or `None` if there isn"t one.
+    Return the renderer function for `notification_type`, or `None` if there isn't one.
     """
     return _renderers.get(notification_type)
 

@@ -17,7 +17,7 @@ from sqlalchemy.orm import Session, InstrumentedAttribute
 from backend.config import config
 from backend.service import CLIError, cli, tasks as tasks_registry
 from backend.model import (
-    User, UserGrant, Role, Audit, BasicAuditEvent, AuthzScope, mappers
+    User, UserRole, Role, Audit, BasicAuditEvent, mappers
 )
 
 # Entrypoints.
@@ -121,7 +121,7 @@ def user_role_assign(
         except ValueError:
             raise CLIError("Invalid realm ID: " + realm_id) from None
 
-    grant = UserGrant(
+    grant = UserRole(
         user_id=user.id,
         realm_id=realm_id,
         role=role

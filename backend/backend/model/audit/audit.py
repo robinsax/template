@@ -19,7 +19,7 @@ MAX_AUDIT_EVENT_LEN = 60
 
 class BasicAuditEvent(EnumMixin, Enum):
     """
-    Audit event types for objects that don"t need custom extension.
+    Audit event types for objects that don't need custom extension.
     """
     CREATE = "create"
     UPDATE = "update"
@@ -67,7 +67,7 @@ class Audit(Mapper):
     occurred_at: Mapped[datetime] = column(dt=True, default_now=True, index=True)
     target_type: Mapped[str] = column(str_len=MAX_TABLENAME_LEN)
     target_id: Mapped[UUID] = column()
-    _event: Mapped[str] = column(name="event", str_len=MAX_AUDIT_EVENT_LEN, nullable=False)
+    _event: Mapped[str] = column(name="event", str_len=MAX_AUDIT_EVENT_LEN)
     params: Mapped[dict | None] = column()
 
     user: Mapped["User"] = relationship()

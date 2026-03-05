@@ -33,14 +33,14 @@ import inspect
 
 from .base import Mapper, Model, EnumMixin
 from .common import current_datetime, get_fernet_encryption
-from .audit import (
-    AuditSummaryModel, Audit, AuditModel, AuditMixin, BasicAuditEvent,
-    AuditStandaloneModel
-)
 from .user import (
     User, UserModel, AuthKey, AuthKeyModel, Role, Permission, UserRole,
     UserRoleModel, AuthKeyRestriction, ROLE_SCOPES, PERMISSIONS_MATRIX,
     MAX_USER_NAME_LENGTH, MAX_USER_EMAIL_LENGTH
+)
+from .audit import (
+    AuditSummaryModel, Audit, AuditModel, AuditMixin, BasicAuditEvent,
+    AuditStandaloneModel
 )
 from .realm import Realm, RealmModel, RealmType
 from .upload import Upload, UploadModel, UploadType
@@ -50,7 +50,7 @@ from .notification import (
 
 # Handle circular refs in Pydantic models.
 _rebuild: list[type[Model]] = [
-    AuditModel, UploadModel, UserModel, AuditSummaryModel, UserGrantModel,
+    AuditModel, UploadModel, UserModel, AuditSummaryModel, UserRoleModel,
     AuditStandaloneModel, RealmModel
 ]
 for model_cls in _rebuild:

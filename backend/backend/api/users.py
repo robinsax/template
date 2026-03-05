@@ -19,7 +19,6 @@ from backend.service import (
 )
 
 from .base import app
-from .common import StateUpdateParams, assert_authz, state_update_handler
 
 # Validators.
 def _validate_password(password: str):
@@ -76,7 +75,7 @@ def get_users(
     Requires *manage users* permission at any scope.
     """
     # Necessarily scopeless to allow discovery for novel grant creation.
-    assert_scopeless_authz(cur_user, Permission.MANAGE_USERS)
+    assert_scopeless_authz(cur_user, Permission.IAM)
 
     users = User.get_all(session)
 
@@ -97,7 +96,7 @@ def get_user(
         raise Invalid("invalid_user")
 
     if user.id != cur_user.id:
-        assert_scopeless_authz(cur_user, Permission.MANAGE_USERS)
+        assert_scopeless_authz(cur_user, Permission.IAM)
 
     return user.to_model()
 
@@ -126,7 +125,7 @@ def create_user(
         raise Invalid("already_exists")
 
     # Scope will be checked later, on grant creation.
-    assert_scopeless_authz(cur_user, Permission.MANAGE_USERS)
+    assert_scopeless_authz(cur_user, Permission.IAM)
 
     if create.locale not in get_supported_locales():
         raise Invalid("invalid_locale")
@@ -258,7 +257,7 @@ def update_user(
     if cur_user.id != user.id:
         required_authz_scope = user.get_minimum_iam_authz_scope()
 
-        assert_authz(cur_user, required_authz_scope, Permission.MANAGE_USERS)
+        assert_authz(cur_user, required_authz_scope, Permission.IAM)
 
     # Update name and locale.
     if update.name:
@@ -280,30 +279,6 @@ def update_user(
 
     return user.to_model()
 
-@app.put("/users/{user_id:uuid}/state")
-def update_user_state(
-    user_id: UUID, req: Request, update: StateUpdateParams,
-    session: Session = Depends(get_session)
-) -> UserModel:
-    """
-    Update the state of the user with `user_id`.
-
-    Requires *manage IAM* permission containing user"s minimum authorization scope if
-    the user is not the requester.
-    """
-    cur_user = get_current_user(req, session)
-
-    user = User.get(session, user_id)
-    if not user:
-        raise Invalid("invalid_user")
-
-    user = state_update_handler(
-        session, cur_user, user, user.get_minimum_iam_authz_scope(), update,
-        require_permission=Permission.MANAGE_USERS
-    )
-
-    return user.to_model()
-
 # Notifications.
 @app.get("/users/{user_id:uuid}/notifications")
 def get_notifications(
@@ -314,14 +289,11 @@ def get_notifications(
     Return notifications for the given user. Returns only unseen notifications unless
     an `all` query parameter is included and non-empty.
 
-    Requires that either the user is the requester or the user has *manage IAM* permission
-    at the user"s minimum authorization scope.
+    Requires that either the user is the requester.
     """
     # Assert authz.
     if cur_user.id != user_id:
-        required_authz_scope = cur_user.get_minimum_iam_authz_scope()
-
-        assert_authz(cur_user, required_authz_scope, Permission.MANAGE_USERS)
+        raise Unauthorized("unauthorized")
 
     include_seen = bool(req.query_params.get("all"))
     notifications = Notification.get_all_for_user(session, user_id, include_seen)

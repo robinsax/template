@@ -5,9 +5,9 @@ from typing import Generator, Optional, TypeVar
 from sqlalchemy import ColumnElement
 from sqlalchemy.orm import Session
 
-from backend.model import BaseMixin
+from backend.model import Mapper
 
-T = TypeVar("T", bound=BaseMixin)
+T = TypeVar("T", bound=Mapper)
 def task_batch_query(
     session: Session, target_cls: type[T],
     query: Optional[ColumnElement] = None, page_size: int = 5
