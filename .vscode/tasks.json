@@ -106,7 +106,7 @@
             "label": "Local: Start API",
             "type": "shell",
             "command": "bash",
-            "args": ["./scripts/dev/local-start-service.sh api"],
+            "args": ["./scripts/dev/local-start-service.sh", "api"],
             "options": {
                 "cwd": "${workspaceFolder}",
                 "env": {

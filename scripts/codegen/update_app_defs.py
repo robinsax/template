@@ -68,7 +68,7 @@ def write_models_ts(src_modules: list[ModuleType]):
     ts_role_scopes = TSObject()
     for key, value in ROLE_SCOPES.items():
         ts_entry = TSValueSet(
-            [TSString(scope.value) for scope in value],
+            [TSString(scope.value) if scope else TSCode("null") for scope in value],
             "array"
         )
         ts_role_scopes.add(key.value, ts_entry)
@@ -77,7 +77,7 @@ def write_models_ts(src_modules: list[ModuleType]):
         TSConstDef(
             "roleScopes",
             ts_role_scopes,
-            TSCode("Record<Role, AuthzScopeType[]>")
+            TSCode("Record<Role, (RealmType | null)[]>")
         )
     )
 
@@ -219,7 +219,7 @@ def write_endpoints_ts(app: FastAPI): # pylint: disable=too-many-statements
     return str(ts_scope)
 
 def update_models():
-    with open_file("./app/src/models/backend.ts", "w") as fh:
+    with open_file("./app/src/model/backend.ts", "w") as fh:
         fh.write(HEADER)
         fh.write("\n")
         fh.write(write_models_ts([model, api]))

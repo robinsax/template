@@ -1,14 +1,15 @@
+import { UserModel } from "@/model";
+
 import { MutationContext, QueryContext } from "./base";
 import { queryAuthState } from "./local";
 
 export const queryCurrentUser = async (
     context: QueryContext
-) => {
+): Promise<UserModel | null> => {
     const authState = await context.query(queryAuthState);
     if (!authState) return null;
 
-    const user = context.api.users.id(authState.userId).get();
-    return user;
+    return await context.api.users.id(authState.userId).get();
 };
 
 export const queryNotifications = async (context: QueryContext, { includeSeen }: {

@@ -1,53 +1,15 @@
 /**
 *   Authorization state hooks and contexts. 
 */
-import React, { ReactNode, createContext, useContext, useMemo } from "react";
+import { useMemo } from "react";
 
-import { Permission, AuthzScope, permissionsMatrix, UserModel } from "@/model";
-import { grantContainsScope, isUserWithinManageScopeOf } from "@/util";
+import { Permission, permissionsMatrix, RealmModel } from "@/model";
+import { queryCurrentUser } from "@/state";
 
-import { useCurrentUser } from "./auth";
-
-const DEFAULT_AUTHZ_SCOPE: AuthzScope = {
-    clientId: null,
-    businessId: null
-};
-
-const authzScopeContext = createContext<AuthzScope>(DEFAULT_AUTHZ_SCOPE);
+import { useQuery } from "./state";
 
 /**
-*   Provides an authorization scope against which {@link useAuthzCheck} compares.
-*
-*   The provided scope will inherit values not explicitly passed as props from the scope
-*   mounted above it.
-*/
-export const AuthzScopeProvider = ({ children, clientId, businessId }: {
-    children: ReactNode,
-    clientId?: string | null,
-    businessId?: string | null
-}) => {
-    const parentScope = useAuthzScope();
-
-    const scope = useMemo(() => ({
-        clientId: clientId === undefined ? parentScope.clientId : clientId,
-        businessId: businessId === undefined ? parentScope.businessId : businessId
-    }), [clientId, businessId]);
-
-    return (
-        <authzScopeContext.Provider value={ scope }>
-            { children }
-        </authzScopeContext.Provider>
-    );
-};
-
-/**
-*   Returns the current {@link AuthzScope} at the caller"s mount point.
-*/
-export const useAuthzScope = () => useContext(authzScopeContext);
-
-/**
-*   Return whether the current user has the given permission within the authorization
-*   scope at the caller"s mount point.
+*   Return whether the current user has the given permission within the given realm.
 * 
 *   If multiple permissions are specified, returns whether the current user has any of
 *   them.
@@ -55,16 +17,10 @@ export const useAuthzScope = () => useContext(authzScopeContext);
 *   If `permission` is `null`, return `true`.
 */
 export const useAuthzCheck = (
-    permission: Permission | Permission[] | null,
-    opts: {
-        scope?: AuthzScope,
-        scopeless?: boolean,
-        anyClientInnerScope?: boolean
-    } = {}
+    realm: RealmModel | null,
+    permission: Permission | Permission[] | null
 ) => {
-    const user = useCurrentUser();
-
-    const contextScope = useAuthzScope();
+    const [user] = useQuery(queryCurrentUser);
 
     return useMemo(() => {
         if (!user) return false;
@@ -75,10 +31,8 @@ export const useAuthzCheck = (
             permission instanceof Array ? permission : [permission]
         );
 
-        const authzScope = opts.scope ? opts.scope : contextScope;
-
-        for (const grant of user.grants) {
-            const permissions = permissionsMatrix[grant.role];
+        for (const role of user.roles) {
+            const permissions = permissionsMatrix[role.role];
 
             let matchesAny = false;
             for (const permission of checkPermissions) {
@@ -89,30 +43,18 @@ export const useAuthzCheck = (
             }
             if (!matchesAny) continue;
 
-            if (opts.scopeless) return true;
+            // Scopeless check or global role.
+            if (!realm || !role.realm) return true;
 
-            const allowedWithinClient = (
-                opts.anyClientInnerScope && grant.client_id == authzScope.clientId
-            );
-            if (allowedWithinClient) return true;
+            // Check for parent of requested realm that role is applied at.
+            let current: RealmModel | null = realm;
+            while (current) {
+                if (current.id == role.realm.id) return true;
 
-            if (grantContainsScope(grant, authzScope)) return true;
+                current = current.parent;
+            }
         }
 
         return false;
-    }, [user, permission, contextScope, opts]);
-};
-
-/**
-*   Return whether the current user has IAM permission on the given `targetUser` within
-*   the authorization scope at the caller"s mount point.
-*/
-export const useUserManageAuthzCheck = (targetUser: UserModel) => {
-    const user = useCurrentUser();
-
-    return useMemo(() => {
-        if (!user) return false;
-
-        return isUserWithinManageScopeOf(targetUser, user);
-    }, [user, targetUser]);
+    }, [user, permission, realm]);
 };

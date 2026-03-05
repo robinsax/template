@@ -1,34 +1,20 @@
 import { useEffect } from "react";
-
-import { getGlobalScope } from "@/util";
-
-const getErrorHandlers = (): ((err: Error) => void)[] => {
-    const globalScope = getGlobalScope<{ __queryErrorHandlers?: ((err: Error) => void)[] }>();
-    if (!globalScope.__queryErrorHandlers) {
-        globalScope.__queryErrorHandlers = [];
-    }
-
-    return globalScope.__queryErrorHandlers;
-};
+const globalErrorHandlers: ((err: Error) => void)[] = [];
 
 export const fireGlobalError = (err: Error) => {
-    const handlers = getErrorHandlers();
-
-    for (const handler of handlers) {
+    for (const handler of globalErrorHandlers) {
         handler(err);
     }
 };
 
 export const useGlobalErrorHandler = (handler: (err: Error) => void) => {
     useEffect(() => {
-        const handlers = getErrorHandlers();
-
-        handlers.push(handler);
+        globalErrorHandlers.push(handler);
 
         return () => {
-            const index = handlers.indexOf(handler);
+            const index = globalErrorHandlers.indexOf(handler);
             if (index >= 0) {
-                handlers.splice(index, 1);
+                globalErrorHandlers.splice(index, 1);
             }
         };
     }, [handler]);

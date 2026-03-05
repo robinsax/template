@@ -1,15 +1,13 @@
 /**
 *   WebSocket hooks.
 */
-import { useEffect, useRef, useMemo, useState } from "react";
+import { useEffect, useRef, useMemo } from "react";
 
 import config from "@/config";
-import {
-    AIChatMessageWSParams, AIChatMessageWSResp, AIChatStartWSParams, AIChatStartWSResp,
-    AIChatSyncWSResp, AuthWSParams
-} from "@/model";
+import { AuthWSParams } from "@/model";
+import { queryAuthState } from "@/state";
 
-import { useCurrentAuthToken } from "./auth";
+import { useQuery } from "./state";
 
 /**
 *   Options for {@link useWebSocket}.
@@ -27,14 +25,14 @@ export type UseWebSocketOptions<R> = {
 
 export type WSSendFn<T> = (data: T) => void;
 
-// Internal WebSocket binding.
-const useWebSocket = <T, R>(
+export const useWebSocket = <T, R>(
     endpoint: string,
     { onReceive, onConnectionError }: UseWebSocketOptions<R>
 ): WSSendFn<T> => {
-    const authToken = useCurrentAuthToken();
+    const [authState] = useQuery(queryAuthState);
 
     const socketRef = useRef<WebSocket | null>(null);
+    const hasAuthenticatedRef = useRef(false);
 
     const txQueueRef = useRef<T[]>([]);
 
@@ -73,65 +71,12 @@ const useWebSocket = <T, R>(
     }, []);
 
     useEffect(() => {
-        const authMessage: AuthWSParams = { token: authToken };
+        if (!authState || hasAuthenticatedRef.current) return;
+
+        const authMessage: AuthWSParams = { token: authState.token };
         send(authMessage as unknown as T);
-    }, []);
+        hasAuthenticatedRef.current = true;
+    }, [authState]);
 
     return send;
-};
-
-export type AIChatParams = AIChatMessageWSParams;
-export type AIChatResp = AIChatMessageWSResp;
-
-export type UseAIChatSocketOptions = (
-    {
-        topic: string,
-        objectId?: string | null
-    } &
-    UseWebSocketOptions<AIChatResp>
-);
-
-/**
-*   Returns handles on an AI chat WebSocket:
-*   - `send`: A function to send messages to the server.
-*   - `chatId`: The ID of the chat, if it has been created.
-*   - `synchronized`: Whether `onReceive` has been called with the full message history.
-* 
-*   The initial authentication and chat start transactions are handled automatically -
-*   the chat can be assumed to be in the chat loop transaction (see API documentation for
-*   `/ai-chat`) once `chatId` is not `null` and `synchronized` is `true`.
-*/
-export const useAIChatSocket = (
-    { topic, objectId, onReceive, ...options }: UseAIChatSocketOptions
-) => {
-    const [chatId, setChatId] = useState<string | null>(null);
-    const [synchronized, setSynchronized] = useState(false);
-
-    const send = useWebSocket<
-        AIChatParams | AIChatStartWSParams,
-        AIChatResp | AIChatStartWSResp | AIChatSyncWSResp
-    >("/ai-chat", {
-        onReceive: (data) => {
-            if ("chat_id" in data) {
-                setChatId(data.chat_id);
-                return;
-            }
-
-            if ("synced" in data) {
-                setSynchronized(true);
-                return;
-            }
-
-            onReceive(data);
-        },
-        ...options
-    });
-
-    useEffect(() => {
-        send({ topic, object_id: objectId || null });
-    }, []);
-
-    return (
-        [send, chatId, synchronized] as [WSSendFn<AIChatParams>, string | null, boolean]
-    );
 };

@@ -1,14 +1,11 @@
 import React from "react";
-import { Heading, Text, Button, Box, VStack, HStack } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
+import { Heading, Text, Box, VStack } from "@chakra-ui/react";
 
-import { useCurrentUserOrNull, useI18n } from "@/hooks";
-import { Icon, SplashScreen } from "@/components/design";
+import { useI18n } from "@/hooks";
+import { SplashScreen } from "@/components/global";
 
-export const NotFound = () => {
+export const NotFoundScreen = () => {
     const t = useI18n();
-
-    const user = useCurrentUserOrNull();
 
     return (
         <SplashScreen>
@@ -21,24 +18,9 @@ export const NotFound = () => {
                         { t("Page not found") }
                     </Text>
                 </Box>
-                <HStack width="full" justifyContent="flex-end">
-                    { user ? (
-                        <Link to="/">
-                            <Button leftIcon={ <Icon name="link" /> }>
-                                { t("Return to dashboard") }
-                            </Button>
-                        </Link>
-                    ) : (
-                        <Link to="/login">
-                            <Button leftIcon={ <Icon name="link" /> }>
-                                { t("Go to login") }
-                            </Button>
-                        </Link>
-                    ) }
-                </HStack>
             </VStack>
         </SplashScreen>
     );
 };
 
-export default NotFound;
+export default NotFoundScreen;

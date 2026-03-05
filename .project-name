@@ -1,1 +1,2 @@
-TEMPLATE: Replace this file with a short name of the project (e.g. "myapp").
+# TEMPLATE: Replace with a short name of the project.
+project_name=template

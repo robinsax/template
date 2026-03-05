@@ -30,33 +30,6 @@ def collect_from_file(file_path: str):
 
     return messages
 
-def collect_campaign_brief():
-    messages = []
-    def walk(target: dict):
-        if "label" in target:
-            messages.append(target["label"])
-        if "detail" in target:
-            messages.append(target["detail"])
-        if "recommend_for" in target:
-            messages.extend(target["recommend_for"])
-
-        if "fields" in target:
-            for field in target["fields"].values():
-                walk(field)
-        if "groups" in target:
-            for group in target["groups"]:
-                walk(group)
-        if "options" in target and isinstance(target["options"], dict):
-            for option in target["options"].values():
-                walk(option)
-
-    with open_file("common/campaign-brief.yaml") as fh:
-        data = yaml.safe_load(fh)
-
-    walk(data["campaign"])
-
-    return messages
-
 def collect_language_names():
     messages = []
     with open_file("common/languages.json") as fh:
@@ -81,7 +54,6 @@ def collect_en_locale():
             for file in files:
                 messages.extend(collect_from_file(os.path.join(rel_root, file)))
 
-    messages.extend(collect_campaign_brief())
     messages.extend(collect_language_names())
 
     locale = {}

@@ -2,7 +2,7 @@ import React from "react";
 import { Heading, Text } from "@chakra-ui/react";
 
 import { useI18n } from "@/hooks";
-import { SplashInfoScreen } from "@/components/design";
+import { SplashInfoScreen } from "@/components/global";
 
 export const Privacy = () => {
     const t = useI18n();

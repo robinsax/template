@@ -19,7 +19,6 @@ class Role(EnumMixin, Enum):
     """
     Granted roles that map to sets of `Permission`s.
     """
-    # Owner roles.
     ADMIN = "admin"
     USER = "user"
 
@@ -27,8 +26,7 @@ class Permission(EnumMixin, Enum):
     """
     Specific permissions against which authorization checks are performed.
     """
-    # IAM / organization management.
-    IAM = "IAM"
+    IAM = "iam"
 
 class UserRoleModel(Model):
     """

@@ -1,6 +1,7 @@
 import uuid
 import inspect
 from enum import Enum
+from types import UnionType
 from datetime import datetime
 from typing import Union, Optional, TextIO, get_origin, get_args
 from fastapi.responses import StreamingResponse
@@ -91,7 +92,7 @@ class TSType(TSSymbol):
             return ["Response"]
 
         origin = get_origin(self.py_type)
-        if origin is Union:
+        if origin is Union or isinstance(self.py_type, UnionType):
             args = get_args(self.py_type)
             optional = False
             if type(None) in args:
@@ -153,7 +154,7 @@ class TSString(TSSymbol):
         self.value = value
 
     def write(self):
-        return [""", self.value, """]
+        return ['"', self.value, '"']
 
 class TSPromise(TSSymbol):
 
@@ -293,7 +294,7 @@ class TSEnumDefs(TSSymbol):
             TSTypeDef(
                 self.name,
                 TSValueSet(
-                    [TSString(e.value) for e in self.enum_type],
+                    [TSString(e.value) for e in list(self.enum_type)],
                     "union"
                 )
             ),
@@ -301,7 +302,7 @@ class TSEnumDefs(TSSymbol):
             TSConstDef(
                 const_name,
                 TSValueSet(
-                    [TSString(e.value) for e in self.enum_type],
+                    [TSString(e.value) for e in list(self.enum_type)],
                     "array"
                 ),
                 TSType(list[self.enum_type])

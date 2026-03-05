@@ -5,7 +5,6 @@ import { parse as uuidParse, stringify as uuidStringify } from "uuid";
 import { format } from "date-fns";
 
 import config from "@/config";
-import { AnyUserGrantModel, AuthzScope, UserModel, permissionsMatrix } from "@/model";
 
 // Misc.
 /**
@@ -44,7 +43,12 @@ export const deepEqual = (a: unknown, b: unknown): boolean => {
 
     for (const key of keysA) {
         if (!keysB.includes(key)) return false;
-        if (!deepEqual((a as Record<string, unknown>)[key], (b as Record<string, unknown>)[key])) return false;
+
+        const innerEqual = deepEqual(
+            (a as Record<string, unknown>)[key],
+            (b as Record<string, unknown>)[key]
+        );
+        if (!innerEqual) return false;
     }
 
     return true;
@@ -213,71 +217,14 @@ export class AppError extends Error {};
 /**
 *   Throws in dev mode and returns with a fallback value in production.
 */
-export const throwOrFallback = <T = unknown>(message: string, rv: T = null as unknown as T): T => {
+export const throwOrFallback = <T = unknown>(
+    message: string, rv: T = null as unknown as T
+): T => {
     if (config.devMode) throw new AppError(message);
 
     console.error(message); // eslint-disable-line no-console
     return rv;
 };
-
-// Authorization logic.
-/**
-*   Returns whether the scope of the given `grant` contains the given `scope`.
-*
-*   "Contains" semantics are equivalent to the backend.
-*/
-export const grantContainsScope = (grant: AnyUserGrantModel, scope: AuthzScope) => {
-    if (grant.scope_type == "global") {
-        return true;
-    }
-
-    if (grant.business_id) {
-        return grant.business_id == scope.businessId;
-    }
-
-    return grant.client_id == scope.clientId;
-};
-
-/**
-*   Return whether `managingUser` has an IAM role grant that contains `targetUser`.
-*/
-export const isUserWithinManageScopeOf = (
-    targetUser: UserModel,
-    managingUser: UserModel
-) => {
-    const clientIds = [];
-    const businessIds = [];
-
-    for (const grant of targetUser.grants) {
-        if (grant.client_id) clientIds.push(grant.client_id);
-        if (grant.business_id) businessIds.push(grant.business_id);
-    }
-
-    let clientId = null;
-    let businessId = null;
-    if (clientIds.length == 1) {
-        clientId = clientIds[0];
-        if (businessIds.length == 1) {
-            businessId = businessIds[0];
-        }
-    }
-
-    const requiredScope: AuthzScope = {
-        clientId,
-        businessId
-    };
-
-    for (const grant of managingUser.grants) {
-        if (!grantContainsScope(grant, requiredScope)) continue;
-
-        if (!("manage_iam" in permissionsMatrix[grant.role])) continue;
-
-        return true;
-    }
-
-    return false;
-};
-
 
 // IndexedDB wrapper.
 /**

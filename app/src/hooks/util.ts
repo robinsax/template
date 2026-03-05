@@ -1,7 +1,7 @@
 /**
 *   Misc. utility hooks.
 */
-import { WheelEvent, useEffect, useMemo, useState, useCallback, useRef } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { marked } from "marked";
 
