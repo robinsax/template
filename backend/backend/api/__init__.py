@@ -11,6 +11,7 @@ from .users import (
     UserPasswordUpdateParams
 )
 from .auth import AuthParams, AuthResp, PasswordResetRequestParams
+from .roles import UserRoleUpdateParams
 from . import uploads
 
 from .base import app

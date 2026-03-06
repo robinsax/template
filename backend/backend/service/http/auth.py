@@ -44,7 +44,7 @@ def get_current_user(req: Request, session: Session = Depends(get_session)) -> U
     return key.user
 
 def assert_authz(
-    user: User, realm: Realm, permission: Permission | None = None
+    user: User, realm: Realm | None, permission: Permission | None = None
 ):
     """
     Raise `Unauthorized` if `check_authz` fails. Use this for authorization checks
@@ -55,7 +55,7 @@ def assert_authz(
         raise Unauthorized("unauthorized")
 
 def assert_authz_any(
-    user: User, realm: Realm, permissions: list[Permission]
+    user: User, realm: Realm | None, permissions: list[Permission]
 ):
     """
     Raise `Unauthorized` if `check_authz` fails for every one of the given permissions.
@@ -77,7 +77,7 @@ def assert_scopeless_authz(user: User, permission: Permission):
     if not check:
         raise Unauthorized("unauthorized")
 
-def assert_role_assign_authz(user: User, realm: Realm, role: Role):
+def assert_role_assign_authz(user: User, realm: Realm | None, role: Role):
     """
     Raise `Unauthorized` if `check_role_assign_authz` fails. Use this for grant set
     authorization checks in endpoints.

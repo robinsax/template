@@ -36,7 +36,7 @@ def is_role_at_least_as_permissive_as(
     return True
 
 def would_role_be_valid(
-    realm: Realm, role: Role, existing_roles: list[UserRole]
+    realm: Realm | None, role: Role, existing_roles: list[UserRole]
 ) -> tuple[bool, list[UserRole] | None]:
     """
     Return whether assignment of `role` at `realm` to the user with `existing_roles`
@@ -95,7 +95,7 @@ def assignable_roles_for_realm(
     return valid_grant_roles
 
 def check_authz(
-    user: User | None, realm: Realm, permission: Permission | None = None
+    user: User | None, realm: Realm | None, permission: Permission | None = None
 ) -> bool:
     """
     Return whether `user` has the given `permission` within the given `authz_scope`.
@@ -134,10 +134,9 @@ def check_scopeless_authz(user: User | None, permission: Permission) -> bool:
         for role in user.roles
     )
 
-def check_role_assign_authz(user: User, realm: Realm, assign_role: Role) -> bool:
+def check_role_assign_authz(user: User, realm: Realm | None, assign_role: Role) -> bool:
     """
-    Return whether `user` is able to assign the given `role` at the given
-    `realm`.
+    Return whether `user` is able to assign the given `role` at the given `realm`.
     """
     iam_allowed = check_authz(user, realm, Permission.IAM)
     if not iam_allowed:

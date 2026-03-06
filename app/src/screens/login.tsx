@@ -21,7 +21,7 @@ export default () => {
 
     return (
         <SplashScreen>
-            <VStack>
+            <VStack width={ 80 }>
                 <FormProvider onSubmit={ onAttempt }>
                     <FormFields names={["email", "password"]} />
                     <FormError />

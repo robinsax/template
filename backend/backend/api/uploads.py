@@ -1,16 +1,13 @@
 '''
-File upload and upload retrieval endpoints. File uploads are subject to authorization,
-which is why these endpoints exist, rather than directly exposing a bucket or equivalent.
+File upload and upload retrieval endpoints, subject to authorization.
 '''
 from uuid import UUID
 from fastapi import Depends, Request
 from fastapi.responses import StreamingResponse
-from google.cloud.exceptions import Unauthorized
 from sqlalchemy.orm import Session
 
 from backend.model import (
-    UploadType, Upload, UploadModel, User, Audit, Realm, Permission,
-    BasicAuditEvent, AuthKey, AuthKeyRestriction
+    UploadType, Upload, UploadModel, User, Audit, Realm, BasicAuditEvent
 )
 from backend.storage import StorageBackend, get_storage_backend
 from backend.service import (

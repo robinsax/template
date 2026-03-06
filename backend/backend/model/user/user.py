@@ -92,11 +92,16 @@ class User(Mapper, AuditMixin):
             self.password_digest.encode("utf-8")
         )
 
-    def get_roles_containing_realm(self, realm: "Realm") -> list["UserRole"]:
+    def get_roles_containing_realm(self, realm: "Realm" | None) -> list["UserRole"]:
         """
         Return the `UserRole`s for this user that contain the given `realm`.
         """
-        return [
-            role for role in self.roles
-            if role.realm.contains_realm(realm)
-        ]
+        contained = []
+
+        for role in self.roles:
+            if role.realm is None:
+                contained.append(role)
+            elif realm is not None and role.realm.contains_realm(realm):
+                contained.append(role)
+        
+        return contained
