@@ -1,9 +1,8 @@
 """
-User access, invite, and management endpoints.
+User access, creation, and management endpoints.
 """
 import re
 from uuid import UUID
-from typing import Optional
 from fastapi import Request, Depends
 from sqlalchemy.orm import Session
 
@@ -232,9 +231,9 @@ class UserUpdateParams(Model):
     """
     User update request JSON body.
     """
-    name: Optional[str] = None
-    locale: Optional[str] = None
-    avatar_id: Optional[str] = None
+    name: str | None = None
+    locale: str | None = None
+    avatar_id: str | None = None
 
 @app.put("/users/{user_id:uuid}")
 def update_user(

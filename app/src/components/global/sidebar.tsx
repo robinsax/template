@@ -9,8 +9,9 @@ import {
 import { NavGroup, NavItem, Persona, Sidebar, SidebarSection } from "@saas-ui/react";
 import { Link, useLocation } from "react-router-dom";
 
-import { usePanelStylesFix } from "@/theme";
-import { useAuthzCheck, useI18n, useWindowListener, useQuery, useMutation } from "@/hooks";
+import {
+    useAuthzCheck, useI18n, useWindowListener, useQuery, useMutation
+} from "@/hooks";
 import { mutateLocalSettings, queryLocalSettings } from "@/state";
 import { Icon, Brand } from "@/components/design";
 
@@ -34,13 +35,11 @@ export const AppSidebar = () => {
         setForceCollapsed(window.innerWidth < COLLAPSE_BREAKPOINT);
     });
 
-    const manageUsersAllowed = useAuthzCheck("manage_iam", {
-        scopeless: true
-    });
+    const manageUsersAllowed = useAuthzCheck(null, "iam");
 
-    const panelStyles = usePanelStylesFix();
-
-    const collapsed = forceCollapsed || (localSettings && localSettings.sidebarCollapsed);
+    const collapsed = (
+        forceCollapsed || (localSettings && localSettings.sidebarCollapsed)
+    );
 
     const settingsControls = (
         <>
@@ -50,10 +49,9 @@ export const AppSidebar = () => {
     );
     return (
         <Sidebar
-            { ...panelStyles }
             position="relative"
             borderRight="solid 1px"
-            borderRightColor="lightBorder"
+            borderRightColor="border"
             boxShadow="raise"
             variant={ collapsed ? "compact" : "default" }
             width={ collapsed ? undefined : "14rem" }
@@ -62,17 +60,18 @@ export const AppSidebar = () => {
         >
             { !forceCollapsed && (
                 <Box
-                    { ...panelStyles }
                     position="absolute"
-                    top="0.5rem" right="-2.5rem"
-                    width="2rem" height="2rem"
+                    top={ 0.5 } right={ -2.5 }
+                    width={ 2 } height={ 2 }
                     border="1px solid"
-                    borderColor="lightBorder"
+                    borderColor="border"
                     borderRadius="md"
                 >
                     <Box
                         width="full" height="full"
-                        onClick={ () => onSettingsChange({ sidebarCollapsed: !collapsed }) }
+                        onClick={ () => onSettingsChange({
+                            sidebarCollapsed: !collapsed
+                        }) }
                         display="flex"
                         alignItems="center" justifyContent="center"
                     >
@@ -146,7 +145,7 @@ export const AppSidebar = () => {
                 <>
                     <Divider/>
                     <Box width="full" pb={ 2 }>
-                        <Brand size="sm"/>
+                        <Brand variant="sm"/>
                     </Box>
                 </>
             ) }

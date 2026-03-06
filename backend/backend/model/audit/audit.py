@@ -1,10 +1,12 @@
 """
 Audit mapper.
 """
+from __future__ import annotations
+
 from uuid import UUID
 from enum import Enum
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional, Union, Any
+from typing import TYPE_CHECKING, Any
 from sqlalchemy import Column, Index, and_, or_, select, exists
 from sqlalchemy.orm import Session, Mapped, relationship
 
@@ -35,7 +37,7 @@ class AuditModel(Model):
     target_id: str
     occurred_at: datetime
     event: str
-    params: Optional[dict]
+    params: dict | None
 
 class AuditStandaloneModel(Model):
     """
@@ -79,7 +81,7 @@ class Audit(Mapper):
     @classmethod
     def create(
         cls, session: Session, user: "User", target: "AuditMixin",
-        event: EnumMixin, params: Union[dict, Model, None] = None
+        event: EnumMixin, params: dict | Model | None = None
     ) -> None:
         """
         Create an `Audit` for the given `target` SQLAlchemy mapper instance.
@@ -102,7 +104,7 @@ class Audit(Mapper):
     @classmethod
     def get_all_for_target(
         cls, session: Session, target: "AuditMixin",
-        events: Optional[list[EnumMixin]] = None
+        events: list[EnumMixin] | None = None
     ) -> list["Audit"]:
         """
         Return all `Audit`s created for the given SQLAlchemy mapper instance in
@@ -125,8 +127,8 @@ class Audit(Mapper):
     @classmethod
     def get_latest_for_target(
         cls, session: Session, target: "AuditMixin",
-        events: Optional[list[EnumMixin]] = None
-    ) -> Optional["Audit"]:
+        events: list[EnumMixin] | None = None
+    ) -> "Audit" | None:
         """
         Return the latest `Audit` created for the given SQLAlchemy mapper instance.
 
@@ -148,7 +150,7 @@ class Audit(Mapper):
     def get_latest_for_targets_in_businesses(
         cls, session: Session, business_ids: list[UUID],
         target_cls_list: list[tuple["AuditMixin", Column]],
-        limit: Optional[int] = None
+        limit: int | None = None
     ) -> list["Audit"]:
         """
         Return the latest `Audit`s created for arbitrary business-related objects
@@ -186,7 +188,7 @@ class Audit(Mapper):
         return self._params
 
     @params.setter
-    def params(self, value: Optional[Union[Model, dict]]):
+    def params(self, value: Model | dict | None):
         """
         Set the parameters of the audit event.
         """

@@ -19,8 +19,9 @@ import {
 } from "@chakra-ui/react";
 import { Select, SelectButton, SelectList } from "@saas-ui/react";
 
+import { APIError } from "@/api-client";
 import { throwOrFallback } from "@/util";
-import { APIError, I18nValueFn, useI18n } from "@/hooks";
+import { I18nValueFn, useI18n } from "@/hooks";
 import { IconName, Icon, LoadIndicator } from "@/components/design";
 
 // Spec types.

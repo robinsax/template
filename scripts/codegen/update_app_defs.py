@@ -84,7 +84,7 @@ def write_models_ts(src_modules: list[ModuleType]):
     return str(ts_scope)
 
 def write_endpoints_ts(app: FastAPI): # pylint: disable=too-many-statements
-    ts_models_import = TSImport("@/models", [])
+    ts_models_import = TSImport("@/model", [])
 
     def add_import(to_add):
         if to_add in (str, StreamedUpload, StreamingResponse):

@@ -1,8 +1,6 @@
 """
 Authorization logic.
 """
-from typing import Optional
-
 from backend.model import (
     User, Realm, UserRole, Permission, Role, PERMISSIONS_MATRIX, ROLE_SCOPES
 )
@@ -39,7 +37,7 @@ def is_role_at_least_as_permissive_as(
 
 def would_role_be_valid(
     realm: Realm, role: Role, existing_roles: list[UserRole]
-) -> tuple[bool, Optional[list[UserRole]]]:
+) -> tuple[bool, list[UserRole] | None]:
     """
     Return whether assignment of `role` at `realm` to the user with `existing_roles`
     would be valid.
@@ -97,7 +95,7 @@ def assignable_roles_for_realm(
     return valid_grant_roles
 
 def check_authz(
-    user: User | None, realm: Realm, permission: Optional[Permission] = None
+    user: User | None, realm: Realm, permission: Permission | None = None
 ) -> bool:
     """
     Return whether `user` has the given `permission` within the given `authz_scope`.

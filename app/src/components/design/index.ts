@@ -1,3 +1,3 @@
 export * from "./icons";
 export * from "./branding";
-export * from "./basic";
+export * from "./blocks";

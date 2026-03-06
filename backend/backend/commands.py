@@ -7,7 +7,6 @@ import secrets
 from uuid import UUID
 from getpass import getpass
 from datetime import timedelta
-from typing import Optional, Union
 import uvicorn
 import requests
 from cryptography.fernet import Fernet
@@ -38,7 +37,7 @@ def serve(service: str):
 @cli.verb()
 def tasks():
     """
-    Run background tasks.
+    Run the continuous background tasks service.
     """
     # Cloud run requires HTTP healthcheck so background tasks run in an FastAPI
     # lifespan even though there are no endpoints that do anything.
@@ -64,18 +63,6 @@ def keys_make_hmac():
     """
     print(base64.urlsafe_b64encode(secrets.token_bytes(32)).decode("utf-8"))
 
-@cli.verb(short_names={ "e": "encryption_key", "t": "token" })
-def keys_decrypt_token(token: str, encryption_key: str = ""):
-    """
-    Decrypt an encrypted ad platform OAuth token.
-    """
-    encryption_key = encryption_key or config.encryption_key.get()
-
-    fernet = Fernet(encryption_key.encode())
-    token_bytes = base64.b64decode(token)
-
-    print(fernet.decrypt(token_bytes).decode("utf-8"))
-
 @cli.verb(with_session=True)
 def user_create(
     session: Session, *, name: str, email: str, password: str
@@ -99,7 +86,7 @@ def user_create(
 @cli.verb(with_session=True)
 def user_role_assign(
     session: Session, email: str, role: str,
-    realm: Optional[str] = None
+    realm: str | None = None
 ):
     """
     Assign a role to a user.
@@ -175,7 +162,7 @@ def _user_prompt_login(root_url: str):
     return auth_resp["token"], auth_resp["auth"]
 
 @cli.verb(short_names={ "r": "root_url" })
-def client_login(*, root_url: Optional[str] = None):
+def client_login(*, root_url: str | None = None):
     """
     Log in to the API and output a token.
     """
@@ -187,7 +174,7 @@ def client_login(*, root_url: Optional[str] = None):
     print("Auth: ", auth)
 
 @cli.verb(short_names={ "r": "root_url" })
-def client(*, root_url: Optional[str] = None):
+def client(*, root_url: str | None = None):
     """
     Run an HTTP client for the API.
 
@@ -266,7 +253,7 @@ def client(*, root_url: Optional[str] = None):
 # Dev tooling.
 @cli.verb(with_session=True, short_names={ "d": "days", "h": "hours" })
 def dev_timetravel( # pylint: disable=too-many-locals
-    session: Session, days: Union[int, str] = 0, hours: Union[int, str] = 0
+    session: Session, days: int | str = 0, hours: int | str = 0
 ):
     """
     Emulate traveling forward in time by decrementing all timestamps in the database by

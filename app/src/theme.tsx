@@ -19,137 +19,66 @@ import "@fontsource/ibm-plex-mono";
 // Chakra theme.
 const force = (value: string) => value + " !important";
 
-const backdropFilter = "blur(10px) saturate(50%)";
 const boxShadow = "0px 0px 5px 2px #0000000d";
-const primaryColor = "#D3B6A980";
 
 const semanticTokens = {
     colors: {
         // Selection colors.
         selection: {
-            default: primaryColor,
-        },
-        selectionOpaque: {
-            default: "#D3B6A9ff",
-        },
-        lightSelection: {
-            default: "#d3b6a947"
+            default: "primary.500",
         },
         error: {
-            default: "#fb8e7280"
+            default: "red.500"
         },
-        errorOpaque: {
-            default: "#fb8e72ff",
+        warning: {
+            default: "yellow.500"
         },
         success: {
-            default: "#4bc8a780"
-        },
-        successOpaque: {
-            default: "#4bc8a7ff",
+            default: "green.500"
         },
         // Text colors.
         themeText: {
-            default: "#10131E",
-            _dark: "#FCFCFC"
-        },
-        themeTextSofter: {
-            default: "#1c1c1ce6",
-            _dark: "#e0e0e0e3"
+            default: "gray.800",
+            _dark: "gray.200"
         },
         lightText: {
-            default: "#939499"
+            default: "gray.500"
         },
         // Border colors.
-        lightBorder: {
-            default: "#0000001a",
-            _dark: "#ffffff1a"
-        },
-        dndTarget: {
-            default: "#FFDE80",
-        },
-        // Map colors.
-        mapSelection: {
-            default: "#239CF3",
-        },
-        mapLand: {
-            default: "#e5e7ed",
-            _dark: "#7d7f83"
-        },
-        mapFeature: {
-            default: "#dddfe5",
-            _dark: "#cccccc"
-        },
-        mapPanelBg: {
-            default: "#f1f3f8",
-            _dark: "#1c1e20"
-        },
-        // Background colors.
-        offsetBg: {
+        border: {
             default: "gray.200",
-            _dark: "gray.900"
-        },
-        offsetBgSofter: {
-            default: "gray.300",
             _dark: "gray.700"
         },
-        warningBg: {
-            default: "#FFDE80cc"
+        // Background colors.
+        primaryBg: {
+            default: "gray.200",
+            _dark: "gray.800"
         },
-        panelBg: {
-            default: "#ffffff80",
-            _dark: "#00000033"
-        },
-        panelBgVariantA: {
-            default: "#ffffff4d",
-            _dark: "#00000066",
-        },
-        panelBgVariantB: {
-            default: "#ffffffb3",
-            _dark: "#ffffff1a",
-        },
-        insetPanelBg: {
-            default: "#0000001a",
-            _dark: "#00000033",
-        },
-        insetPanelBgVariantA: {
-            default: "#0000000d",
-            _dark: "#0000001a",
-        },
-        insetPanelBgVariantB: {
-            default: "#00000033",
-            _dark: "#0000004d",
+        offsetBg: {
+            default: "gray.300",
+            _dark: "gray.700"
         }
     },
     shadows: {
-        raise: "0px 0px 5px 2px #0000000d",
+        light: "0px 0px 5px 2px #0000000d",
         selection: "0px 0px 5px 2px #D3B6A91a"
     }
 };
 
 const defaultInputVariant = {
-    bg: "insetPanelBgVariantA",
-    border: force("1px solid #9898981a")
+    bg: "offsetBg",
+    border: "1px solid",
+    borderColor: "border"
 };
 
-const panelBaseStyles = (
-    props: StyleFunctionProps,
-    lightVariant: keyof typeof semanticTokens.colors = "panelBg"
-) => ({
-    bg: (
-        props.colorMode == "dark" ?
-            semanticTokens.colors.panelBg._dark : lightVariant
-    ),
-    backdropFilter
-});
-
-const makeColorWeights = (color: string, desat: number = 25) => {
+const makeColorWeights = (color: string) => {
     const tc = new TinyColor(color);
     const scale: Record<number, string> = {};
     const steps = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 
     for (let i = 0; i < steps.length; i++) {
-        const amount = (i - 3) * 5;
-        let sc = tc.clone().desaturate(desat);
+        const amount = (i - 4);
+        let sc = tc.clone();
 
         if (amount < 0) sc = sc.lighten(-amount);
         else sc = sc.darken(amount * 2);
@@ -171,11 +100,11 @@ const theme = extendTheme(saasTheme, {
         mono: "IBM Plex Mono, monospace"
     },
     colors: {
-        primary: makeColorWeights(primaryColor),
-        red: makeColorWeights("#FB8E72", 50),
-        green: makeColorWeights("#4BC8A7", 10),
-        blue: makeColorWeights("#239CF3"),
-        yellow: makeColorWeights("#FFDE80", 50)
+        primary: makeColorWeights("#3c9ee0"),
+        red: makeColorWeights("#db5838"),
+        green: makeColorWeights("#39d780"),
+        blue: makeColorWeights("#3c9ee0"),
+        yellow: makeColorWeights("#eddb3d")
     },
     styles: {
         global: {
@@ -184,8 +113,11 @@ const theme = extendTheme(saasTheme, {
                 boxShadow: force("none"),
                 outline: force("none"),
             },
+            // Default styles.
             "body": {
-                overflowY: force("hidden")
+                overflowY: force("hidden"),
+                color: "themeText",
+                bg: "primaryBg"
             },
             // Global scroll policy.
             ".saas-app-shell__main": {
@@ -197,46 +129,6 @@ const theme = extendTheme(saasTheme, {
             },
             '[data-theme="dark"] input:-webkit-autofill, [data-theme="dark"] input:-webkit-autofill:focus': { // eslint-disable-line
                 color: force("white")
-            },
-            // Override default hover effects.
-            "&[data-active]": {
-                backgroundColor: force(semanticTokens.colors.insetPanelBg.default)
-            },
-            '[data-theme="dark"] &[data-active]': {
-                backgroundColor: force(semanticTokens.colors.insetPanelBg._dark)
-            },
-            ".sui-nav-item__link:hover": {
-                backgroundColor: force(
-                    semanticTokens.colors.insetPanelBgVariantA.default
-                )
-            },
-            '[data-theme="dark"] .sui-nav-item__link:hover': {
-                backgroundColor: force(
-                    semanticTokens.colors.insetPanelBgVariantA._dark
-                )
-            },
-            // Override menu styles (SaaSUI <select>).
-            ".chakra-menu__menu-list": {
-                backgroundColor: force(
-                    semanticTokens.colors.panelBg.default
-                ),
-                backdropFilter
-            },
-            ".chakra-menu__menuitem-option": {
-                backgroundColor: force(
-                    semanticTokens.colors.insetPanelBgVariantA.default
-                ),
-                backdropFilter
-            },
-            [".chakra-menu__menuitem-option:hover," +
-            '.chakra-menu__menuitem-option[aria-checked="true"]']: {
-                backgroundColor: force("transparent")
-            },
-            '[data-theme="dark"] .chakra-menu__menu-list': {
-                backgroundColor: force(
-                    semanticTokens.colors.panelBg._dark
-                ),
-                backdropFilter
             }
         }
     },
@@ -262,8 +154,7 @@ const theme = extendTheme(saasTheme, {
         Switch: {
             baseStyle: {
                 track: {
-                    bg: "insetPanelBg",
-                    backdropFilter
+                    bg: "offsetBg"
                 }
             }
         },
@@ -276,45 +167,19 @@ const theme = extendTheme(saasTheme, {
             }
         },
         Button: {
-            baseStyle: {
-                transition: "all 0.1s ease-in-out",
-                _hover: {
-                    transform: "scale(1.02)"
-                }
-            },
             variants: {
                 solid: {
-                    bg: "selection",
-                    backdropFilter,
-                    _hover: {
-                        bg: "selection"
-                    }
-                },
-                primary: {
                     bg: "offsetBg",
-                    color: "themeText",
-                    backdropFilter,
+                    transition: "none",
                     _hover: {
-                        bg: "selection"
+                        bg: "primary.500"
                     }
-                },
-                cta: {
-                    bg: "panelBg",
-                    color: "themeText",
-                    fontSize: "lg",
-                    p: 3,
-                    height: "auto",
-                    backdropFilter,
-                    _hover: {
-                        bg: "selection"
-                    },
-                    boxShadow: "raise"
                 }
             }
         },
         Divider: {
             baseStyle: {
-                borderColor: "lightBorder"
+                borderColor: "border"
             }
         },
         Input: {
@@ -341,58 +206,26 @@ const theme = extendTheme(saasTheme, {
                 outline: defaultInputVariant
             }
         },
-        Card: {
-            baseStyle: (props: StyleFunctionProps) => ({
-                container: {
-                    ...panelBaseStyles(props),
-                    borderStyle: "solid",
-                    borderWidth: 1,
-                    borderColor: "lightBorder"
-                }
-            })
-        },
-        Modal: {
-            baseStyle: (props: StyleFunctionProps) => ({
-                dialog: panelBaseStyles(props, "panelBgVariantB")
-            })
-        },
-        Tooltip: {
-            baseStyle: (props: StyleFunctionProps) => ({
-                ...panelBaseStyles(props),
-                borderRadius: "md",
-                zIndex: 5000
-            })
-        },
         Popover: {
             baseStyle: (props: StyleFunctionProps) => ({
                 content: {
-                    ...panelBaseStyles(props),
-                    borderColor: "lightBorder",
+                    borderColor: "border",
                     boxShadow: force(boxShadow),
-                    bg: props.colorMode == "dark" ?
-                        "#1d1d1dbf" : "#ffffffb3"
+                    bg: (
+                        props.colorMode == "dark" ?
+                            "#1d1d1d" : "#ffffff"
+                    )
                 },
                 arrow: {
-                    backgroundColor: props.colorMode == "dark" ?
-                        "#1d1d1dbf !important"
-                    :
-                        "#ffffffb3 !important"
+                    backgroundColor: (
+                        props.colorMode == "dark" ?
+                            force("#1d1d1d") : force("#ffffff")
+                    )
                 }
             })
         }
     }
 });
-
-// Compute toast backgrounds.
-const errorToastBg = (
-    makeColorWeights(semanticTokens.colors.error.default, 50)[200] + "d0"
-);
-const successToastBg = (
-    makeColorWeights(semanticTokens.colors.success.default, 20)[200] + "d0"
-);
-const warningToastBg = (
-    makeColorWeights(semanticTokens.colors.dndTarget.default, 20)[200] + "d0"
-);
 
 /**
 *   Theme provider mounted at the app root.
@@ -404,8 +237,8 @@ export const ThemedRoot = ({ children }: { children: ReactNode }) => {
             toastOptions={ {
                 defaultOptions: {
                     icon: (
-                        <Box mt="0.25rem">
-                            <Icon name="info" size="1rem"/>
+                        <Box mt={ 0.25 }>
+                            <Icon name="info" size={ 1 }/>
                         </Box>
                     ),
                     position: "top",
@@ -418,19 +251,19 @@ export const ThemedRoot = ({ children }: { children: ReactNode }) => {
             <style>{ `
                 .chakra-toast__inner > * {
                     background-color: ${
-                        semanticTokens.colors.panelBg.default
+                        semanticTokens.colors.offsetBg.default
                     } !important;
                     color: ${ semanticTokens.colors.themeText.default } !important;
                     backdrop-filter: blur(0px) !important;
                 }
                 .chakra-toast__inner > *[data-status="error"] {
-                    background-color: ${ errorToastBg } !important;
+                    background-color: ${ theme.colors.red[500] } !important;
                 }
                 .chakra-toast__inner > *[data-status="warning"] {
-                    background-color: ${ warningToastBg } !important;
+                    background-color: ${ theme.colors.yellow[500] } !important;
                 }
                 .chakra-toast__inner > *[data-status="success"] {
-                    background-color: ${ successToastBg } !important;
+                    background-color: ${ theme.colors.green[500] } !important;
                 }
                 .chakra-alert__icon {
                     color: ${ semanticTokens.colors.themeText.default } !important;
@@ -442,41 +275,6 @@ export const ThemedRoot = ({ children }: { children: ReactNode }) => {
             </Box>
         </SaasProvider>
     );
-};
-
-/**
-*   Returns a style object that fixes a dark theme bug in Chakra for panel backgrounds.
-*
-*   Use as:
-*   ```tsx
-*   const styles = usePanelStylesFix();
-* 
-*   // ...
-* 
-*   <Box {...styles}>
-*   ```
-*/
-export const usePanelStylesFix = (lowOpacity?: boolean) => {
-    const { colorMode } = useColorMode();
-
-    const convertValue = (value: string) => {
-        if (lowOpacity) return value.replace(/, [0-9.]+?\)/, ", 0.35)");
-        return value;
-    };
-
-    return useMemo(() => {
-        return {
-            sx: {
-                background: convertValue(
-                    colorMode == "dark" ?
-                        semanticTokens.colors.panelBg._dark
-                    :
-                        semanticTokens.colors.panelBg.default
-                ) + " !important"
-            },
-            backdropFilter
-        };
-    }, [colorMode]);
 };
 
 /**

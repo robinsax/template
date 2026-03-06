@@ -1,5 +1,5 @@
 import { deepEqual } from "@/util";
-import { APIClient } from "@/api";
+import { APIClient } from "@/api-client";
 
 type QueryState<R, P = null> = {
     fn: QueryFn<R, P>,

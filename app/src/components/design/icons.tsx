@@ -8,7 +8,7 @@ import React, { SVGAttributes, useMemo } from "react";
 import { MdDarkMode } from "react-icons/md";
 import {
     FaChevronUp, FaChevronDown, FaGlobeAmericas, FaChevronLeft, FaChevronRight, FaCog,
-    FaTrash, FaBell, FaInfoCircle
+    FaTrash, FaBell, FaInfoCircle, FaSignInAlt
 } from "react-icons/fa";
 import { BiSolidError } from "react-icons/bi";
 
@@ -27,7 +27,8 @@ const icons = {
     error: BiSolidError,
     delete: FaTrash,
     notifications: FaBell,
-    info: FaInfoCircle
+    info: FaInfoCircle,
+    login: FaSignInAlt
 };
 
 /**
@@ -51,7 +52,7 @@ export const safeIconName = (name: string): IconName => {
 */
 export const Icon = ({ name, color, ...props }: {
     name: IconName,
-    size?: string,
+    size?: string | number,
     color?: ThemeColor
 } & SVGAttributes<SVGSVGElement>) => {
     const Target = useMemo(() => icons[name], [name]);

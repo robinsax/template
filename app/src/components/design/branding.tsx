@@ -2,37 +2,28 @@
 *   Branding UI.
 */
 import React from "react";
-import { VStack, Heading, Text, Badge, Box } from "@chakra-ui/react";
+import { Heading, Badge, HStack } from "@chakra-ui/react";
 
 import config from "@/config";
 import { useI18n } from "@/hooks";
 
-export const Brand = ({ size }: { size?: "sm" | "lg" }) => {
+export const Brand = ({ variant }: { variant?: "sm" | "lg" }) => {
     const t = useI18n();
 
     return (
-        <VStack
-            width="full" alignItems="center"
-            spacing={ 1 }
-        >
-            <Box position="relative">
-                <Heading
-                    fontSize={ size == "sm" ? "1.5rem" : "3rem" }
-                    fontWeight="bold"
-                >
-                    { t(config.appName) }
-                </Heading>
-                <Badge
-                    colorScheme="blue" position="absolute"
-                    right="-8px" bottom="-7px"
-                    fontSize={ size == "sm" ? "0.5rem" : "0.75rem" }
-                >
-                    { t("Beta") }
-                </Badge>
-            </Box>
-            <Text variant="light" fontWeight="bold">
-                { t("by {owner}", { owner: t(config.ownerName) }) }
-            </Text>
-        </VStack>
+        <HStack>
+            <Heading
+                fontSize={ variant == "sm" ? "1.5rem" : "3rem" }
+                fontWeight="bold"
+            >
+                { t(config.appName) }
+            </Heading>
+            <Badge
+                bg="blue.500" color="gray.50"
+                fontSize={ variant == "sm" ? "0.6rem" : "0.75rem" }
+            >
+                { t("Beta") }
+            </Badge>
+        </HStack>
     );
 };

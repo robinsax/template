@@ -6,12 +6,13 @@ from typing import Optional
 from urllib.parse import unquote
 
 from backend.api import (
-    AuthResp, AuthParams, UserInviteParams, UserClaimParams,
-    UserGrantUpdateParams
+    AuthResp, AuthParams, UserRoleUpdateParams, UserRoleCreateParams
 )
 from backend.model import (
-    AuthKeyRestriction, UserModel, UserType, User, UserGrantModel, Role
+    AuthKeyRestriction, UserModel, User, UserRoleModel, Role
 )
+
+# AAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
 from ..base import StepsContext, step, any_of, output
 from ..fuzzy import make_name, make_num, make_valid_password, make_next_int
@@ -68,12 +69,12 @@ def _create_grant(
     if business_id:
         endpoint += "/businesses/" + business_id
 
-    resp: UserGrantModel = context.put(
+    resp: UserRoleModel = context.put(
         endpoint + "/users/" + user_id,
-        UserGrantUpdateParams(role=role)
+        UserRoleCreateParams(role=role)
     )
 
-    if str(resp.user_id) != user_id or str(resp.client_id) != client_id:
+    if str(resp.user_id) != user_id or str(resp.realm_id) != client_id:
         context.fail("Grant not created")
 
     return { "grant_id": resp.id }

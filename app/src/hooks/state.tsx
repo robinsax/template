@@ -6,7 +6,7 @@ import {
     MutationFn, QueryFn, StateEngine, createStateEngine, queryAuthState,
     queryLocalSettings
 } from "@/state";
-import { createAPIClient } from "@/api";
+import { createAPIClient } from "@/api-client";
 
 import { fireGlobalError } from "./errors";
 

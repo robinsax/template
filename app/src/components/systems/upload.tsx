@@ -7,10 +7,10 @@ import React, {
 } from "react";
 import { Input, useToast } from "@chakra-ui/react";
 
-import { useGrowOnHover } from "@/theme";
+import { APICallOptions } from "@/api-client";
 import { UploadModel, Permission } from "@/model";
 import {
-    APICallOptions, useAuthzCheck, useI18n
+    useAuthzCheck, useI18n
 } from "@/hooks";
 import { Clickable } from "@/components/design";
 

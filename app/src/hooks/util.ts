@@ -1,38 +1,10 @@
 /**
 *   Misc. utility hooks.
 */
-import { useEffect, useMemo, useState, useCallback, useRef } from "react";
+import { useEffect, useCallback, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { marked } from "marked";
 
 import { IDBCache, openIDBCache } from "@/util";
-
-/**
-*   An index state for tab or steps groups that maps to a query parameter with the given
-*   key, where each index is represented in the query string with the corresponding entry
-*   in `values`.
-*
-*   For example, allows a tab group to add, and respect, `?tab=my-tab` in the page URL.
-*/
-export const useQueryIndexState = (key: string, values: string[]) => {
-    const [searchParams] = useSearchParams();
-    const navigate = useNavigate();
-
-    const index = Math.max(0, values.indexOf(searchParams.get(key) || ""));
-
-    const onChange = (index: number) => {
-        navigate("?" + key + "=" + values[index]);
-    };
-
-    return { index, onChange };
-};
-
-/**
-*   Hook wrapper for `marked`.
-*/
-export const useMarkdown = (markdown: string) => {
-    return useMemo(() => marked(markdown) as string, [markdown]);
-};
 
 type WindowEventName = keyof WindowEventMap;
 type EventType<T extends WindowEventName> = WindowEventMap[T];
@@ -50,42 +22,6 @@ export const useWindowListener = <K extends WindowEventName>(
             window.removeEventListener(event, fn);
         };
     }, [fn, event]);
-};
-
-/**
-*   Returns a counter that increases from 0 at a rate of `coef` while `active` is true.
-*
-*   Useful for animations.
-*/
-export const useContinuousTick = ({ coef, active }: {
-    coef: number,
-    active: boolean
-}) => {
-    const [value, setValue] = useState(0);
-
-    useEffect(() => {
-        if (!active) return;
-
-        const rate = 25;
-        let stop = false;
-
-        let t = 0;
-        (async () => {
-            while (true) {
-                if (stop) return;
-
-                setValue(t += rate * coef);
-
-                await new Promise(resolve => setTimeout(resolve, rate));
-            }
-        })();
-
-        return () => {
-            stop = true;
-        };
-    }, [active]);
-
-    return value;
 };
 
 /**
@@ -135,6 +71,26 @@ export const useScrollTo = () => {
             });
         }, 500);
     }, []);
+};
+
+/**
+*   An index state for tab or steps groups that maps to a query parameter with the given
+*   key, where each index is represented in the query string with the corresponding entry
+*   in `values`.
+*
+*   For example, allows a tab group to add, and respect, `?tab=my-tab` in the page URL.
+*/
+export const useQueryIndexState = (key: string, values: string[]) => {
+    const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+
+    const index = Math.max(0, values.indexOf(searchParams.get(key) || ""));
+
+    const onChange = (index: number) => {
+        navigate("?" + key + "=" + values[index]);
+    };
+
+    return { index, onChange };
 };
 
 /**

@@ -1,7 +1,6 @@
 """
 Authentication endpoints.
 """
-from typing import Optional
 from datetime import timedelta
 from fastapi import Request, Depends
 from sqlalchemy.orm import Session
@@ -30,9 +29,9 @@ class AuthParams(Model):
 
     `restriction` can be set to generate a restricted key.
     """
-    email: Optional[str] = None
-    password: Optional[str] = None
-    restriction: Optional[AuthKeyRestriction] = None
+    email: str | None = None
+    password: str | None = None
+    restriction: AuthKeyRestriction | None = None
 
 class AuthResp(Model):
     """

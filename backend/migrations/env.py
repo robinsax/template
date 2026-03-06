@@ -3,7 +3,7 @@ from logging.config import fileConfig
 
 from alembic import context
 
-from backend.model import Base
+from backend.model import Mapper
 from backend.service import get_engine
 
 config = context.config
@@ -11,7 +11,7 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-target_metadata = Base.metadata
+target_metadata = Mapper.metadata
 
 def run_migrations_offline() -> None:
     """

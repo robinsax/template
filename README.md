@@ -3,7 +3,7 @@
 # Project Template
 
 Before starting, install the following and ensure they are in your `PATH`:
-- Python 3.11 (exact minor version)
+- Python 3.11+
 - Node 22+
 - Docker (with Compose)
 - Google Cloud SDK (authenticate and set project)
@@ -32,7 +32,7 @@ This repository is laid out as follows:
 
 The following general stacks are used:
 - Backend:
-    - Python 3.11
+    - Python 3
     - FastAPI
     - SQLAlchemy
     - Pydantic

@@ -5,12 +5,14 @@ import React, { ReactNode, UIEvent, useState, useCallback } from "react";
 import { Box, Flex, HStack, VStack, Spacer } from "@chakra-ui/react";
 import { AppShell, Persona } from "@saas-ui/react";
 
+import config from "@/config";
 import { useHideScrollbars } from "@/theme";
 import { useI18n, useQuery } from "@/hooks";
 import { queryCurrentUser } from "@/state";
-import { Icon, Brand } from "@/components/design";
+import { Icon, Brand, ClickableLink } from "@/components/design";
 
 import { AppSidebar } from "./sidebar";
+import { AppHeader } from "./header";
 import { LocaleSelect, ThemeToggle } from "./settings";
 
 /**
@@ -22,7 +24,9 @@ export const SplashScreen = ({ children }: { children: React.ReactNode }) => {
     const [user] = useQuery(queryCurrentUser);
 
     return (
-        <AppShell>
+        <AppShell
+            navbar={ <AppHeader/> }
+        >
             <VStack height="100vh">
                 <HStack p={ 4 } width="full" justifyContent="left" spacing={ 6 }>
                     { user && (
@@ -37,12 +41,18 @@ export const SplashScreen = ({ children }: { children: React.ReactNode }) => {
                         spacing={ 2 } fontSize="xs"
                         position="relative" top="0.5rem"
                     >
-                        <a href="/terms" target="_blank">
+                        <ClickableLink href="/terms" target="_blank">
                             { t("Terms") }
-                        </a>
-                        <a href="/privacy" target="_blank">
+                        </ClickableLink>
+                        <ClickableLink href="/privacy" target="_blank">
                             { t("Privacy") }
-                        </a>
+                        </ClickableLink>
+                        <Box
+                            fontSize="2xs"
+                            color="lightText"
+                        >
+                            { t(config.copyright) }
+                        </Box>
                     </HStack>
                     <Spacer/>
                     <LocaleSelect/>

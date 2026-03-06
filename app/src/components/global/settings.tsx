@@ -4,12 +4,12 @@
 import React from "react";
 import {
     HStack, Switch, Text, Popover, PopoverTrigger, PopoverContent, PopoverBody, Button,
-    VStack, PopoverArrow, Box, useColorMode
+    VStack, PopoverArrow, useColorMode
 } from "@chakra-ui/react";
 
 import { useQuery, useMutation, useI18n, supportedLocales } from "@/hooks";
 import { queryLocalSettings, mutateLocalSettings } from "@/state";
-import { Icon } from "@/components/design";
+import { Clickable, Icon } from "@/components/design";
 
 /**
 *   UI to toggle the theme.
@@ -38,22 +38,27 @@ export const LocaleSelect = () => {
     const [onSettingsChange] = useMutation(mutateLocalSettings);
 
     return (
-        <Popover>
+        <Popover placement="top-end">
             <PopoverTrigger>
                 <Button variant="ghost">
                     <Icon name="globe"/>
                 </Button>
             </PopoverTrigger>
-            <PopoverContent width="auto">
+            <PopoverContent width="240px">
                 <PopoverArrow/>
                 <PopoverBody>
                     <VStack spacing={ 1 }>
                         { supportedLocales.map(locale => (
-                            <Box
-                                width="full"
-                                p={ 2 }
+                            <Clickable
                                 key={ locale.key }
-                                onClick={ () => onSettingsChange({ locale: locale.key }) }
+                                width="full" px={ 2 } py={ 1 }
+                                active={
+                                    !!currentSettings &&
+                                    locale.key == currentSettings.locale
+                                }
+                                onClick={ () => onSettingsChange({
+                                    locale: locale.key
+                                }) }
                             >
                                 <Text
                                     position="relative"
@@ -62,7 +67,7 @@ export const LocaleSelect = () => {
                                 >
                                     { t(locale.label) }
                                 </Text>
-                            </Box>
+                            </Clickable>
                         )) }
                     </VStack>
                 </PopoverBody>

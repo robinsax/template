@@ -1,10 +1,10 @@
 import React from "react";
-import { Heading } from "@chakra-ui/react";
+import { Heading, Text } from "@chakra-ui/react";
 
 import { useI18n } from "@/hooks";
 import { SplashInfoScreen } from "@/components/global";
 
-export const Terms = () => {
+export default () => {
     const t = useI18n();
 
     return (
@@ -12,11 +12,9 @@ export const Terms = () => {
             <Heading>
                 { t("Terms of Service") }
             </Heading>
-            <Heading size="md">
-                { t("Not implemented yet.") }
-            </Heading>
+            <Text>
+                { t("Not authored yet.") }
+            </Text>
         </SplashInfoScreen>
     );
 };
-
-export default Terms;

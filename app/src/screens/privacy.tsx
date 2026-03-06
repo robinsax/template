@@ -4,18 +4,15 @@ import { Heading, Text } from "@chakra-ui/react";
 import { useI18n } from "@/hooks";
 import { SplashInfoScreen } from "@/components/global";
 
-export const Privacy = () => {
+export default () => {
     const t = useI18n();
 
     return (
         <SplashInfoScreen>
             <Heading>{ t("Privacy Policy") }</Heading>
-            { /* eslint-disable max-len */ }
             <Text>
-                { t("Not implemented yet.") }
+                { t("Not authored yet.") }
             </Text>
         </SplashInfoScreen>
     );
 };
-
-export default Privacy;

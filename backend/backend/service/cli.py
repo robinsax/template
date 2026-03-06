@@ -123,8 +123,10 @@ class CLI:
         Show help for the CLI.
         """
         keys = sorted(self.verbs.keys())
+
         for verb in keys:
             fn, opts = self.verbs[verb]
+            print("======")
             print(verb)
 
             for arg in opts.args:
@@ -139,10 +141,10 @@ class CLI:
 
             if fn.__doc__:
                 show_doc = fn.__doc__.rstrip()
-                if not opts.args:
-                    show_doc = show_doc[1:]
 
                 print(show_doc)
+            print()
+        print()
 
     def run(self, argv: list[str]):
         """
@@ -150,7 +152,7 @@ class CLI:
         """
         if len(argv) < 1:
             self._show_help()
-            raise CLIError(f"Usage: { self.root_verb } <command>")
+            raise CLIError(f"Usage: python { self.root_verb } <command>")
 
         fn, opts, args = self._parse_args(argv)
 

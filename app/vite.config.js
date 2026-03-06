@@ -4,6 +4,9 @@ import { defineConfig } from "vite";
 export default defineConfig({
     root: "src",
     publicDir: "public",
+    build: {
+        assetsDir: "assets"
+    },
     server: {
         port: 8000,
         host: true
