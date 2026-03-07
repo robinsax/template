@@ -18,14 +18,17 @@ import { LocaleSelect, ThemeToggle } from "./settings";
 /**
 *   Splash screen layout.
 */
-export const SplashScreen = ({ children }: { children: React.ReactNode }) => {
+export const SplashScreen = ({ children, noHeader = false }: {
+    children: React.ReactNode,
+    noHeader?: boolean
+}) => {
     const t = useI18n();
 
     const [user] = useQuery(queryCurrentUser);
 
     return (
         <AppShell
-            navbar={ <AppHeader/> }
+            navbar={ noHeader ? undefined : <AppHeader/> }
         >
             <VStack height="100vh">
                 <HStack p={ 4 } width="full" justifyContent="left" spacing={ 6 }>
@@ -55,8 +58,8 @@ export const SplashScreen = ({ children }: { children: React.ReactNode }) => {
                         </Box>
                     </HStack>
                     <Spacer/>
-                    <LocaleSelect/>
                     <ThemeToggle/>
+                    <LocaleSelect/>
                 </HStack>
             </VStack>
         </AppShell>

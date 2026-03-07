@@ -19,11 +19,11 @@ export const ThemeToggle = () => {
 
     return (
         <HStack justifyContent="right">
+            <Icon name="darkTheme"/>
             <Switch
                 isChecked={ colorMode == "dark" }
                 onChange={ toggleColorMode }
             />
-            <Icon name="darkTheme"/>
         </HStack>
     );
 };
@@ -52,6 +52,8 @@ export const LocaleSelect = () => {
                             <Clickable
                                 key={ locale.key }
                                 width="full" px={ 2 } py={ 1 }
+                                activeColor="offsetBg"
+                                variant="solid"
                                 active={
                                     !!currentSettings &&
                                     locale.key == currentSettings.locale

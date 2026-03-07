@@ -23,6 +23,19 @@ const boxShadow = "0px 0px 5px 2px #0000000d";
 
 const semanticTokens = {
     colors: {
+        // Chakra tokens.
+        "chakra-border-color": {
+            default: "gray.300",
+            _dark: "gray.700"
+        },
+        "chakra-body-bg": {
+            default: "gray.200",
+            _dark: "gray.800"
+        },
+        "chakra-body-text": {
+            default: "gray.800",
+            _dark: "gray.200"
+        },
         // Selection colors.
         selection: {
             default: "primary.500",
@@ -37,16 +50,12 @@ const semanticTokens = {
             default: "green.500"
         },
         // Text colors.
-        themeText: {
-            default: "gray.800",
-            _dark: "gray.200"
-        },
         lightText: {
             default: "gray.500"
         },
         // Border colors.
         border: {
-            default: "gray.200",
+            default: "gray.300",
             _dark: "gray.700"
         },
         // Background colors.
@@ -115,9 +124,7 @@ const theme = extendTheme(saasTheme, {
             },
             // Default styles.
             "body": {
-                overflowY: force("hidden"),
-                color: "themeText",
-                bg: "primaryBg"
+                overflowY: force("hidden")
             },
             // Global scroll policy.
             ".saas-app-shell__main": {
@@ -171,8 +178,11 @@ const theme = extendTheme(saasTheme, {
                 solid: {
                     bg: "offsetBg",
                     transition: "none",
+                    border: "1px solid",
+                    borderColor: "chakra-border-color",
                     _hover: {
-                        bg: "primary.500"
+                        bg: "primary.500",
+                        borderColor: "primary.500"
                     }
                 }
             }
@@ -211,16 +221,14 @@ const theme = extendTheme(saasTheme, {
                 content: {
                     borderColor: "border",
                     boxShadow: force(boxShadow),
-                    bg: (
-                        props.colorMode == "dark" ?
-                            "#1d1d1d" : "#ffffff"
-                    )
+                    bg: "primaryBg"
                 },
                 arrow: {
-                    backgroundColor: (
-                        props.colorMode == "dark" ?
-                            force("#1d1d1d") : force("#ffffff")
-                    )
+                    bg: force(
+                        props.colorMode === "dark" ?
+                            theme.colors.gray[800] : theme.colors.gray[200]
+                    ),
+                    borderColor: "border"
                 }
             })
         }
@@ -247,28 +255,6 @@ export const ThemedRoot = ({ children }: { children: ReactNode }) => {
                 }
             } }
         >
-            { /* This is the only way to style toasts that I could find... */ }
-            <style>{ `
-                .chakra-toast__inner > * {
-                    background-color: ${
-                        semanticTokens.colors.offsetBg.default
-                    } !important;
-                    color: ${ semanticTokens.colors.themeText.default } !important;
-                    backdrop-filter: blur(0px) !important;
-                }
-                .chakra-toast__inner > *[data-status="error"] {
-                    background-color: ${ theme.colors.red[500] } !important;
-                }
-                .chakra-toast__inner > *[data-status="warning"] {
-                    background-color: ${ theme.colors.yellow[500] } !important;
-                }
-                .chakra-toast__inner > *[data-status="success"] {
-                    background-color: ${ theme.colors.green[500] } !important;
-                }
-                .chakra-alert__icon {
-                    color: ${ semanticTokens.colors.themeText.default } !important;
-                }
-            ` }</style>
             <Box height="100vh" width="full">
                 <ColorModeScript initialColorMode={ theme.config.initialColorMode }/>
                 { children }

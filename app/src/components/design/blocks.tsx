@@ -9,7 +9,7 @@ export type ClickableProps<T extends "span" | "a"> = HTMLChakraProps<T> & {
     active?: boolean,
     disableActive?: boolean,
     activeColor?: string,
-    presentation?: "underline" | "background"
+    variant?: "underline" | "solid"
 };
 
 const createClickable = <T extends "span" | "a">(type: T) => {
@@ -20,16 +20,16 @@ const createClickable = <T extends "span" | "a">(type: T) => {
                 active = false,
                 disableActive = false,
                 activeColor = "primary.200",
-                presentation = "underline"
+                variant = "underline"
             } = props as unknown as (
                 ClickableProps<T> & { theme: Record<string, Record<string, unknown>> }
             );
 
             const resolvedColor = get(theme.colors, activeColor, activeColor);
 
-            const bgRule = presentation == "background" ? activeColor : "transparent";
+            const bgRule = variant == "solid" ? activeColor : "transparent";
             const borderBottomRule = (
-                presentation == "underline" ? `2px solid ${resolvedColor}` : "none"
+                variant == "underline" ? `2px solid ${resolvedColor}` : "none"
             );
 
             return {
@@ -37,6 +37,7 @@ const createClickable = <T extends "span" | "a">(type: T) => {
                 cursor: !disableActive ? "pointer" : "inherit",
                 bg: (active && !disableActive) ? bgRule : "transparent",
                 borderBottom: (active && !disableActive) ? borderBottomRule : "none",
+                borderRadius: variant == "solid" ? "sm" : "none",
                 _hover: {
                     bg: !disableActive ? bgRule : "transparent",
                     borderBottom: !disableActive ? borderBottomRule : "none"

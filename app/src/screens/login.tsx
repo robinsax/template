@@ -6,6 +6,7 @@ import { useMutation } from "@/hooks";
 import { mutateAuthStateLogIn } from "@/state";
 import { SplashScreen } from "@/components/global";
 import { useFormSystem } from "@/components/systems";
+import { Brand } from "@/components/design";
 
 export default () => {
     const {
@@ -20,12 +21,16 @@ export default () => {
     const [onAttempt] = useMutation(mutateAuthStateLogIn);
 
     return (
-        <SplashScreen>
-            <VStack width={ 80 }>
+        <SplashScreen noHeader>
+            <VStack width={ 80 } spacing={ 4 }>
+                <Brand/>
                 <FormProvider onSubmit={ onAttempt }>
                     <FormFields names={["email", "password"]} />
                     <FormError />
-                    <FormSubmit label={ t => t("Login") }/>
+                    <FormSubmit
+                        label={ t => t("Log In") }
+                        iconName="login"
+                    />
                 </FormProvider>
             </VStack>
         </SplashScreen>
