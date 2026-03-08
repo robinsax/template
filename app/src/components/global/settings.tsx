@@ -1,30 +1,27 @@
 /**
 *   Settings control components. 
 */
-import React from "react";
-import {
-    HStack, Switch, Text, Popover, PopoverTrigger, PopoverContent, PopoverBody, Button,
-    VStack, PopoverArrow, useColorMode
-} from "@chakra-ui/react";
-
 import { useQuery, useMutation, useI18n, supportedLocales } from "@/hooks";
 import { queryLocalSettings, mutateLocalSettings } from "@/state";
-import { Clickable, Icon } from "@/components/design";
+import { Icon, Stack, Switch } from "@/components/base";
 
 /**
 *   UI to toggle the theme.
 */
 export const ThemeToggle = () => {
-    const { colorMode, toggleColorMode } = useColorMode();
+    const [currentSettings] = useQuery(queryLocalSettings);
+    const [onSettingsChange] = useMutation(mutateLocalSettings);
 
     return (
-        <HStack justifyContent="right">
+        <Stack layout="horizontal" justify="end">
             <Icon name="darkTheme"/>
             <Switch
-                isChecked={ colorMode == "dark" }
-                onChange={ toggleColorMode }
+                active={ !!currentSettings && currentSettings.darkTheme }
+                onChange={ () => onSettingsChange({
+                    darkTheme: !currentSettings?.darkTheme
+                }) }
             />
-        </HStack>
+        </Stack>
     );
 };
 
@@ -38,6 +35,8 @@ export const LocaleSelect = () => {
     const [onSettingsChange] = useMutation(mutateLocalSettings);
 
     return (
+        <></>
+        /*
         <Popover placement="top-end">
             <PopoverTrigger>
                 <Button variant="ghost">
@@ -75,5 +74,6 @@ export const LocaleSelect = () => {
                 </PopoverBody>
             </PopoverContent>
         </Popover>
+        */
     );
 };

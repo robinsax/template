@@ -10,7 +10,7 @@ import {
     I18nValueFn, useI18n, useMutation, useQuery
 } from "@/hooks";
 import { mutateClearNotifications, queryNotifications } from "@/state";
-import { Icon, ClickableLink, Clickable } from "@/components/design";
+import { Icon, ClickableLink, Clickable } from "@/components/base";
 
 // Presentations per type.
 type NotificationPresentation = {

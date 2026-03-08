@@ -5,22 +5,21 @@
 *   This is important because of fetched state providers, and also allows more graceful
 *   loading states.
 */
-import React from "react";
 import { createRoot } from "react-dom/client";
 
 import { I18nProvider, StateEngineProvider } from "@/hooks";
 import { Router } from "@/routing";
-import { ThemedRoot } from "@/theme";
+import { ThemeRoot } from "@/theme";
 
 export const App = () => {
     return (
-        <ThemedRoot>
-            <StateEngineProvider>
+        <StateEngineProvider>
+            <ThemeRoot>
                 <I18nProvider>
                     <Router/>
                 </I18nProvider>
-            </StateEngineProvider>
-        </ThemedRoot>
+            </ThemeRoot>
+        </StateEngineProvider>
     );
 };
 

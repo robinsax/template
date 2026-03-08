@@ -1,38 +1,59 @@
-import React from "react";
-import { VStack } from "@chakra-ui/react";
+import { useEffect } from "react";
 
-import { AuthParams } from "@/model";
-import { useMutation } from "@/hooks";
-import { mutateAuthStateLogIn } from "@/state";
-import { SplashScreen } from "@/components/global";
-import { useFormSystem } from "@/components/systems";
-import { Brand } from "@/components/design";
+import { useForm, useI18n, useQuery, useSetRoute } from "@/hooks";
+import { LogInCredentials, mutateAuthStateLogIn, queryCurrentUser } from "@/state";
+import { Brand, SplashScreen } from "@/components/global";
+import { Alert, Button, Input, Label, Stack } from "@/components/base";
 
 export default () => {
-    const {
-        FormProvider, FormFields, FormError, FormSubmit
-    } = useFormSystem<Omit<AuthParams, "restriction">>({
-        fields: {
-            email: { type: "text", label: t => t("Email") },
-            password: { type: "password", label: t => t("Password") },
-        }
-    });
+    const t = useI18n();
+    const setRoute = useSetRoute();
 
-    const [onAttempt] = useMutation(mutateAuthStateLogIn);
+    const [user] = useQuery(queryCurrentUser);
+
+    useEffect(() => {
+        if (user) setRoute("home");
+    }, [user, setRoute]);
+
+    const [
+        values, setValue, onSubmit, working, error
+    ] = useForm<LogInCredentials>(mutateAuthStateLogIn, {
+        email: "",
+        password: ""
+    }, {
+        invalid_credential: t => t("Incorrect email or password"),
+    });
 
     return (
         <SplashScreen noHeader>
-            <VStack width={ 80 } spacing={ 4 }>
+            <Stack width={ 80 } gap={ 4 }>
                 <Brand/>
-                <FormProvider onSubmit={ onAttempt }>
-                    <FormFields names={["email", "password"]} />
-                    <FormError />
-                    <FormSubmit
-                        label={ t => t("Log In") }
-                        iconName="login"
-                    />
-                </FormProvider>
-            </VStack>
+                { error && (
+                    <Alert type="error">
+                        { error }
+                    </Alert>
+                ) }
+                <Label forName="email">
+                    { t("Email") }
+                </Label>
+                <Input
+                    type="text" name="email"
+                    value={ values.email }
+                    onChange={ (value) => setValue("email", value) }
+                />
+                <Label forName="password">
+                    { t("Password") }
+                </Label>
+                <Input
+                    type="password" name="password"
+                    value={ values.password }
+                    onChange={ (value) => setValue("password", value) }
+                />
+                <Button
+                    working={ working }
+                    onClick={ onSubmit }
+                />
+            </Stack>
         </SplashScreen>
     );
 };

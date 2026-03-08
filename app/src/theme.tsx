@@ -1,306 +1,122 @@
 /**
 *   Theme definition with related providers and hooks.
 */
-import React, { ReactNode, useMemo } from "react";
-import {
-    Box, ColorModeScript, StyleFunctionProps, extendTheme, useColorMode
-} from "@chakra-ui/react";
-import { SaasProvider } from "@saas-ui/react";
-import { theme as saasTheme } from "@saas-ui/theme";
-import { TinyColor } from "@ctrl/tinycolor";
+import { ReactNode, useMemo } from "react";
+import { Global, css } from "@emotion/react";
 
-// Specific to prevent circular import.
-import { Icon } from "./components/design/icons";
+import { useQuery } from "./hooks";
+import { queryLocalSettings } from "./state";
 
 import "@fontsource/lexend";
 import "@fontsource/manrope";
 import "@fontsource/ibm-plex-mono";
 
-// Chakra theme.
-const force = (value: string) => value + " !important";
-
-const boxShadow = "0px 0px 5px 2px #0000000d";
-
-const semanticTokens = {
+export const theme = {
+    grid: [1, "rem"],
     colors: {
-        // Chakra tokens.
-        "chakra-border-color": {
-            default: "gray.300",
-            _dark: "gray.700"
-        },
-        "chakra-body-bg": {
-            default: "gray.200",
-            _dark: "gray.800"
-        },
-        "chakra-body-text": {
-            default: "gray.800",
-            _dark: "gray.200"
-        },
-        // Selection colors.
-        selection: {
-            default: "primary.500",
-        },
-        error: {
-            default: "red.500"
-        },
-        warning: {
-            default: "yellow.500"
-        },
-        success: {
-            default: "green.500"
-        },
-        // Text colors.
-        lightText: {
-            default: "gray.500"
-        },
-        // Border colors.
-        border: {
-            default: "gray.300",
-            _dark: "gray.700"
-        },
-        // Background colors.
-        primaryBg: {
-            default: "gray.200",
-            _dark: "gray.800"
-        },
-        offsetBg: {
-            default: "gray.300",
-            _dark: "gray.700"
-        }
+        primary: ["#3c9ee0"],
+        error: ["#db5838"],
+        warning: ["#eddb3d"],
+        success: ["#39d780"],
+        background: ["#e6e6e6", "#333333"],
+        text: ["#333333", "#e6e6e6"],
+        border: ["#cccccc"],
+        subtle: ["#999999", "#666666"]
     },
     shadows: {
-        light: "0px 0px 5px 2px #0000000d",
-        selection: "0px 0px 5px 2px #D3B6A91a"
-    }
-};
-
-const defaultInputVariant = {
-    bg: "offsetBg",
-    border: "1px solid",
-    borderColor: "border"
-};
-
-const makeColorWeights = (color: string) => {
-    const tc = new TinyColor(color);
-    const scale: Record<number, string> = {};
-    const steps = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
-
-    for (let i = 0; i < steps.length; i++) {
-        const amount = (i - 4);
-        let sc = tc.clone();
-
-        if (amount < 0) sc = sc.lighten(-amount);
-        else sc = sc.darken(amount * 2);
-
-        scale[steps[i]] = sc.toHexString();
-    }
-
-    return scale;
-};
-
-const theme = extendTheme(saasTheme, {
-    config: {
-        useSystemColorMode: true
+        normalDrop: ["0px 0px 5px 2px #0000000d"]
     },
-    semanticTokens,
     fonts: {
-        heading: "Lexend, sans-serif",
-        body: "Manrope, sans-serif",
-        mono: "IBM Plex Mono, monospace"
+        body: ["Manrope, sans-serif"],
+        heading: ["Lexend, sans-serif"],
+        mono: ["IBM Plex Mono, monospace"]
     },
-    colors: {
-        primary: makeColorWeights("#3c9ee0"),
-        red: makeColorWeights("#db5838"),
-        green: makeColorWeights("#39d780"),
-        blue: makeColorWeights("#3c9ee0"),
-        yellow: makeColorWeights("#eddb3d")
-    },
-    styles: {
-        global: {
-            // Remove default Chakra outlines.
-            '*:focus, [aria-expanded="true"]': {
-                boxShadow: force("none"),
-                outline: force("none"),
-            },
-            // Default styles.
-            "body": {
-                overflowY: force("hidden")
-            },
-            // Global scroll policy.
-            ".saas-app-shell__main": {
-                minWidth: force("950px")
-            },
-            // Prevent autofill styles.
-            "input:-webkit-autofill, input:-webkit-autofill:focus": {
-                color: force("black")
-            },
-            '[data-theme="dark"] input:-webkit-autofill, [data-theme="dark"] input:-webkit-autofill:focus': { // eslint-disable-line
-                color: force("white")
-            }
-        }
-    },
-    components: {
-        Alert: {
-            baseStyle: {
-                container: {
-                    fontSize: "sm",
-                    backgroundOpacity: 0.5
-                }
-            }
-        },
-        Badge: {
-            baseStyle: (props: StyleFunctionProps) => {
-                const { colorScheme, colorMode } = props;
-
-                return {
-                    bg: colorScheme + (colorMode == "dark" ? ".500" : ".200"),
-                    color: colorScheme + (colorMode == "dark" ? ".50" : ".600")
-                };
-            }
-        },
-        Switch: {
-            baseStyle: {
-                track: {
-                    bg: "offsetBg"
-                }
-            }
-        },
-        Text: {
-            variants: {
-                light: {
-                    color: "lightText",
-                    fontSize: "xs"
-                }
-            }
-        },
-        Button: {
-            variants: {
-                solid: {
-                    bg: "offsetBg",
-                    transition: "none",
-                    border: "1px solid",
-                    borderColor: "chakra-border-color",
-                    _hover: {
-                        bg: "primary.500",
-                        borderColor: "primary.500"
-                    }
-                }
-            }
-        },
-        Divider: {
-            baseStyle: {
-                borderColor: "border"
-            }
-        },
-        Input: {
-            variants: {
-                outline: {
-                    field: defaultInputVariant
-                },
-                flushed: {
-                    field: {
-                        borderColor: "lightText"
-                    }
-                }
-            }
-        },
-        Select: {
-            variants: {
-                outline: {
-                    field: defaultInputVariant
-                }
-            }
-        },
-        Textarea: {
-            variants: {
-                outline: defaultInputVariant
-            }
-        },
-        Popover: {
-            baseStyle: (props: StyleFunctionProps) => ({
-                content: {
-                    borderColor: "border",
-                    boxShadow: force(boxShadow),
-                    bg: "primaryBg"
-                },
-                arrow: {
-                    bg: force(
-                        props.colorMode === "dark" ?
-                            theme.colors.gray[800] : theme.colors.gray[200]
-                    ),
-                    borderColor: "border"
-                }
-            })
-        }
+    fontSizes: {
+        xs: ["0.75rem"],
+        sm: ["0.875rem"],
+        md: ["1rem"],
+        lg: ["2rem"],
+        xl: ["3rem"]
     }
-});
+};
 
-/**
-*   Theme provider mounted at the app root.
-*/
-export const ThemedRoot = ({ children }: { children: ReactNode }) => {
+type _Theme = typeof theme;
+export type Theme = {
+    color: keyof _Theme["colors"],
+    shadow: keyof _Theme["shadows"],
+    font: keyof _Theme["fonts"],
+    fontSize: keyof _Theme["fontSizes"]
+};
+
+const writeVariables = (index: number) => {
+    const group = (
+        object: Record<string, string[]>, prefix: string, index: number
+    ) => (
+        Object.keys(object).map(key => (
+            `--${ prefix }-${ key }: ${ object[key][index] || object[key][0] }`
+        )).join('\n')
+    );
+
+    return [
+        group(theme.colors, 'c', index),
+        group(theme.shadows, 's', index),
+        group(theme.fonts, 'f', index),
+        group(theme.fontSizes, 'fs', index)
+    ].join('\n');
+};
+
+const baseStylesheet = css`
+    body {
+        ${ writeVariables(0) }
+    }
+    body[data-theme="dark"] {
+        ${ writeVariables(1) }
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0px;
+        padding: 0px;
+        border-color: var(--c-border);
+    }
+
+    body {
+        font-family: var(--f-body);
+        font-size: var(--fs-md);
+        color: var(--c-text);
+        background-color: var(--c-background);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--f-heading);
+    }
+`;
+
+export const ThemeRoot = ({ children }: { children: ReactNode }) => {
+    const [localSettings] = useQuery(queryLocalSettings);
+
+    useMemo(() => {
+        if (localSettings && localSettings.darkTheme) {
+            document.body.setAttribute('data-theme', 'dark');
+        } else {
+            document.body.removeAttribute('data-theme');
+        }
+    }, [localSettings]);
+
     return (
-        <SaasProvider
-            theme={ theme }
-            toastOptions={ {
-                defaultOptions: {
-                    icon: (
-                        <Box mt={ 0.25 }>
-                            <Icon name="info" size={ 1 }/>
-                        </Box>
-                    ),
-                    position: "top",
-                    duration: 5000,
-                    isClosable: true
-                }
-            } }
-        >
-            <Box height="100vh" width="full">
-                <ColorModeScript initialColorMode={ theme.config.initialColorMode }/>
-                { children }
-            </Box>
-        </SaasProvider>
+        <>
+            <Global styles={ baseStylesheet }/>
+            { children }
+        </>
     );
 };
 
-/**
-*   The set of color keys defined in the theme.
-*/
-export type ThemeColor = keyof typeof semanticTokens.colors;
-
-/**
-*   Returns the corresponding color for the given `themeKey` as a hex or rgba() string.
-*/
-export const useThemeColor = (themeKey: ThemeColor) => {
-    const { colorMode } = useColorMode();
+export const useThemeColor = (color: Theme["color"]) => {
+    const [localSettings] = useQuery(queryLocalSettings);
 
     return useMemo(() => {
-        return (
-            colorMode == "dark" ?
-                "_dark" in semanticTokens.colors[themeKey] ?
-                    semanticTokens.colors[themeKey]._dark
-                :
-                    semanticTokens.colors[themeKey].default
-            :
-                semanticTokens.colors[themeKey].default
-        ) as string;
-    }, [colorMode, themeKey]);
-};
+        const index = localSettings && localSettings.darkTheme ? 1 : 0;
 
-export const useDarkTheme = () => {
-    const { colorMode } = useColorMode();
-
-    return colorMode == "dark";
-};
-
-export const useHideScrollbars = () => {
-    return useMemo(() => {
-        return {
-            sx: {
-                "&::-webkit-scrollbar": { display: "none" },
-                scrollbarWidth: "none",
-                msOverflowStyle: "none",
-            }
-        };
-    }, []);
+        return theme.colors[color][index] || theme.colors[color][0];
+    }, [localSettings, color]);
 };

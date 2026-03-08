@@ -1,4 +1,4 @@
-import React, { ComponentType, useEffect, useState } from "react";
+import { ComponentType, useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 export const routes = {

@@ -5,9 +5,20 @@ import { useEffect, useCallback, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
 import { IDBCache, openIDBCache } from "@/util";
+import { RouteKey } from "@/routing";
 
 type WindowEventName = keyof WindowEventMap;
 type EventType<T extends WindowEventName> = WindowEventMap[T];
+
+export const useSetRoute = () => {
+    const navigate = useNavigate();
+
+    const setRoute = useCallback((route: RouteKey) => {
+        navigate(route);
+    }, [navigate]);
+
+    return setRoute;
+};
 
 /**
 *   Hook to register a window-level event listener until unmount.

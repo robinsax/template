@@ -1,11 +1,12 @@
 /**
 *   Drag and drop component system using cursor-based hit detection.
 */
-import React, {
+import {
     ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useRef,
     forwardRef, useState
 } from "react";
-import { Box, ChakraProps, Portal } from "@chakra-ui/react";
+
+import { BlockStyles, Box } from "./blocks";
 
 /**
 *   Handler for drop-related events.
@@ -234,7 +235,7 @@ export const createDragDropSystem = <T,>() => {
                 startDrag 
             }}>
                 { children }
-                { dragPreview && <Portal>
+                { dragPreview && (
                     <Box
                         position="fixed"
                         left={ `${dragPreview.x}px` }
@@ -246,7 +247,7 @@ export const createDragDropSystem = <T,>() => {
                     >
                         {dragPreview.element}
                     </Box>
-                </Portal>}
+                ) }
             </context.Provider>
         );
     };
@@ -257,7 +258,7 @@ export const createDragDropSystem = <T,>() => {
         data: T,
         onDrag?: () => void,
         onDrop?: () => void
-    } & ChakraProps) => {
+    } & BlockStyles) => {
         const { registerDrag, startDrag } = useContext(context);
         const [isDragging, setIsDragging] = useState(false);
 
@@ -284,12 +285,12 @@ export const createDragDropSystem = <T,>() => {
         return (
             <Box
                 onMouseDown={ handleMouseDown }
-                style={{
-                    transform: isDragging 
+                transform={
+                    isDragging 
                         ? `rotate(3deg) ${extraTransform || ""}` 
-                        : extraTransform || "",
-                    cursor: isDragging ? "grabbing" : "grab"
-                }}
+                        : extraTransform || ""
+                }
+                cursor={ isDragging ? "grabbing" : "grab" }
                 userSelect="none"
                 { ...props }
             >
@@ -304,7 +305,7 @@ export const createDragDropSystem = <T,>() => {
         onDrop: DropHandlerFn<T>,
         onDraggingChanged?: DropHandlerFn<T | null>,
         onHoverChanged?: (hovered: boolean) => void
-    } & ChakraProps>(({
+    } & BlockStyles>(({
         children, onOver, onDrop, onDraggingChanged, onHoverChanged, ...props
     }, forwardedRef) => {
         const contextValue = useContext(context);

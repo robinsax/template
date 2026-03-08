@@ -2,15 +2,15 @@
 *   Component system for type safe presentation of lists of models with good out of the
 *   box behavior.
 */
-import React, {
+import {
     ReactNode, ComponentType, Fragment, createContext, useMemo, useState, useContext,
     useEffect
 } from "react";
-import { VStack, Input, Box, Text, Flex } from "@chakra-ui/react";
 
 import { I18nFn, I18nValueFn, useI18n } from "@/hooks";
 import { BaseModel } from "@/model";
-import { LoadIndicator } from "@/components/design";
+
+import { Box, Text, Input, LoadIndicator, Stack } from "./blocks";
 
 // Spec.
 /**
@@ -145,30 +145,29 @@ export const createListSystem = <T extends BaseModel>({
                 { data ? (
                     children
                 ) : (
-                    <Flex minH="10rem" justifyContent="center" alignItems="center">
+                    <Stack minHeight="10rem" justifyContent="center" alignItems="center">
                         <LoadIndicator/>
-                    </Flex>
+                    </Stack>
                 )}
             </context.Provider>
         );
     };
 
     const ListFilterInput = ({ label }: ListFilterInputProps) => {
-        const t = useI18n();
         const { filterTerm, setFilterTerm } = useData();
 
         return (
             <Input
-                placeholder={ label ? label(t) : t("Type to search...") }
+                placeholder={ t => label ? label(t) : t("Type to search...") }
                 value={ filterTerm }
-                onChange={ e => setFilterTerm(e.target.value) }
+                onChange={ setFilterTerm }
             />
         );
     };
 
     const List = ({
         children, maxItems, filter: filterProp, emptyLabel, emptyLabelAlign,
-        emptyView, noLayout, spacing, initialOrder
+        emptyView, initialOrder
     }: ListProps<T>) => {
         const t = useI18n();
         const { data, filterTerm } = useData();
@@ -217,7 +216,7 @@ export const createListSystem = <T extends BaseModel>({
             emptyLabel || specEmptyLabel
         ), [emptyLabel, specEmptyLabel]);
 
-        const inner = (
+        return (
             slicedData.length ? (
                 <>
                     <>
@@ -229,7 +228,7 @@ export const createListSystem = <T extends BaseModel>({
                     </>
                     { slicedData.length < filteredData.length && (
                         <Box width="full" textAlign="center">
-                            <Text variant="light">
+                            <Text color="subtle">
                                 { t("{count} more...", {
                                     count: filteredData.length - slicedData.length
                                 }) }
@@ -244,7 +243,7 @@ export const createListSystem = <T extends BaseModel>({
                         py={ 2 }
                         textAlign={ emptyLabelAlign || "center" }
                     >
-                        <Text variant="light">
+                        <Text color="subtle">
                             { filterTerm ? (
                                 t("No results.")
                             ) : (
@@ -257,16 +256,6 @@ export const createListSystem = <T extends BaseModel>({
                         </Text>
                     </Box>
                 )
-            )
-        );
-
-        return (
-            noLayout ? (
-                inner
-            ) : (
-                <VStack width="full" spacing={ spacing || 2 } alignItems="left">
-                    { inner }
-                </VStack>
             )
         );
     };

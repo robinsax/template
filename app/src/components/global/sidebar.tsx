@@ -1,19 +1,14 @@
 /**
 *   Global application sidebar. 
 */
-import React, { useState } from "react";
-import {
-    HStack, Spacer, Divider, VStack, Box, Popover, PopoverTrigger, PopoverContent,
-    PopoverBody, PopoverArrow, Portal
-} from "@chakra-ui/react";
-import { NavGroup, NavItem, Persona, Sidebar, SidebarSection } from "@saas-ui/react";
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 import {
     useAuthzCheck, useI18n, useWindowListener, useQuery, useMutation
 } from "@/hooks";
 import { mutateLocalSettings, queryLocalSettings } from "@/state";
-import { Icon, Brand } from "@/components/design";
+import { Icon, Brand } from "@/components/base";
 
 import { ThemeToggle, LocaleSelect } from "./settings";
 
@@ -48,6 +43,8 @@ export const AppSidebar = () => {
         </>
     );
     return (
+        <></>
+        /*
         <Sidebar
             position="relative"
             borderRight="solid 1px"
@@ -150,5 +147,6 @@ export const AppSidebar = () => {
                 </>
             ) }
         </Sidebar>
+        */
     );
 };

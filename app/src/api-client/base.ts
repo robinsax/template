@@ -2,18 +2,12 @@
 *   API client internals. 
 */
 import config from "@/config";
+import { MutationError } from "@/errors";
 
 /**
 *   Thrown when an API call fails.
 */
-export class APIError extends Error {
-    detail: string;
-
-    constructor(detail: string) {
-        super(detail);
-        this.detail = detail;
-    }
-};
+export class APIError extends MutationError {};
 
 export type APICallMethod = "get" | "post" | "put" | "delete";
 

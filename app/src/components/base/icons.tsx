@@ -4,7 +4,7 @@
 *
 *   Using an icon set ensures icons are consistent throughout the app.
 */
-import React, { SVGAttributes, useMemo } from "react";
+import { SVGAttributes, useMemo } from "react";
 import { MdDarkMode } from "react-icons/md";
 import {
     FaChevronUp, FaChevronDown, FaGlobeAmericas, FaChevronLeft, FaChevronRight, FaCog,
@@ -13,7 +13,7 @@ import {
 import { BiSolidError } from "react-icons/bi";
 
 import { throwOrFallback } from "@/util";
-import { ThemeColor, useThemeColor } from "@/theme";
+import { Theme, useThemeColor } from "@/theme";
 
 // Icons manifest.
 const icons = {
@@ -53,7 +53,7 @@ export const safeIconName = (name: string): IconName => {
 export const Icon = ({ name, color, ...props }: {
     name: IconName,
     size?: string | number,
-    color?: ThemeColor
+    color?: Theme["color"]
 } & SVGAttributes<SVGSVGElement>) => {
     const Target = useMemo(() => icons[name], [name]);
     if (!Target) return throwOrFallback("Icon not found: " + name, null);

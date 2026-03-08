@@ -5,6 +5,7 @@ import { AuthParams } from "@/model";
 
 export type LocalSettings = {
     sidebarCollapsed: boolean,
+    darkTheme: boolean,
     locale: I18nLocaleKey
 };
 
@@ -15,6 +16,7 @@ export const queryLocalSettings = (): LocalSettings => {
 
     return {
         sidebarCollapsed: false,
+        darkTheme: false,
         locale: "en_US"
     };
 };
@@ -53,8 +55,10 @@ export const mutateAuthState = (
     context.invalidate(queryAuthState);
 };
 
+export type LogInCredentials = Omit<AuthParams, "restriction">;
+
 export const mutateAuthStateLogIn = async (
-    context: MutationContext, creds: Omit<AuthParams, "restriction">
+    context: MutationContext, creds: LogInCredentials
 ) => {
     const resp = await context.api.auth.post({
         ...creds,

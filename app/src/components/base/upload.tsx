@@ -12,7 +12,7 @@ import { UploadModel, Permission } from "@/model";
 import {
     useAuthzCheck, useI18n
 } from "@/hooks";
-import { Clickable } from "@/components/design";
+import { Clickable } from "@/components/base";
 
 import { useEnableStateCheck } from "./actions";
 
