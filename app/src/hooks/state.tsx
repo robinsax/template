@@ -39,11 +39,11 @@ export const StateEngineProvider = ({ children }: { children: ReactNode }) => {
 export const useQuery = <R, P = null>(
     fn: QueryFn<R, P>, ...args: P extends null ? [] : [param: P]
 ): [R | null, boolean, Error | null] => {
-    const [data, setData] = useState<R | null>(null);
+    const engine = useContext(stateEngineContext);
+
+    const [data, setData] = useState<R | null>(() => engine.queryImmediate(fn, ...args));
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
-
-    const engine = useContext(stateEngineContext);
 
     useEffect(() => {
         const listener = (

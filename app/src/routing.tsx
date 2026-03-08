@@ -16,6 +16,7 @@ export const routes = {
 export type RouteKey = keyof typeof routes;
 
 const routing = {
+    [routes.home]: () => import("./screens/home"),
     [routes.privacy]: () => import("./screens/privacy"),
     [routes.terms]: () => import("./screens/terms"),
     [routes.login]: () => import("./screens/login"),

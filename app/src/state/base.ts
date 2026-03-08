@@ -42,6 +42,9 @@ export type QueryListener<R> = (
 );
 
 export type StateEngine = {
+    queryImmediate: <R, P = null>(
+        fn: QueryFn<R, P>, ...args: P extends null ? [] : [param: P]
+    ) => R | null,
     queryOnce: ImmediateQueryExecFn,
     queryListen: (
         (<R>(fn: QueryFn<R, never>, listener: QueryListener<R>) => () => void) &
@@ -108,6 +111,15 @@ export const createStateEngine = (api: APIClient): StateEngine => {
                 await runQuery(refireEntry);
             }
         })();
+    };
+
+    const queryImmediate = <R, P = null>(
+        fn: QueryFn<R, P>, ...args: P extends null ? [] : [param: P]
+    ): R | null => {
+        const param = args[0] as P;
+        const state = getQueryState(fn, param);
+
+        return state.data;
     };
 
     const runQuery = async <R, P = null>(state: QueryState<R, P>) => {
@@ -191,5 +203,5 @@ export const createStateEngine = (api: APIClient): StateEngine => {
         return await fn(context, param);
     };
 
-    return { queryOnce, queryListen, mutate };
+    return { queryOnce, queryImmediate, queryListen, mutate };
 };

@@ -32,7 +32,9 @@ export const ActiveUserMenu = ({ small = false, buttonStyles, ...props }: BlockS
                 >
                     <Icon name="user" marginRight={ small ? 0 : 0.5 }/>
                     { !small && (
-                        <Text>{ !user ? "\u00A0" : user.name.split(' ')[0] }</Text>
+                        <Text>
+                            { !user ? "\u00A0" : user.name.split(' ')[0] }
+                        </Text>
                     ) }
                 </Button>
             ) }

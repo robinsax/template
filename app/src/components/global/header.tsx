@@ -17,12 +17,12 @@ export const AppHeader = () => {
             paddingX={ 2 } paddingY={ 1 }
             boxShadow="defaultDrop"
         >
-            <Brand variant="sm"/>
+            <Brand small/>
             <Spacer/>
             { user ? (
                 <ActiveUserMenu/>
             ) : (
-                <Link href="login">
+                <Link route="login">
                     <Button>
                         { t("Log in") }
                         <Icon name="login" marginLeft={ 0.5 }/>

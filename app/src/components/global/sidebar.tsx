@@ -32,7 +32,7 @@ export const AppSidebar = () => {
         setForceCollapsed(window.innerWidth < COLLAPSE_BREAKPOINT);
     });
 
-    const adminAllowed = !useAuthzCheck(null, ["iam"]);
+    const adminAllowed = useAuthzCheck(null, ["iam"]);
 
     const collapsed = (
         forceCollapsed || (!!localSettings && localSettings.sidebarCollapsed)
@@ -81,11 +81,11 @@ export const AppSidebar = () => {
             </Stack>
             <Stack width="100%" gap={ 0.5 }>
                 <NavLink route="userHome" icon="dashboard">
-                    { t("Dashboard") }
+                    { !collapsed && t("Dashboard") }
                 </NavLink>
                 { adminAllowed && (
                     <NavLink route="admin" icon="admin">
-                        { t("Admin") }
+                        { !collapsed && t("Admin") }
                     </NavLink>
                 ) }
             </Stack>

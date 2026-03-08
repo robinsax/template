@@ -80,6 +80,7 @@ export const Button = ({
         paddingX: 1,
         paddingY: 0.5,
         borderRadius: 0.25,
+        gap: 0.5,
         hover: {
             borderBottomColor: activeBackground
         }
@@ -95,9 +96,9 @@ export const Button = ({
                 <LoadIndicator/>
                 &nbsp;
             </> : <>
-                { (icon && iconLeft) && <Icon name={ icon } marginRight={ 0.5 }/> }
+                { (icon && iconLeft) && <Icon name={ icon }/> }
                 { children }
-                { (icon && !iconLeft) && <Icon name={ icon } marginLeft={ 0.5 }/> }
+                { (icon && !iconLeft) && <Icon name={ icon }/> }
             </> }
         </div>
     );
