@@ -224,7 +224,7 @@ def update_models():
         fh.write("\n")
         fh.write(write_models_ts([model, api]))
 
-    with open_file("./app/src/api/binding.ts", "w") as fh:
+    with open_file("./app/src/api-client/binding.ts", "w") as fh:
         fh.write(HEADER)
         fh.write("\n")
         fh.write(write_endpoints_ts(api_app))

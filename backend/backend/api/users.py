@@ -19,6 +19,14 @@ from backend.service import (
 
 from .base import app
 
+# Common models.
+class UserPasswordSetParams(Model):
+    """
+    Request body for password set flows.
+    """
+    token: str
+    password: str
+
 # Validators.
 def _validate_password(password: str):
     """
@@ -26,15 +34,6 @@ def _validate_password(password: str):
     """
     if len(password) < 10:
         raise Invalid("password_too_short")
-
-    if not re.search(r"[A-Z]", password):
-        raise Invalid("password_no_uppercase")
-
-    if not re.search(r"[a-z]", password):
-        raise Invalid("password_no_lowercase")
-
-    if not re.search(r"[0-9]", password):
-        raise Invalid("password_no_digit")
 
     if not re.search(r"[^A-Za-z0-9]", password):
         raise Invalid("password_no_special")
@@ -110,21 +109,16 @@ class UserCreateParams(Model):
 
 @app.post("/users")
 def create_user(
-    create: UserCreateParams, session: Session = Depends(get_session),
-    cur_user: User = Depends(get_current_user)
+    create: UserCreateParams, session: Session = Depends(get_session)
 ) -> UserModel:
     """
     Create a new user and send them an a confirmation email.
     """
-
     _validate_user_name(create.name)
     _validate_user_email(create.email)
 
     if User.get_by_email(session, create.email):
         raise Invalid("already_exists")
-
-    # Scope will be checked later, on grant creation.
-    assert_scopeless_authz(cur_user, Permission.IAM)
 
     if create.locale not in get_supported_locales():
         raise Invalid("invalid_locale")
@@ -136,34 +130,27 @@ def create_user(
     )
 
     session.add(user)
-    session.commit()
+    session.flush()
     session.refresh(user)
 
-    Audit.create(session, cur_user, user, BasicAuditEvent.CREATE)
+    Audit.create(session, user, user, BasicAuditEvent.CREATE)
 
     # Note the (restricted) auth key for this user will be generated when the
     # notification is dispatched via email.
-    Notification.create(session, NotificationType.CONFIRM_EMAIL, user, source_user=cur_user)
+    Notification.create(session, NotificationType.CONFIRM_EMAIL, user)
     session.commit()
 
     return user.to_model()
 
-class UserConfirmParams(Model):
-    """
-    User confirm request JSON body.
-    """
-    confirm_token: str
-    password: str
-
 @app.post("/users/confirmations")
 def confirm_user(
-    params: UserConfirmParams, session: Session = Depends(get_session)
+    params: UserPasswordSetParams, session: Session = Depends(get_session)
 ) -> UserModel:
     """
     Confirm a user account and set a password using the confirm token.
     """
     confirm_key = AuthKey.get_for_token(
-        session, params.confirm_token,
+        session, params.token,
         allowed_restriction=AuthKeyRestriction.EMAIL_CONFIRM
     )
     if not confirm_key:
@@ -184,16 +171,9 @@ def confirm_user(
 
     return user.to_model()
 
-class UserPasswordUpdateParams(Model):
-    """
-    User password update request JSON body.
-    """
-    reset_token: str
-    password: str
-
 @app.put("/users/{user_id:uuid}/password")
 def update_user_password(
-    user_id: UUID, update: UserPasswordUpdateParams,
+    user_id: UUID, update: UserPasswordSetParams,
     session: Session = Depends(get_session)
 ) -> UserModel:
     """
@@ -203,7 +183,7 @@ def update_user_password(
     the *password reset* restriction.
     """
     reset_key = AuthKey.get_for_token(
-        session, update.reset_token,
+        session, update.token,
         allowed_restriction=AuthKeyRestriction.PASSWORD_RESET
     )
     if not reset_key:
@@ -233,7 +213,6 @@ class UserUpdateParams(Model):
     """
     name: str | None = None
     locale: str | None = None
-    avatar_id: str | None = None
 
 @app.put("/users/{user_id:uuid}")
 def update_user(

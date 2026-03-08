@@ -1,7 +1,6 @@
 import { I18nLocaleKey } from "@/hooks";
 
 import { MutationContext } from "./base";
-import { AuthParams } from "@/model";
 
 export type LocalSettings = {
     sidebarCollapsed: boolean,
@@ -30,43 +29,4 @@ export const mutateLocalSettings = (
     localStorage.setItem("localSettings", JSON.stringify(updated));
 
     context.invalidate(queryLocalSettings);
-};
-
-export type StoredAuthState = {
-    token: string,
-    userId: string
-};
-
-export const queryAuthState = (): StoredAuthState | null => {
-    if (!localStorage.hasItem("authState")) return null;
-
-    return JSON.parse(localStorage.getItem("authState") as string);
-};
-
-export const mutateAuthState = (
-    context: MutationContext, newState: StoredAuthState | null
-) => {
-    if (newState) {
-        localStorage.setItem("authState", JSON.stringify(newState));
-    } else {
-        localStorage.removeItem("authState");
-    }
-
-    context.invalidate(queryAuthState);
-};
-
-export type LogInCredentials = Omit<AuthParams, "restriction">;
-
-export const mutateAuthStateLogIn = async (
-    context: MutationContext, creds: LogInCredentials
-) => {
-    const resp = await context.api.auth.post({
-        ...creds,
-        restriction: null
-    });
-
-    mutateAuthState(context, {
-        token: resp.token,
-        userId: resp.auth.user_id
-    });
 };

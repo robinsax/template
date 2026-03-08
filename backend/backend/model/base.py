@@ -5,7 +5,8 @@ from uuid import UUID, uuid4
 from typing import Any, Type, TypeVar, Union, get_args, get_origin
 from pydantic import BaseModel
 from sqlalchemy import (
-    TypeDecorator, Column, Enum as SQLAEnum, UUID, ForeignKey, String, DateTime
+    TypeDecorator, Column, Enum as SQLAEnum, UUID as SQLAUUID, ForeignKey, String,
+    DateTime
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Session, Mapped, Query, DeclarativeBase, mapped_column
@@ -186,15 +187,15 @@ def column(
     Column containing an inferred value with some configuration.
     """
     if pk:
-        return mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+        return mapped_column(SQLAUUID(as_uuid=True), primary_key=True, default=uuid4)
 
     args = []
     if name:
         args = [name]
 
     kwargs = {
-        'unique': unique,
-        'index': index
+        "unique": unique,
+        "index": index
     }
     if target:
         if issubclass(target, EnumMixin):
@@ -206,7 +207,7 @@ def column(
     elif raw_jsonb:
         args.extend([JSONB])
     elif fk:
-        args.extend([UUID(as_uuid=True), ForeignKey(fk)])
+        args.extend([SQLAUUID(as_uuid=True), ForeignKey(fk)])
     elif dt:
         args.extend([DateTime(timezone=True)])
         if default_now:

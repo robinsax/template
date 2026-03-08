@@ -1,75 +1,49 @@
-import { MouseEvent, ChangeEvent, ReactNode, useCallback } from "react";
+import {
+    MouseEvent, KeyboardEvent, ChangeEvent, ReactNode, useCallback, useMemo
+} from "react";
 import { useNavigate } from "react-router-dom";
 
-import { Permission, RealmModel } from "@/model";
-import { RouteKey } from "@/routing";
-import { I18nValueFn, useAuthzCheck, useI18n } from "@/hooks";
+import { RouteKey, routes } from "@/routing";
+import { I18nValueFn, useI18n } from "@/hooks";
 
 import { BlockProps, BlockStyles, useBlockProps } from "./base";
-import { LoadIndicator } from "./layout";
-import { useEnableState } from "./enable-state";
-
-export type ConditionalProps = {
-    enableState?: string,
-    permission?: Permission | Permission[],
-    realm?: RealmModel | null,
-    showDisabled?: boolean
-};
-
-const useConditionalProps = <T extends ConditionalProps>(props: T) => {
-    const { enableState, permission, realm, showDisabled, ...rest } = props;
-    
-    const isEnabled = useEnableState(enableState || null);
-    const isAllowed = useAuthzCheck(realm || null, permission || null);
-
-    const enabled = isEnabled && isAllowed;
-    const visible = !enabled && showDisabled;
-
-    return [visible, enabled, rest] as const;
-};
-
-export type DynamicProps<T = HTMLDivElement> = BlockProps<T> & ConditionalProps;
-
-export const DynamicBox = ({ children, ...props }: DynamicProps & {
-    children: ReactNode
-}) => {
-    const [visible, _, rest] = useConditionalProps(props);
-    
-    const rawProps = useBlockProps(rest);
-    
-    return visible && (
-        <div { ...rawProps }>
-            { children }
-        </div>
-    );
-};
+import { ConditionalBlockProps, useConditionalProps } from "./conditions";
+import { IconName, Icon, LoadIndicator } from "./icons";
 
 export const Link = ({
-    children, href, target, ...props
-}: DynamicProps<HTMLAnchorElement> & {
+    children, underlined, route, search, target, ...props
+}: ConditionalBlockProps<HTMLAnchorElement> & {
     children: ReactNode,
-    href: RouteKey,
-    target?: "_blank" | "_self" | "_parent" | "_top",
-    access?: string | null
+    route: RouteKey,
+    search?: Record<string, string>,
+    underlined?: boolean,
+    target?: "_blank" | "_self" | "_parent" | "_top"
 }) => {
     const [visible, enabled, rest] = useConditionalProps(props);
     
     const rawProps = useBlockProps(rest, {
         color: "inherit",
-        textDecoration: "none"
-    });
+        textDecoration: "none",
+        borderBottom: underlined ? "default" : "none",
+        borderColor: underlined ? "border" : "transparent",
+        hover: underlined ? { borderColor: "primary" } : undefined
+    }, [underlined]);
 
     const navigate = useNavigate();
+
+    const url = useMemo(() => (
+        routes[route] + (search ? "?" + new URLSearchParams(search).toString() : "")
+    ), [route, search]);
 
     const onClick = useCallback((event: MouseEvent) => {
         event.preventDefault();
 
-        navigate(href);
-    }, [navigate, href]);
+        navigate(url);
+    }, [navigate, url]);
 
     return visible && (
         <a
-            href={ enabled ? href : "" } target={ target }
+            href={ enabled ? url : "" } target={ target }
             onClick={ onClick }
             { ...rawProps }
         >
@@ -78,34 +52,60 @@ export const Link = ({
     );
 };
 
-export const Button = ({ children, onClick, working, ...props }: DynamicProps & {
+export const Button = ({
+    children, onClick, working, ghost, active, icon, iconLeft, ...props
+}: ConditionalBlockProps<HTMLDivElement> & {
     children?: ReactNode,
     working?: boolean,
+    ghost?: boolean,
+    active?: boolean,
+    icon?: IconName,
+    iconLeft?: boolean,
     onClick?: () => void
 }) => {
     const [visible, enabled, rest] = useConditionalProps(props);
 
+    const activeBackground = ghost ? "offset" : "primary";
     const rawProps = useBlockProps(rest, {
-        display: "inline-block",
+        display: "inline-flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
         verticalAlign: "top",
-        backgroundColor: "primary",
+        textAlign: "center",
+        backgroundColor: active ? activeBackground : (ghost ? "transparent" : "offset"),
+        border: ghost ? "none" : "default",
+        borderColor: "border",
         cursor: enabled ? "pointer" : "not-allowed",
+        paddingX: 1,
+        paddingY: 0.5,
+        borderRadius: 0.25,
         hover: {
-            boxShadow: "normalDrop"
+            borderBottomColor: activeBackground
         }
-    }, [enabled]);
+    }, [enabled, ghost, active]);
 
     return visible && (
         <div
             onClick={ enabled ? onClick : undefined }
             { ...rawProps }
         >
-            { working ? <LoadIndicator/> : children }
+            { working ? <>
+                &nbsp;
+                <LoadIndicator/>
+                &nbsp;
+            </> : <>
+                { (icon && iconLeft) && <Icon name={ icon } marginRight={ 0.5 }/> }
+                { children }
+                { (icon && !iconLeft) && <Icon name={ icon } marginLeft={ 0.5 }/> }
+            </> }
         </div>
     );
 };
 
-export const Switch = ({ toggle, active, onChange, ...props }: DynamicProps & {
+export const Switch = ({ toggle, active, onChange, ...props }: (
+    ConditionalBlockProps<HTMLDivElement>
+) & {
     toggle?: BlockStyles,
     active?: boolean,
     onChange?: (active: boolean) => void
@@ -115,18 +115,24 @@ export const Switch = ({ toggle, active, onChange, ...props }: DynamicProps & {
     const rawProps = useBlockProps(rest, {
         display: "inline-block",
         verticalAlign: "top",
-        backgroundColor: "subtle",
-        width: 4,
-        height: 2,
+        border: "default",
+        backgroundColor: "offset",
+        borderColor: "border",
+        width: 3,
+        height: 1.5,
+        boxSizing: "content-box",
+        borderRadius: 0.75,
         cursor: enabled ? "pointer" : "not-allowed"
     }, [enabled]);
     const toggleRawProps = useBlockProps(toggle || {}, {
         display: "inline-block",
         verticalAlign: "top",
         backgroundColor: "primary",
-        width: 2,
-        height: 2,
-        left: active ? 2 : 0
+        width: 1.5,
+        height: 1.5,
+        marginLeft: active ? 1.5 : 0,
+        borderRadius: 0.75,
+        transition: "0.2s margin-left"
     }, [active]);
 
     return visible && (
@@ -140,25 +146,42 @@ export const Switch = ({ toggle, active, onChange, ...props }: DynamicProps & {
 };
 
 export const Input = <T extends number | string>({ 
-    type = "text", value, name, placeholder, onChange, ...props 
+    type = "text", value, invalid, name, placeholder, onChange, onEnter, ...props 
 }: BlockProps<HTMLInputElement> & {
     type?: "text" | "password" | "number",
     name?: string,
     value?: T | null, 
     placeholder?: I18nValueFn,
-    onChange?: (value: T) => void 
+    invalid?: boolean,
+    onChange?: (value: T) => void,
+    onEnter?: () => void
 }) => {
     const t = useI18n();
 
     const rawProps = useBlockProps(props, {
-        display: "inline-block",
-        verticalAlign: "top",
-        backgroundColor: "subtle"
-    });
+        backgroundColor: "offset",
+        color: "text",
+        outline: "none",
+        border: "default",
+        borderColor: "border",
+        borderBottomColor: invalid ? "error" : "border",
+        borderRadius: 0.25,
+        paddingX: 1, paddingY: 0.5,
+        width: "100%",
+        fontSize: "md",
+        fontFamily: "body",
+        focus: {
+            borderBottomColor: invalid ? "error" : "primary"
+        }
+    }, [invalid]);
 
     const onChangeInner = useCallback((event: ChangeEvent<HTMLInputElement>) => {
         if (onChange) onChange(event.target.value as T);
     }, [onChange]);
+
+    const onKeyPress = useCallback((event: KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "Enter" && onEnter) onEnter();
+    }, [onEnter]);
 
     return (
         <input
@@ -166,6 +189,7 @@ export const Input = <T extends number | string>({
             name={ name }
             value={ value ?? undefined }
             onChange={ onChangeInner }
+            onKeyPress={ onKeyPress }
             placeholder={ placeholder ? placeholder(t) : undefined }
             { ...rawProps }
         />

@@ -1,11 +1,11 @@
 /**
 *   Misc. utility hooks.
 */
-import { useEffect, useCallback, useRef } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useEffect, useCallback, useRef, useMemo } from "react";
+import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 
 import { IDBCache, openIDBCache } from "@/util";
-import { RouteKey } from "@/routing";
+import { RouteKey, routes } from "@/routing";
 
 type WindowEventName = keyof WindowEventMap;
 type EventType<T extends WindowEventName> = WindowEventMap[T];
@@ -13,11 +13,47 @@ type EventType<T extends WindowEventName> = WindowEventMap[T];
 export const useSetRoute = () => {
     const navigate = useNavigate();
 
-    const setRoute = useCallback((route: RouteKey) => {
-        navigate(route);
+    const setRoute = useCallback((route: RouteKey, search?: Record<string, string>) => {
+        let url = routes[route];
+        if (search) url += "?" + new URLSearchParams(search).toString();
+
+        navigate(url);
     }, [navigate]);
 
     return setRoute;
+};
+
+export const useRoute = () => {
+    const location = useLocation();
+
+    const route = useMemo(() => {
+        for (const [key, value] of Object.entries(routes)) {
+            if (location.pathname == value) {
+                return key as RouteKey;
+            }
+        }
+
+        return null;
+    }, [location.pathname]);
+
+    const search = useMemo(() => {
+        const params = new URLSearchParams(location.search);
+
+        const search: Record<string, string> = {};
+        for (const [key, value] of params.entries()) {
+            search[key] = value;
+        }
+        
+        return search;
+    }, [location.search]);
+
+    return [route, search];
+};
+
+export const useSearchParam = (name: string) => {
+    const [searchParams] = useSearchParams();
+    
+    return searchParams.get(name);
 };
 
 /**

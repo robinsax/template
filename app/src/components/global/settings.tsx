@@ -3,7 +3,7 @@
 */
 import { useQuery, useMutation, useI18n, supportedLocales } from "@/hooks";
 import { queryLocalSettings, mutateLocalSettings } from "@/state";
-import { Icon, Stack, Switch } from "@/components/base";
+import { Icon, Popover, Stack, Switch, Button, Text } from "@/components/base";
 
 /**
 *   UI to toggle the theme.
@@ -13,7 +13,7 @@ export const ThemeToggle = () => {
     const [onSettingsChange] = useMutation(mutateLocalSettings);
 
     return (
-        <Stack layout="horizontal" justify="end">
+        <Stack horizontal justify="end">
             <Icon name="darkTheme"/>
             <Switch
                 active={ !!currentSettings && currentSettings.darkTheme }
@@ -35,45 +35,43 @@ export const LocaleSelect = () => {
     const [onSettingsChange] = useMutation(mutateLocalSettings);
 
     return (
-        <></>
-        /*
-        <Popover placement="top-end">
-            <PopoverTrigger>
-                <Button variant="ghost">
+        <Popover
+            trigger={ open => (
+                <Button ghost active={ open }>
                     <Icon name="globe"/>
                 </Button>
-            </PopoverTrigger>
-            <PopoverContent width="240px">
-                <PopoverArrow/>
-                <PopoverBody>
-                    <VStack spacing={ 1 }>
-                        { supportedLocales.map(locale => (
-                            <Clickable
-                                key={ locale.key }
-                                width="full" px={ 2 } py={ 1 }
-                                activeColor="offsetBg"
-                                variant="solid"
-                                active={
-                                    !!currentSettings &&
-                                    locale.key == currentSettings.locale
-                                }
-                                onClick={ () => onSettingsChange({
-                                    locale: locale.key
-                                }) }
-                            >
-                                <Text
-                                    position="relative"
-                                    top="1px"
-                                    fontSize="xs"
-                                >
-                                    { t(locale.label) }
-                                </Text>
-                            </Clickable>
-                        )) }
-                    </VStack>
-                </PopoverBody>
-            </PopoverContent>
+            ) }
+            panelStyles={ {
+                width: 10
+            } }
+        >
+            <Stack gap={ 1 }>
+                <Text fontSize="xs" color="subtle">
+                    { t("Select a language") }
+                </Text>
+                { supportedLocales.map(locale => (
+                    <Button ghost
+                        key={ locale.key }
+                        active={
+                            !!currentSettings &&
+                            currentSettings.locale == locale.key
+                        }
+                        width="100%"
+                        justifyContent="flex-start"
+                        onClick={ () => onSettingsChange({
+                            locale: locale.key
+                        }) }
+                    >
+                        <Text
+                            position="relative"
+                            top="1px"
+                            fontSize="xs"
+                        >
+                            { t(locale.label) }
+                        </Text>
+                    </Button>
+                )) }
+            </Stack>
         </Popover>
-        */
     );
 };

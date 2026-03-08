@@ -1,7 +1,10 @@
 import { ReactNode } from "react";
 import { jsx } from "@emotion/react";
 
+import { I18nValueFn, useI18n } from "@/hooks";
+
 import { BlockProps, BlockStyles, useBlockProps } from "./base";
+import { Icon, IconName } from "./icons";
 
 export const Box = ({ children, ...props }: BlockProps & {
     children?: ReactNode
@@ -33,7 +36,9 @@ export const Heading = ({
     children?: ReactNode,
     level?: 1 | 2 | 3 | 4 | 5 | 6
 }) => {
-    const rawProps = useBlockProps(props);
+    const rawProps = useBlockProps(props, {
+        fontFamily: "heading"
+    });
 
     return jsx(
         `h${level}`,
@@ -47,7 +52,7 @@ const prefixStackAlign = (value: string) => (
 );
 
 export const Stack = ({
-    children, horizontal = false, justify = "start", align = "center",
+    children, horizontal = false, justify = "start", align,
     ...props
 }: BlockProps & {
     children?: ReactNode,
@@ -55,6 +60,8 @@ export const Stack = ({
     justify?: "start" | "end" | "center" | "space-between",
     align?: "start" | "end" | "center" | "stretch" | "baseline"
 }) => {
+    align = align || (horizontal ? "center" : "start");
+
     const rawProps = useBlockProps(props, {
         display: "flex",
         flexDirection: horizontal ? "row" : "column",
@@ -82,7 +89,9 @@ export const Badge = ({ children, ...props }: BlockProps & {
     const rawProps = useBlockProps(props, {
         display: "inline-block",
         verticalAlign: "top",
-        backgroundColor: "primary"
+        backgroundColor: "primary",
+        padding: 0.25,
+        borderRadius: 0.25
     });
 
     return (
@@ -92,21 +101,19 @@ export const Badge = ({ children, ...props }: BlockProps & {
     );
 };
 
-export const LoadIndicator = () => {
-    return (
-        <div css={ { display: "inline-block" } }>
-            ...
-        </div>
-    );
-};
-
 export const Alert = ({ children, type = "info", ...props }: BlockProps & {
     children?: ReactNode,
     type?: "error" | "warning" | "info" | "success"
 }) => {
     const rawProps = useBlockProps(props, {
-        padding: 2,
-        backgroundColor: ({
+        padding: 1,
+        width: "100%",
+        border: "default",
+        borderLeft: "thick",
+        borderRadius: 0.25,
+        borderColor: "border",
+        backgroundColor: "offset",
+        borderLeftColor: ({
             error: "error",
             warning: "warning",
             info: "primary",
@@ -128,12 +135,61 @@ export const Label = ({
     required?: boolean,
     children?: ReactNode
 }) => {
-    const rawProps = useBlockProps(props);
+    const rawProps = useBlockProps(props, {
+        display: "flex",
+        alignItems: "center",
+        gap: 0.5
+    });
 
     return (
         <label htmlFor={ forName } { ...rawProps }>
             { children }
             { required && <Box display="inline-block" color="error">*</Box> }
         </label>
+    );
+};
+
+export const Card = ({ children, ...props }: BlockProps & {
+    children?: ReactNode
+}) => {
+    const rawProps = useBlockProps(props, {
+        border: "default",
+        backgroundColor: "background",
+        borderColor: "border",
+        padding: 2,
+        borderRadius: 0.5,
+        boxShadow: "defaultDrop"
+    });
+
+    return (
+        <div { ...rawProps }>
+            { children }
+        </div>
+    );
+};
+
+export const Field = ({ name, required = false, label, icon, error, children }: {
+    children?: ReactNode,
+    name: string,
+    label: I18nValueFn,
+    required?: boolean,
+    icon?: IconName,
+    error?: I18nValueFn | null
+}) => {
+    const t = useI18n();
+
+    return (
+        <Stack width="100%" gap={ 0.5 }>
+            <Label forName={ name } required={ required }>
+                { icon && <Icon name={ icon } /> }
+                { label(t) }
+            </Label>
+            { children }
+            { error && (
+                <Text color="error">
+                    { error(t) }
+                </Text>
+            ) }
+        </Stack>
     );
 };

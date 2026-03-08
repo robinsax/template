@@ -55,15 +55,18 @@ export const useQuery = <R, P = null>(
         };
 
         return engine.queryListen(fn as QueryFn<R, P | undefined>, listener, args[0]);
-    }, [fn, ...args]);
+    }, []);
 
     return [data, loading, error];
 };
 
+export type WrappedMutationFn<P> = (
+    unknown extends P ? () => void : (param: P) => void
+);
+
 export const useMutation = <P, R = void>(
-    fn: MutationFn<P, R>
-): [(param: P) => void, boolean, Error | null, R | null] => {
-    const [result, setResult] = useState<R | null>(null);
+    fn: MutationFn<P, R>, onSuccess?: (result: R) => void
+): [WrappedMutationFn<P>, boolean, Error | null] => {
     const [working, setWorking] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
@@ -80,12 +83,11 @@ export const useMutation = <P, R = void>(
 
                 try {
                     const result = await engine.mutate(fn, param);
-                    setResult(result);
                     setError(null);
+                    if (onSuccess) onSuccess(result);
                 } catch (err) {
                     const castErr = err instanceof Error ? err : new Error(String(err));
                     setError(castErr);
-                    setResult(null);
                     fireGlobalError(castErr);
                 } finally {
                     setWorking(false);
@@ -97,5 +99,5 @@ export const useMutation = <P, R = void>(
         return callback;
     }, [fn]);
 
-    return [onMutate, working, error, result];
+    return [onMutate as WrappedMutationFn<P>, working, error];
 };

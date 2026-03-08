@@ -126,6 +126,29 @@
             }
         },
         {
+            "label": "Local: Start Tasks",
+            "type": "shell",
+            "command": "bash",
+            "args": ["./scripts/dev/local-start-service.sh", "tasks"],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "POSTGRES_URI": "postgresql://admin:admin@localhost:5432/main",
+                    "SERVICE_ORIGIN": "http://localhost",
+                    "SERVICE_PORT": "8001",
+                    "LOAD_DOTENVS": "${workspaceFolder}/.env;${workspaceFolder}/.env.platforms",
+                    "ENCRYPTION_KEY": "xn7MwEMY1l7G9dItXwzn5F6NK80WrSuv_n2lSKXDwHc=",
+                    "AUTH_TOKEN_HMAC_KEY": "rjv40P742AP_16-Z2VOR3nJibqVrn9R6qyvEq3fwkBo=",
+                    "DEV_MODE": "true"
+                }
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
             "label": "Local: Start Dependencies",
             "type": "shell",
             "command": "docker-compose",
@@ -149,6 +172,7 @@
             "dependsOn": [
                 "Local: Start Dependencies",
                 "Local: Start API",
+                "Local: Start Tasks",
                 "Local: Start App"
             ],
             "problemMatcher": [],

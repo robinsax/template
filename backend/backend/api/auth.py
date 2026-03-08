@@ -59,7 +59,7 @@ def provision_auth_key(
         - Reset link emails contain a token for an equivalent key.
     """
     # Validate credentials.
-    if params.email and params.password:
+    if params.email is not None and params.password is not None:
         user = User.get_by_email(session, params.email)
 
         if not user or not user.check_password(params.password):
@@ -79,11 +79,7 @@ def provision_auth_key(
         except ValueError:
             raise Invalid("invalid_restriction") from None
 
-        if restriction == AuthKeyRestriction.ASSET_GET:
-            expiry_delta = timedelta(
-                minutes=config.auth_key_asset_get_expiry_minutes.get()
-            )
-        elif restriction == AuthKeyRestriction.PASSWORD_RESET:
+        if restriction == AuthKeyRestriction.PASSWORD_RESET:
             # Also require password for reset tokens (block physical session
             # hijack).
             if not params.password or not user.check_password(params.password):

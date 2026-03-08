@@ -12,7 +12,7 @@ from backend.service import task
 
 logger = getLogger(__name__)
 
-@task(interval_seconds=30)
+@task(interval_seconds=10)
 def send_notification_emails(session: Session, mailer: Optional[Mailer] = None):
     """
     Attempt to send all pending email notifications. Marks any notifications for which

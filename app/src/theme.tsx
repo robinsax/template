@@ -7,36 +7,48 @@ import { Global, css } from "@emotion/react";
 import { useQuery } from "./hooks";
 import { queryLocalSettings } from "./state";
 
-import "@fontsource/lexend";
 import "@fontsource/manrope";
 import "@fontsource/ibm-plex-mono";
+import "@fontsource-variable/playfair-display";
 
 export const theme = {
-    grid: [1, "rem"],
+    grid: [12, "px"],
     colors: {
         primary: ["#3c9ee0"],
         error: ["#db5838"],
         warning: ["#eddb3d"],
         success: ["#39d780"],
-        background: ["#e6e6e6", "#333333"],
+        background: ["#f5f5f5", "#222222"],
+        offset: ["#e6e6e6", "#1a1a1a"],
         text: ["#333333", "#e6e6e6"],
-        border: ["#cccccc"],
+        border: ["#cccccc", "#333333"],
         subtle: ["#999999", "#666666"]
     },
     shadows: {
-        normalDrop: ["0px 0px 5px 2px #0000000d"]
+        defaultDrop: [
+            "0px 0px 5px 2px #00000011",
+            "0px 0px 5px 2px #ffffff02"
+        ],
+        defaultInset: [
+            "inset 0px 0px 5px 2px #00000011",
+            "inset 0px 0px 5px 2px #ffffff02"
+        ]
     },
     fonts: {
         body: ["Manrope, sans-serif"],
-        heading: ["Lexend, sans-serif"],
+        heading: ["Playfair Display Variable, sans-serif"],
         mono: ["IBM Plex Mono, monospace"]
     },
     fontSizes: {
-        xs: ["0.75rem"],
-        sm: ["0.875rem"],
-        md: ["1rem"],
-        lg: ["2rem"],
-        xl: ["3rem"]
+        xs: ["11px"],
+        sm: ["12px"],
+        md: ["14px"],
+        lg: ["20px"],
+        xl: ["30px"]
+    },
+    borders: {
+        default: ["1px solid"],
+        thick: ["4px solid"]
     }
 };
 
@@ -45,7 +57,8 @@ export type Theme = {
     color: keyof _Theme["colors"],
     shadow: keyof _Theme["shadows"],
     font: keyof _Theme["fonts"],
-    fontSize: keyof _Theme["fontSizes"]
+    fontSize: keyof _Theme["fontSizes"],
+    border: keyof _Theme["borders"]
 };
 
 const writeVariables = (index: number) => {
@@ -54,18 +67,24 @@ const writeVariables = (index: number) => {
     ) => (
         Object.keys(object).map(key => (
             `--${ prefix }-${ key }: ${ object[key][index] || object[key][0] }`
-        )).join('\n')
+        )).join(';\n') + ";"
     );
 
     return [
         group(theme.colors, 'c', index),
         group(theme.shadows, 's', index),
         group(theme.fonts, 'f', index),
-        group(theme.fontSizes, 'fs', index)
+        group(theme.fontSizes, 'fs', index),
+        group(theme.borders, 'b', index)
     ].join('\n');
 };
 
 const baseStylesheet = css`
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
     body {
         ${ writeVariables(0) }
     }
@@ -77,7 +96,6 @@ const baseStylesheet = css`
         box-sizing: border-box;
         margin: 0px;
         padding: 0px;
-        border-color: var(--c-border);
     }
 
     body {
@@ -85,10 +103,6 @@ const baseStylesheet = css`
         font-size: var(--fs-md);
         color: var(--c-text);
         background-color: var(--c-background);
-    }
-
-    h1, h2, h3, h4, h5, h6 {
-        font-family: var(--f-heading);
     }
 `;
 
@@ -109,14 +123,4 @@ export const ThemeRoot = ({ children }: { children: ReactNode }) => {
             { children }
         </>
     );
-};
-
-export const useThemeColor = (color: Theme["color"]) => {
-    const [localSettings] = useQuery(queryLocalSettings);
-
-    return useMemo(() => {
-        const index = localSettings && localSettings.darkTheme ? 1 : 0;
-
-        return theme.colors[color][index] || theme.colors[color][0];
-    }, [localSettings, color]);
 };

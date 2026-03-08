@@ -25,27 +25,14 @@ def serve(service: str):
     """
     Serve the given HTTP service on the configured port, with hot reloading in dev mode.
     """
-    if service not in ("api",):
+    if service not in ("api", "tasks"):
         raise CLIError("unknown service: " + service)
 
     uvicorn.run(
         "backend." + service + ":app",
         host="0.0.0.0", port=config.service_port.get(),
-        reload=config.dev_mode.get()
-    )
-
-@cli.verb()
-def tasks():
-    """
-    Run the continuous background tasks service.
-    """
-    # Cloud run requires HTTP healthcheck so background tasks run in an FastAPI
-    # lifespan even though there are no endpoints that do anything.
-    uvicorn.run(
-        "backend.tasks:app",
-        host="0.0.0.0", port=8080,
         reload=config.dev_mode.get(),
-        lifespan="on"
+        lifespan="on" if service == "tasks" else "off"
     )
 
 # Administration.

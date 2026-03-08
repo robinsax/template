@@ -1,6 +1,6 @@
 /** This file is auto-generated. Do not modify it. */
 /* eslint-disable max-len */
-import { UserModel, UserCreateParams, UserConfirmParams, UserPasswordUpdateParams, UserUpdateParams, NotificationModel, NotificationsUpdateParams, AuthParams, AuthResp, AuthKeyModel, PasswordResetRequestParams, UploadModel } from "@/models";
+import { UserModel, UserCreateParams, UserPasswordSetParams, UserUpdateParams, NotificationModel, NotificationsUpdateParams, AuthParams, AuthResp, AuthKeyModel, PasswordResetRequestParams, Role, UserRoleUpdateParams, UserRoleModel, UploadModel } from "@/model";
 
 import { APIClientBase, APICallOptions } from "./base";
 
@@ -13,7 +13,7 @@ export const binding = (api: APIClientBase) => ({
         id: (user_id: string) => (({
             get: (options?: APICallOptions): Promise<UserModel> => (api.call({ path: `/users/${user_id}`, method: "get" }, options)),
             password: {
-                put: (body: UserPasswordUpdateParams, options?: APICallOptions): Promise<UserModel> => (api.call({ path: `/users/${user_id}/password`, method: "put", body }, options))            
+                put: (body: UserPasswordSetParams, options?: APICallOptions): Promise<UserModel> => (api.call({ path: `/users/${user_id}/password`, method: "put", body }, options))            
             },
             put: (body: UserUpdateParams, options?: APICallOptions): Promise<UserModel> => (api.call({ path: `/users/${user_id}`, method: "put", body }, options)),
             notifications: {
@@ -23,7 +23,7 @@ export const binding = (api: APIClientBase) => ({
         })),
         post: (body: UserCreateParams, options?: APICallOptions): Promise<UserModel> => (api.call({ path: `/users`, method: "post", body }, options)),
         confirmations: {
-            post: (body: UserConfirmParams, options?: APICallOptions): Promise<UserModel> => (api.call({ path: `/users/confirmations`, method: "post", body }, options))        
+            post: (body: UserPasswordSetParams, options?: APICallOptions): Promise<UserModel> => (api.call({ path: `/users/confirmations`, method: "post", body }, options))        
         }    
     },
     auth: {
@@ -33,6 +33,38 @@ export const binding = (api: APIClientBase) => ({
         passwordResets: {
             post: (body: PasswordResetRequestParams, options?: APICallOptions): Promise<void> => (api.call({ path: `/auth/password-resets`, method: "post", body }, options))        
         }    
+    },
+    realms: {
+        global: {
+            userRoles: {
+                id: (user_id: string) => (({
+                    roleOptions: {
+                        get: (options?: APICallOptions): Promise<Role[]> => (api.call({ path: `/realms/global/user-roles/${user_id}/role-options`, method: "get" }, options))                    
+                    },
+                    put: (body: UserRoleUpdateParams, options?: APICallOptions): Promise<UserRoleModel> => (api.call({ path: `/realms/global/user-roles/${user_id}`, method: "put", body }, options))                
+                }))            
+            },
+            users: {
+                id: (user_id: string) => (({
+                    delete: (options?: APICallOptions): Promise<void> => (api.call({ path: `/realms/global/users/${user_id}`, method: "delete" }, options))                
+                }))            
+            }        
+        },
+        id: (realm_id: string) => (({
+            userRoles: {
+                id: (user_id: string) => (({
+                    roleOptions: {
+                        get: (options?: APICallOptions): Promise<Role[]> => (api.call({ path: `/realms/${realm_id}/user-roles/${user_id}/role-options`, method: "get" }, options))                    
+                    },
+                    put: (body: UserRoleUpdateParams, options?: APICallOptions): Promise<UserRoleModel> => (api.call({ path: `/realms/${realm_id}/user-roles/${user_id}`, method: "put", body }, options))                
+                }))            
+            },
+            users: {
+                id: (user_id: string) => (({
+                    delete: (options?: APICallOptions): Promise<void> => (api.call({ path: `/realms/${realm_id}/users/${user_id}`, method: "delete" }, options))                
+                }))            
+            }        
+        }))    
     },
     uploads: {
         type: (upload_type: string) => (({

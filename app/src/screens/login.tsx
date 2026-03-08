@@ -1,58 +1,54 @@
-import { useEffect } from "react";
+import { useState } from "react";
 
-import { useForm, useI18n, useQuery, useSetRoute } from "@/hooks";
-import { LogInCredentials, mutateAuthStateLogIn, queryCurrentUser } from "@/state";
+import { useI18n, useQuery } from "@/hooks";
+import { queryCurrentUser } from "@/state";
+import { reroute } from "@/util";
+import { Button, Card, Link, Stack, Text, Box } from "@/components/base";
 import { Brand, SplashScreen } from "@/components/global";
-import { Alert, Button, Input, Label, Stack } from "@/components/base";
+import { LoginForm } from "@/components/users";
 
 export default () => {
     const t = useI18n();
-    const setRoute = useSetRoute();
+
+    const [email, setEmail] = useState("");
 
     const [user] = useQuery(queryCurrentUser);
 
-    useEffect(() => {
-        if (user) setRoute("home");
-    }, [user, setRoute]);
-
-    const [
-        values, setValue, onSubmit, working, error
-    ] = useForm<LogInCredentials>(mutateAuthStateLogIn, {
-        email: "",
-        password: ""
-    }, {
-        invalid_credential: t => t("Incorrect email or password"),
-    });
-
+    if (user) return reroute("userHome");
     return (
-        <SplashScreen noHeader>
-            <Stack width={ 80 } gap={ 4 }>
+        <SplashScreen>
+            <Stack height="100%" align="center" gap={ 2 }>
                 <Brand/>
-                { error && (
-                    <Alert type="error">
-                        { error }
-                    </Alert>
-                ) }
-                <Label forName="email">
-                    { t("Email") }
-                </Label>
-                <Input
-                    type="text" name="email"
-                    value={ values.email }
-                    onChange={ (value) => setValue("email", value) }
-                />
-                <Label forName="password">
-                    { t("Password") }
-                </Label>
-                <Input
-                    type="password" name="password"
-                    value={ values.password }
-                    onChange={ (value) => setValue("password", value) }
-                />
-                <Button
-                    working={ working }
-                    onClick={ onSubmit }
-                />
+                <Card width={ 30 }>
+                    <LoginForm
+                        onEmailChanged={ setEmail }
+                        afterPassword={
+                            <Box width="100%" textAlign="right" marginTop={ 0.25 }>
+                                <Link
+                                    underlined
+                                    route="loginReset" search={ { email } }
+                                    fontSize="sm" color="subtle"
+                                    hover={ { color: "text"} }
+                                >
+                                    { t("Forgot your password?") }
+                                </Link>
+                            </Box>
+                        }
+                    />
+                </Card>
+                <Stack
+                    horizontal width="100%" justify="center"
+                    fontSize="sm"
+                >
+                    <Text color="subtle">
+                        { t("Don't have an account?") }
+                    </Text>
+                    <Link route="signup">
+                        <Button icon="signup">
+                            { t("Sign up") }
+                        </Button>
+                    </Link>
+                </Stack>
             </Stack>
         </SplashScreen>
     );

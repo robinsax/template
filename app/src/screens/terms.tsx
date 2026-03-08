@@ -1,20 +1,18 @@
-import React from "react";
-import { Heading, Text } from "@chakra-ui/react";
-
 import { useI18n } from "@/hooks";
-import { SplashInfoScreen } from "@/components/global";
+import { Heading, Text } from "@/components/base";
+import { SplashScreen } from "@/components/global";
 
 export default () => {
     const t = useI18n();
 
     return (
-        <SplashInfoScreen>
+        <SplashScreen header>
             <Heading>
                 { t("Terms of Service") }
             </Heading>
-            <Text>
+            <Text color="subtle">
                 { t("Not authored yet.") }
             </Text>
-        </SplashInfoScreen>
+        </SplashScreen>
     );
 };

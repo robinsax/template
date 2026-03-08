@@ -2,15 +2,18 @@
 *   Global application sidebar. 
 */
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
 
 import {
     useAuthzCheck, useI18n, useWindowListener, useQuery, useMutation
 } from "@/hooks";
 import { mutateLocalSettings, queryLocalSettings } from "@/state";
-import { Icon, Brand } from "@/components/base";
+import {
+    Icon, Box, Stack, Spacer, Popover, Button, NavLink
+} from "@/components/base";
+import { ActiveUserMenu } from "@/components/users";
 
 import { ThemeToggle, LocaleSelect } from "./settings";
+import { Brand } from "./branding";
 
 const COLLAPSE_BREAKPOINT = 1000;
 
@@ -19,7 +22,6 @@ const COLLAPSE_BREAKPOINT = 1000;
 */
 export const AppSidebar = () => {
     const t = useI18n();
-    const location = useLocation();
 
     const [localSettings] = useQuery(queryLocalSettings);
     const [onSettingsChange] = useMutation(mutateLocalSettings);
@@ -30,123 +32,84 @@ export const AppSidebar = () => {
         setForceCollapsed(window.innerWidth < COLLAPSE_BREAKPOINT);
     });
 
-    const manageUsersAllowed = useAuthzCheck(null, "iam");
+    const adminAllowed = !useAuthzCheck(null, ["iam"]);
 
     const collapsed = (
-        forceCollapsed || (localSettings && localSettings.sidebarCollapsed)
+        forceCollapsed || (!!localSettings && localSettings.sidebarCollapsed)
     );
+    const width = collapsed ? 5 : 16;
 
-    const settingsControls = (
-        <>
-            <LocaleSelect/>
-            <ThemeToggle/>
-        </>
-    );
-    return (
-        <></>
-        /*
-        <Sidebar
-            position="relative"
-            borderRight="solid 1px"
-            borderRightColor="border"
-            boxShadow="raise"
-            variant={ collapsed ? "compact" : "default" }
-            width={ collapsed ? undefined : "14rem" }
-            toggleBreakpoint={ false }
-            transition="width 0.1s ease-in-out"
+    const settings = <>
+        <ThemeToggle/>
+        <LocaleSelect/>
+    </>;
+    return <>
+        <Box height={ 1 } width={ width }/>
+        <Stack
+            position="fixed" top={ 0 } left={ 0 }
+            height="100vh" backgroundColor="background"
+            borderRight="default" borderRightColor="border"
+            boxShadow="defaultDrop"
+            padding={ 1 } width={ width }
         >
             { !forceCollapsed && (
                 <Box
                     position="absolute"
                     top={ 0.5 } right={ -2.5 }
                     width={ 2 } height={ 2 }
-                    border="1px solid"
-                    borderColor="border"
-                    borderRadius="md"
+                    border="default" borderColor="border"
+                    borderRadius={ 0.25 }
                 >
                     <Box
-                        width="full" height="full"
+                        width="100%" height="100%"
+                        display="flex" alignItems="center" justifyContent="center"
+                        cursor="pointer" boxShadow="defaultDrop"
                         onClick={ () => onSettingsChange({
                             sidebarCollapsed: !collapsed
                         }) }
-                        display="flex"
-                        alignItems="center" justifyContent="center"
                     >
-                        <Icon
-                            name={ collapsed ? "right" : "left" }
-                            size="0.5rem"
-                        />
+                        <Icon name={ collapsed ? "right" : "left" }/>
                     </Box>
                 </Box>
             ) }
-            <VStack
-                width="full"
-                alignItems="right"
-                py={ 2 } px={ collapsed ? 1 : 2 }
-                spacing={ 4 }
-                sx={ { marginTop: "0 !important" } }
-            >
-                <Persona
-                    height="40px"
-                    size="sm"
+            <Stack horizontal width="100%" justify="end">
+                <ActiveUserMenu
+                    small={ collapsed }
+                    width={ collapsed ? "100%" : undefined }
+                    buttonStyles={ collapsed ? { width: "100%" } : {} }
                 />
-            </VStack>
-            <Divider/>
-            <SidebarSection>
-                <NavItem
-                    as={ Link }
-                    isActive={ location.pathname == "/" }
-                    to="/"
-                >
+            </Stack>
+            <Stack width="100%" gap={ 0.5 }>
+                <NavLink route="userHome" icon="dashboard">
                     { t("Dashboard") }
-                </NavItem>
-                { manageUsersAllowed && (
-                    <NavGroup title={ t("Management") }>
-                        { manageUsersAllowed && (
-                            <NavItem
-                                as={ Link }
-                                isActive={ location.pathname == "/management/users" }
-                                to="/management/users"
-                            >
-                                { t("Users") }
-                            </NavItem>
-                        ) }
-                    </NavGroup>
+                </NavLink>
+                { adminAllowed && (
+                    <NavLink route="admin" icon="admin">
+                        { t("Admin") }
+                    </NavLink>
                 ) }
-            </SidebarSection>
+            </Stack>
             <Spacer/>
-            <SidebarSection>
-                <HStack width="full" justifyContent="right" spacing={ 4 }>
-                    { collapsed ? (
-                        <Popover placement="right-end">
-                            <PopoverTrigger>
-                                <Icon name="settings"/>
-                            </PopoverTrigger>
-                            <Portal>
-                                <PopoverContent width="auto">
-                                    <PopoverArrow/>
-                                    <PopoverBody>
-                                        <HStack spacing={ 2 }>
-                                            { settingsControls }
-                                        </HStack>
-                                    </PopoverBody>
-                                </PopoverContent>
-                            </Portal>
-                        </Popover>
-                    ) : (
-                        settingsControls
-                    ) }
-                </HStack>
-            </SidebarSection>
             { !collapsed && (
-                <>
-                    <Divider/>
-                    <Box width="full" pb={ 2 }>
-                        <Brand variant="sm"/>
-                    </Box>
-                </>
+                <Stack horizontal justify="center" width="100%" padding={ 1 }>
+                    <Brand small/>
+                </Stack>
             ) }
-        </Sidebar>
-        */
-    );
+            <Stack horizontal width="100%" justify="center">
+                { !collapsed ? settings : (
+                    <Popover
+                        trigger={ open => (
+                            <Button ghost active={ open }>
+                                <Icon name="settings" />
+                            </Button>
+                        ) }
+                    >
+                        <Stack horizontal>
+                            { settings }
+                        </Stack>
+                    </Popover>
+                ) }
+            </Stack>
+        </Stack>
+    </>;
 };

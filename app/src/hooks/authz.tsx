@@ -23,9 +23,8 @@ export const useAuthzCheck = (
     const [user] = useQuery(queryCurrentUser);
 
     return useMemo(() => {
+        if (!permission && !realm) return true;
         if (!user) return false;
-
-        if (permission == null) return true;
 
         const checkPermissions = (
             permission instanceof Array ? permission : [permission]

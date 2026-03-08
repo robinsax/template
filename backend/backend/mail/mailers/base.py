@@ -26,12 +26,12 @@ class Mailer:
 
         content = renderer(
             session, notification,
-            notification.owner.locale or config.default_locale.get()
+            notification.user.locale or config.default_locale.get()
         )
         if not content:
             return False
 
-        self.do_send(notification.owner.email, content)
+        self.do_send(notification.user.email, content)
         return True
 
     def do_send(self, recipient_addr: str, content: MailContent):

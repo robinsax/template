@@ -7,8 +7,7 @@ Base API service implementation.
 from backend.service import AuthWSParams
 
 from .users import (
-    UserConfirmParams, UserCreateParams, UserUpdateParams, NotificationsUpdateParams,
-    UserPasswordUpdateParams
+    UserCreateParams, UserUpdateParams, NotificationsUpdateParams, UserPasswordSetParams
 )
 from .auth import AuthParams, AuthResp, PasswordResetRequestParams
 from .roles import UserRoleUpdateParams

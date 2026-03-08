@@ -227,7 +227,7 @@ export const createListSystem = <T extends BaseModel>({
                         )) }
                     </>
                     { slicedData.length < filteredData.length && (
-                        <Box width="full" textAlign="center">
+                        <Box width="100%" textAlign="center">
                             <Text color="subtle">
                                 { t("{count} more...", {
                                     count: filteredData.length - slicedData.length
@@ -239,8 +239,8 @@ export const createListSystem = <T extends BaseModel>({
             ) : emptyView || (
                 finalEmptyLabel && (
                     <Box
-                        width="full"
-                        py={ 2 }
+                        width="100%"
+                        paddingY={ 2 }
                         textAlign={ emptyLabelAlign || "center" }
                     >
                         <Text color="subtle">

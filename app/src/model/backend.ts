@@ -30,7 +30,6 @@ export type AuthKeyModel = {
     user_id: string,
     created_at: Date,
     expires_at: Date,
-    revoked_at: (Date | null),
     restriction: (AuthKeyRestriction | null)
 };
 
@@ -70,7 +69,7 @@ export type RealmModel = {
     id: string,
     type: RealmType,
     name: string,
-    parent: (RealmModel | null)
+    parent: RealmModel
 };
 
 export type RealmType = ("instance");
@@ -132,26 +131,24 @@ export type PasswordResetRequestParams = {
     email: string
 };
 
-export type UserConfirmParams = {
-    confirm_token: string,
-    password: string
-};
-
 export type UserCreateParams = {
     name: string,
     email: string,
     locale: string
 };
 
-export type UserPasswordUpdateParams = {
-    reset_token: string,
+export type UserPasswordSetParams = {
+    token: string,
     password: string
+};
+
+export type UserRoleUpdateParams = {
+    role: Role
 };
 
 export type UserUpdateParams = {
     name: (string | null),
-    locale: (string | null),
-    avatar_id: (string | null)
+    locale: (string | null)
 };
 
 export const permissionsMatrix: Record<Role, Partial<Record<Permission, boolean>>> = {

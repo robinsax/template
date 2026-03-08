@@ -1,9 +1,11 @@
 /**
 *   Non-component-tree utilities. 
 */
+import { Navigate } from "react-router-dom";
 import { parse as uuidParse, stringify as uuidStringify } from "uuid";
 import { format } from "date-fns";
 
+import { RouteKey, routes } from "@/routing";
 import config from "@/config";
 
 // Misc.
@@ -18,6 +20,10 @@ export type Callback<T = never> = [T] extends [never] ? () => void : (value: T) 
 export type AsyncCallback<T = never> = (
     [T] extends [never] ? () => Promise<void> : (value: T) => Promise<void>
 );
+
+export const reroute = (href: RouteKey) => {
+    return <Navigate to={ routes[href] } />;
+};
 
 /**
 *   Returns a callback that invokes each of the returned callback in sequence.

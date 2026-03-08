@@ -26,7 +26,7 @@ def render_confirm_email(
         timedelta(days=config.auth_key_invitation_expiry_days.get())
     )
     invite_key = AuthKey(
-        user_id=notification.owner.id,
+        user_id=notification.user.id,
         expires_at=expiry,
         restriction=AuthKeyRestriction.EMAIL_CONFIRM
     )
@@ -53,7 +53,7 @@ def render_password_reset(
         timedelta(hours=config.auth_key_password_reset_expiry_hours.get())
     )
     reset_key = AuthKey(
-        user_id=notification.owner.id,
+        user_id=notification.user.id,
         expires_at=expiry,
         restriction=AuthKeyRestriction.PASSWORD_RESET
     )
@@ -64,5 +64,5 @@ def render_password_reset(
 
     return render_template(locale, "password_reset.html", {
         "origin": config.service_origin.get(),
-        "url_params": urlencode({ "reset": token, "user": notification.owner.id })
+        "url_params": urlencode({ "reset": token, "user": notification.user.id })
     })

@@ -5,7 +5,7 @@ import { ReactNode } from "react";
 
 import config from "@/config";
 import { useI18n } from "@/hooks";
-import { Stack, Link, Spacer, Box } from "@/components/base";
+import { Stack, Link, Spacer, Box, Text } from "@/components/base";
 
 import { AppSidebar } from "./sidebar";
 import { AppHeader } from "./header";
@@ -14,29 +14,35 @@ import { LocaleSelect, ThemeToggle } from "./settings";
 /**
 *   Splash screen layout.
 */
-export const SplashScreen = ({ children, noHeader = false }: {
-    children: React.ReactNode,
-    noHeader?: boolean
+export const SplashScreen = ({ children, header = false }: {
+    children: ReactNode,
+    header?: boolean
 }) => {
     const t = useI18n();
 
     return (
-        <Stack height="100vh">
-            { !noHeader && <AppHeader/> }
-            <Stack flex={ 1 } justify="center" align="center">
+        <Stack minHeight="100vh">
+            { header && <AppHeader/> }
+            <Stack
+                justify="center" align="center"
+                flex={ 1 } width="100%" height="100%"
+            >
                 { children }
             </Stack>
-            <Stack width="100%" justify="start" p={ 4 } gap={ 4 }>
-                <Stack horizontal fontSize="sm" gap={ 2 }>
-                    <Link href="terms" target="_blank">
+            <Stack
+                horizontal width="100%" justify="start"
+                paddingX={ 2 } paddingY={ 1 }
+            >
+                <Stack horizontal fontSize="sm">
+                    <Link underlined route="terms" target="_blank">
                         { t("Terms") }
                     </Link>
-                    <Link href="privacy" target="_blank">
+                    <Link underlined route="privacy" target="_blank">
                         { t("Privacy") }
                     </Link>
-                    <Box fontSize="xs" color="subtle">
+                    <Text fontSize="xs" color="subtle">
                         { t(config.copyright) }
-                    </Box>
+                    </Text>
                 </Stack>
                 <Spacer/>
                 <ThemeToggle/>
@@ -55,7 +61,7 @@ export const SidebarScreen = ({ children }: {
     return (
         <Stack horizontal>
             <AppSidebar/>
-            <Box flex={ 1 } p={ 10 }>
+            <Box flex={ 1 } padding={ 4 }>
                 { children }
             </Box>
         </Stack>

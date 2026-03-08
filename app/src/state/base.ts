@@ -1,9 +1,10 @@
+import config from "@/config";
 import { deepEqual } from "@/util";
 import { APIClient } from "@/api-client";
 
 type QueryState<R, P = null> = {
     fn: QueryFn<R, P>,
-    depends: QueryState<unknown, unknown>[] | null,
+    dependents: QueryState<unknown, unknown>[],
     param: P,
     loading: boolean,
     listeners: (() => void)[],
@@ -54,18 +55,18 @@ export type StateEngine = {
 export const createStateEngine = (api: APIClient): StateEngine => {
     const states: QueryState<unknown, unknown>[] = [];
 
+    if (config.devMode) (window as unknown as Record<string, unknown>).states = states;
+
     const getQueryState = <R, P>(fn: QueryFn<R, P>, param: P): QueryState<R, P> => {
         for (const state of states) {
-            if (state.fn != fn) continue;
-
-            if (param && deepEqual(state.param, param)) {
+            if (state.fn == fn && deepEqual(state.param, param)) {
                 return state as QueryState<R, P>;
             }
         }
 
         const newState: QueryState<R, P> = {
             fn,
-            depends: null,
+            dependents: [],
             param: param,
             loading: false,
             listeners: [],
@@ -97,29 +98,29 @@ export const createStateEngine = (api: APIClient): StateEngine => {
         for (const stateEntry of stateEntries) {
             queueFire(stateEntry);
 
-            if (!stateEntry.depends) continue;
-            for (const dep of stateEntry.depends) {
+            for (const dep of stateEntry.dependents) {
                 queueFire(dep);
             }
         }
 
-        for (const refireEntry of toFire) {
-            runQuery(refireEntry);
-        }
+        (async () => {
+            for (const refireEntry of toFire) {
+                await runQuery(refireEntry);
+            }
+        })();
     };
 
     const runQuery = async <R, P = null>(state: QueryState<R, P>) => {
         state.loading = true;
         state.listeners.forEach(listener => listener());
 
-        const depends: QueryState<unknown, unknown>[] = [];
         const query = async <R, P = null>(
             fn: QueryFn<R, P>, ...args: P extends null ? [] : [param: P]
         ) => {
             const param = args[0] as P;
             const dependencyState = getQueryState(fn, param);
 
-            depends.push(dependencyState as QueryState<unknown, unknown>);
+            dependencyState.dependents.push(state as QueryState<unknown, unknown>);
 
             return await queryOnce(fn, ...args);
         };
@@ -138,7 +139,6 @@ export const createStateEngine = (api: APIClient): StateEngine => {
             state.listeners.forEach(listener => listener());
             state.waiters.forEach(waiter => waiter());
             state.waiters = [];
-            state.depends = depends;
         }
     };
 
