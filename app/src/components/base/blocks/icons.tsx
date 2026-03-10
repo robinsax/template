@@ -15,10 +15,14 @@ import { FaTrash, FaBell } from "react-icons/fa";
 import { BiSolidError } from "react-icons/bi";
 import { ImSpinner8 } from "react-icons/im";
 import { AiOutlineUserAdd, AiOutlineUser } from "react-icons/ai";
-import { IoLockOpenOutline, IoSettingsOutline } from "react-icons/io5";
-import { IoMdGlobe } from "react-icons/io";
+import {
+    IoLockOpenOutline, IoLockClosedOutline, IoSettingsOutline
+} from "react-icons/io5";
+import { IoMdGlobe, IoMdClose } from "react-icons/io";
 import { RiAdminLine } from "react-icons/ri";
 import { RxDashboard } from "react-icons/rx";
+import { GoDot } from "react-icons/go";
+import { FiEdit2 } from "react-icons/fi";
 
 import { throwOrFallback } from "@/util";
 
@@ -43,9 +47,13 @@ const icons = {
     password: MdOutlinePassword,
     signup: AiOutlineUserAdd,
     user: AiOutlineUser,
+    lock: IoLockClosedOutline,
     unlock: IoLockOpenOutline,
     admin: RiAdminLine,
-    dashboard: RxDashboard
+    dashboard: RxDashboard,
+    dot: GoDot,
+    edit: FiEdit2,
+    close: IoMdClose
 };
 
 /**

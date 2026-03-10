@@ -2,7 +2,7 @@
 User role assignment control and rule exposure endpoints.
 """
 from uuid import UUID
-from fastapi import Request, Depends
+from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from backend.model import (
@@ -12,6 +12,7 @@ from backend.model import (
 from backend.logic import (
     would_role_be_valid, assignable_roles_for_realm, check_role_assign_authz
 )
+from backend.model.user.user import UserAuditEvent
 from backend.service import (
     Invalid, get_current_user, assert_authz, assert_role_assign_authz, get_session
 )
@@ -140,12 +141,12 @@ def _update_role_for_realm( # pylint: disable=too-many-locals
             role.deleted_at = current_datetime()
 
     # Create or update role.
-    event = None
+    role_event = None
     if target_role:
-        event = BasicAuditEvent.UPDATE
+        role_event = BasicAuditEvent.UPDATE
         target_role.role = update.role
     else:
-        event = BasicAuditEvent.CREATE
+        role_event = BasicAuditEvent.CREATE
         target_role = UserRole(
             user_id=target_user_id,
             realm_id=realm.id if realm else None,
@@ -156,7 +157,8 @@ def _update_role_for_realm( # pylint: disable=too-many-locals
     session.flush()
     session.refresh(target_role)
 
-    Audit.create(session, cur_user, target_role, event, update)
+    Audit.create(session, cur_user, target_role, role_event, update)
+    Audit.create(session, cur_user, target_user, UserAuditEvent.ADD_ROLE, update)
     session.commit()
 
     return target_role
@@ -233,6 +235,7 @@ def _delete_role_for_realm(
     session.flush()
 
     Audit.create(session, cur_user, target_role, BasicAuditEvent.DELETE)
+    Audit.create(session, cur_user, target_user, UserAuditEvent.REMOVE_ROLE)
     session.commit()
 
 @app.delete("/realms/global/users/{user_id:uuid}")

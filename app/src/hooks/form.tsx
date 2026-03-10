@@ -11,7 +11,7 @@ export type FormError = {
 
 export const useForm = <T, R = void>(
     mutation: MutationFn<T, R>, initialValue: T,
-    errors: Record<string, I18nValueFn>,
+    errors: Record<string, I18nValueFn> = {},
     onSuccess?: (result: R) => void
 ) => {
     const [values, setValues] = useState({ ...initialValue });

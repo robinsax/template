@@ -1,10 +1,11 @@
 import bcrypt
 from uuid import UUID
+from enum import Enum
 from datetime import datetime
 from typing import TYPE_CHECKING
 from sqlalchemy.orm import Mapped, Session, Query, relationship, selectinload
 
-from ..base import Mapper, Model, column
+from ..base import Mapper, Model, EnumMixin, column
 from ..audit import AuditMixin
 
 if TYPE_CHECKING:
@@ -13,6 +14,19 @@ if TYPE_CHECKING:
 
 MAX_USER_NAME_LENGTH = 30
 MAX_USER_EMAIL_LENGTH = 60
+
+class UserAuditEvent(EnumMixin, Enum):
+    """
+    Audit event types for `User`.
+    """
+    CREATE = "create"
+    UPDATE_PASSWORD = "update_password"
+    UPDATE_DETAILS = "update_details"
+    CONFIRM = "confirm"
+    DEACTIVATE = "deactivate"
+    REACTIVATE = "reactivate"
+    ADD_ROLE = "add_role"
+    REMOVE_ROLE = "remove_role"
 
 class UserModel(Model):
     """
@@ -23,6 +37,8 @@ class UserModel(Model):
     email: str
     roles: list["UserRoleModel"]
     locale: str
+    is_confirmed: bool
+    is_inactive: bool
 
 class User(Mapper, AuditMixin):
     """
@@ -32,6 +48,7 @@ class User(Mapper, AuditMixin):
     """
     __tablename__ = "users"
     __model__ = UserModel
+    __audit_events__ = UserAuditEvent
 
     id: Mapped[UUID] = column(pk=True)
     email: Mapped[str] = column(str_len=MAX_USER_EMAIL_LENGTH, unique=True, index=True)
@@ -71,6 +88,10 @@ class User(Mapper, AuditMixin):
     @property
     def is_inactive(self) -> bool:
         return self.deactivated_at is not None
+
+    @property
+    def is_confirmed(self) -> bool:
+        return self.password_digest is not None
 
     def set_password(self, password: str):
         """

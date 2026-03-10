@@ -22,7 +22,8 @@ export const theme = {
         offset: ["#e6e6e6", "#1a1a1a"],
         text: ["#333333", "#e6e6e6"],
         border: ["#cccccc", "#333333"],
-        subtle: ["#999999", "#666666"]
+        subtle: ["#999999", "#666666"],
+        overlay: ["#00000080"]
     },
     shadows: {
         defaultDrop: [

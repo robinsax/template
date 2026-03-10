@@ -6,15 +6,14 @@ from uuid import UUID
 from fastapi import Request, Depends
 from sqlalchemy.orm import Session
 
-from backend.logic import get_supported_locales
+from backend.logic import get_supported_locales, can_user_manage_user
 from backend.model import (
-    Model, Permission, User, UserModel, Audit, BasicAuditEvent, Notification,
-    NotificationType, NotificationModel, AuthKeyRestriction, AuthKey,
+    Model, Permission, User, UserModel, Audit, UserAuditEvent, Notification,
+    NotificationType, NotificationModel, AuthKeyRestriction, AuthKey, AuditModel,
     MAX_USER_NAME_LENGTH, MAX_USER_EMAIL_LENGTH, current_datetime
 )
 from backend.service import (
-    Invalid, Unauthorized, get_current_user, assert_scopeless_authz, assert_authz,
-    get_session
+    Invalid, Unauthorized, get_current_user, assert_scopeless_authz, get_session
 )
 
 from .base import app
@@ -98,6 +97,22 @@ def get_user(
 
     return user.to_model()
 
+@app.get("/users/{user_id:uuid}/audits")
+def get_user_audits(
+    user_id: UUID, session: Session = Depends(get_session),
+    cur_user: User = Depends(get_current_user)
+) -> list[AuditModel]:
+    """
+    Return the audits for the user with `user_id`.
+    """
+    user = User.get(session, user_id)
+    if not user:
+        raise Invalid("invalid_user")
+
+    audits = Audit.get_all_for_target(session, user)
+
+    return [audit.to_model() for audit in audits]
+
 # User creation flow.
 class UserCreateParams(Model):
     """
@@ -133,7 +148,7 @@ def create_user(
     session.flush()
     session.refresh(user)
 
-    Audit.create(session, user, user, BasicAuditEvent.CREATE)
+    Audit.create(session, user, user, UserAuditEvent.CREATE)
 
     # Note the (restricted) auth key for this user will be generated when the
     # notification is dispatched via email.
@@ -163,10 +178,10 @@ def confirm_user(
     user.set_password(params.password)
     confirm_key.revoke()
 
-    session.commit()
+    session.flush()
     session.refresh(user)
 
-    Audit.create(session, user, user, BasicAuditEvent.UPDATE)
+    Audit.create(session, user, user, UserAuditEvent.CONFIRM)
     session.commit()
 
     return user.to_model()
@@ -201,7 +216,7 @@ def update_user_password(
     session.commit()
     session.refresh(user)
 
-    Audit.create(session, user, user, BasicAuditEvent.UPDATE, update)
+    Audit.create(session, user, user, UserAuditEvent.UPDATE_PASSWORD, update)
     session.commit()
 
     return user.to_model()
@@ -223,7 +238,7 @@ def update_user(
     """
     Update the user with `user_id`.
 
-    Requires  *manage IAM* permission containing user"s minimum authorization scope if
+    Requires  *manage IAM* permission containing user's minimum authorization scope if
     the user is not the requester.
     """
 
@@ -232,27 +247,71 @@ def update_user(
     if not user:
         raise Invalid("invalid_user")
 
-    if cur_user.id != user.id:
-        required_authz_scope = user.get_minimum_iam_authz_scope()
-
-        assert_authz(cur_user, required_authz_scope, Permission.IAM)
+    if cur_user.id != user.id and not can_user_manage_user(cur_user, user):
+        raise Unauthorized("unauthorized")
 
     # Update name and locale.
-    if update.name:
+    if update.name is not None:
         _validate_user_name(update.name)
         user.name = update.name
 
-    if update.locale:
+    if update.locale is not None:
         if update.locale not in get_supported_locales():
             raise Invalid("invalid_locale")
 
         user.locale = update.locale
 
     # Save.
-    session.commit()
+    session.flush()
     session.refresh(user)
 
-    Audit.create(session, cur_user, user, BasicAuditEvent.UPDATE, update)
+    Audit.create(session, cur_user, user, UserAuditEvent.UPDATE_DETAILS, update)
+    session.commit()
+
+    return user.to_model()
+
+class UserActiveUpdateParams(Model):
+    """
+    User activation update request JSON body.
+    """
+    active: bool
+
+@app.put("/users/{user_id:uuid}/activation")
+def update_user_active_state(
+    user_id: UUID, update: UserActiveUpdateParams,
+    session: Session = Depends(get_session),
+    cur_user: User = Depends(get_current_user)
+) -> UserModel:
+    """
+    Update the active state of the user with `user_id`.
+
+    Requires *manage IAM* permission containing user's minimum authorization scope if
+    the user is not the requester.
+    """
+    # Validate target and authz.
+    user = User.get(session, user_id)
+    if not user:
+        raise Invalid("invalid_user")
+
+    if cur_user.id != user.id and not can_user_manage_user(cur_user, user):
+        raise Unauthorized("unauthorized")
+
+    # Update active state.
+    if update.active == (not user.is_inactive):
+        raise Invalid("noop")
+
+    event = UserAuditEvent.DEACTIVATE
+    if not update.active:
+        user.deactivated_at = current_datetime()
+    else:
+        user.deactivated_at = None
+        event = UserAuditEvent.REACTIVATE
+
+    # Save.
+    session.flush()
+    session.refresh(user)
+
+    Audit.create(session, cur_user, user, event, update)
     session.commit()
 
     return user.to_model()

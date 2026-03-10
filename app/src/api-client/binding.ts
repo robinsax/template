@@ -1,6 +1,6 @@
 /** This file is auto-generated. Do not modify it. */
 /* eslint-disable max-len */
-import { UserModel, UserCreateParams, UserPasswordSetParams, UserUpdateParams, NotificationModel, NotificationsUpdateParams, AuthParams, AuthResp, AuthKeyModel, PasswordResetRequestParams, Role, UserRoleUpdateParams, UserRoleModel, UploadModel } from "@/model";
+import { UserModel, AuditModel, UserCreateParams, UserPasswordSetParams, UserUpdateParams, UserActiveUpdateParams, NotificationModel, NotificationsUpdateParams, AuthParams, AuthResp, AuthKeyModel, PasswordResetRequestParams, Role, UserRoleUpdateParams, UserRoleModel, UploadModel } from "@/model";
 
 import { APIClientBase, APICallOptions } from "./base";
 
@@ -12,10 +12,16 @@ export const binding = (api: APIClientBase) => ({
         get: (options?: APICallOptions): Promise<UserModel[]> => (api.call({ path: `/users`, method: "get" }, options)),
         id: (user_id: string) => (({
             get: (options?: APICallOptions): Promise<UserModel> => (api.call({ path: `/users/${user_id}`, method: "get" }, options)),
+            audits: {
+                get: (options?: APICallOptions): Promise<AuditModel[]> => (api.call({ path: `/users/${user_id}/audits`, method: "get" }, options))            
+            },
             password: {
                 put: (body: UserPasswordSetParams, options?: APICallOptions): Promise<UserModel> => (api.call({ path: `/users/${user_id}/password`, method: "put", body }, options))            
             },
             put: (body: UserUpdateParams, options?: APICallOptions): Promise<UserModel> => (api.call({ path: `/users/${user_id}`, method: "put", body }, options)),
+            activation: {
+                put: (body: UserActiveUpdateParams, options?: APICallOptions): Promise<UserModel> => (api.call({ path: `/users/${user_id}/activation`, method: "put", body }, options))            
+            },
             notifications: {
                 get: (options?: APICallOptions): Promise<NotificationModel[]> => (api.call({ path: `/users/${user_id}/notifications`, method: "get" }, options)),
                 put: (body: NotificationsUpdateParams, options?: APICallOptions): Promise<void> => (api.call({ path: `/users/${user_id}/notifications`, method: "put", body }, options))            

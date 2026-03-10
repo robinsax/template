@@ -101,11 +101,6 @@ Integrations such as cloud storage backends and SMTP dispatch will not function 
 - Run task `Workspace: Configure Local Integrations` and follow the prompts.
 - Restart the local deployment if it is running.
 
-No ad platforms will be available until configured. To configure these connections:
-- Run task `Workspace: Configure Local Ad Platform Connections` and follow the prompts.
-    - Note that for local development, most ad platforms should be run against their mock backends. This task will prompt you to confirm that configuration.
-- Restart the local deployment if it is running.
-
 # Codegen Scripts
 
 > Run task `Codegen: All` to run all codegen scripts before merging to trunk branches. CI will fail if there are uncommitted changes after code generation.

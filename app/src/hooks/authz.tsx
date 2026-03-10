@@ -18,7 +18,8 @@ import { useQuery } from "./state";
 */
 export const useAuthzCheck = (
     realm: RealmModel | null,
-    permission: Permission | Permission[] | null
+    permission: Permission | Permission[] | null,
+    { scopeless = false }: { scopeless?: boolean } = {}
 ) => {
     const [user] = useQuery(queryCurrentUser);
 
@@ -39,11 +40,12 @@ export const useAuthzCheck = (
                 if (!permissions[permission]) continue;
 
                 matchesAny = true;
+                break;
             }
             if (!matchesAny) continue;
 
             // Scopeless check or global role.
-            if (!realm || !role.realm) return true;
+            if (scopeless || !role.realm) return true;
 
             // Check for parent of requested realm that role is applied at.
             let current: RealmModel | null = realm;

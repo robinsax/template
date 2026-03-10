@@ -6,11 +6,13 @@ from __future__ import annotations
 from uuid import UUID
 from enum import Enum
 from datetime import datetime
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 from sqlalchemy import Column, Index, and_, or_, select, exists
 from sqlalchemy.orm import Session, Mapped, relationship
 
-from ..base import Mapper, Model, EnumMixin, Model, MAX_TABLENAME_LEN, column
+from ..base import (
+    Mapper, Model, EnumMixin, Model, MAX_TABLENAME_LEN, column
+)
 from ..common import model_to_column_repr, dict_to_column_repr
 
 if TYPE_CHECKING:
@@ -27,30 +29,25 @@ class BasicAuditEvent(EnumMixin, Enum):
     UPDATE = "update"
     DELETE = "delete"
 
+class AuditUserModel(Model):
+    """
+    Summary model of `User` for audit attribution.
+    """
+    id: str
+    email: str
+    name: str
+
 class AuditModel(Model):
     """
     Default `Model` for `Audit`s.
     """
     id: str
-    user: "UserModel"
+    user: AuditUserModel
     target_type: str
     target_id: str
     occurred_at: datetime
     event: str
     params: dict | None
-
-class AuditStandaloneModel(Model):
-    """
-    `Audit` model for standalone exposure (when detached from target).
-
-    The target mapper must declare a `__audit_self_summary__` model for this to be usable.
-    """
-    id: str
-    user: "UserModel"
-    occurred_at: datetime
-    event: str
-    target_type: str
-    target_summary: Any
 
 class Audit(Mapper):
     """
@@ -70,7 +67,7 @@ class Audit(Mapper):
     target_type: Mapped[str] = column(str_len=MAX_TABLENAME_LEN)
     target_id: Mapped[UUID] = column()
     _event: Mapped[str] = column(name="event", str_len=MAX_AUDIT_EVENT_LEN)
-    params: Mapped[dict | None] = column()
+    _params: Mapped[dict | None] = column(name="params", raw_jsonb=True)
 
     user: Mapped["User"] = relationship()
 

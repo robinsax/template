@@ -1,5 +1,7 @@
 import {
-    MouseEvent, KeyboardEvent, ChangeEvent, ReactNode, useCallback, useMemo
+    MouseEvent, KeyboardEvent, ChangeEvent, ReactNode, useCallback, useMemo,
+    useState,
+    useRef
 } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -9,6 +11,8 @@ import { I18nValueFn, useI18n } from "@/hooks";
 import { BlockProps, BlockStyles, useBlockProps } from "./base";
 import { ConditionalBlockProps, useConditionalProps } from "./conditions";
 import { IconName, Icon, LoadIndicator } from "./icons";
+import { Popover } from "./popover";
+import { Spacer } from "./layout";
 
 export const Link = ({
     children, underlined, route, search, target, ...props
@@ -146,6 +150,23 @@ export const Switch = ({ toggle, active, onChange, ...props }: (
     );
 };
 
+const useDefaultInputStyles = (invalid?: boolean): BlockStyles => ({
+    backgroundColor: "offset",
+    color: "text",
+    outline: "none",
+    border: "default",
+    borderColor: "border",
+    borderBottomColor: invalid ? "error" : "border",
+    borderRadius: 0.25,
+    paddingX: 1, paddingY: 0.5,
+    width: "100%",
+    fontSize: "md",
+    fontFamily: "body",
+    focus: {
+        borderBottomColor: invalid ? "error" : "primary"
+    }
+});
+
 export const Input = <T extends number | string>({ 
     type = "text", value, invalid, name, placeholder, onChange, onEnter, ...props 
 }: BlockProps<HTMLInputElement> & {
@@ -159,22 +180,9 @@ export const Input = <T extends number | string>({
 }) => {
     const t = useI18n();
 
-    const rawProps = useBlockProps(props, {
-        backgroundColor: "offset",
-        color: "text",
-        outline: "none",
-        border: "default",
-        borderColor: "border",
-        borderBottomColor: invalid ? "error" : "border",
-        borderRadius: 0.25,
-        paddingX: 1, paddingY: 0.5,
-        width: "100%",
-        fontSize: "md",
-        fontFamily: "body",
-        focus: {
-            borderBottomColor: invalid ? "error" : "primary"
-        }
-    }, [invalid]);
+    const defaultStyles = useDefaultInputStyles(invalid);
+
+    const rawProps = useBlockProps(props, defaultStyles, [invalid]);
 
     const onChangeInner = useCallback((event: ChangeEvent<HTMLInputElement>) => {
         if (onChange) onChange(event.target.value as T);
@@ -197,69 +205,77 @@ export const Input = <T extends number | string>({
     );
 };
 
-export const TextArea = ({ 
-    value, name, placeholder, onChange, ...props 
-}: BlockProps<HTMLTextAreaElement> & { 
+export const Select = <T extends string>({
+    value, name, options, onChange, invalid, placeholder, ...props 
+}: BlockProps & { 
     value?: string, 
     name?: string,
+    invalid?: boolean,
+    options: [T, I18nValueFn][],
     placeholder?: I18nValueFn,
     onChange?: (value: string) => void 
 }) => {
     const t = useI18n();
 
-    const rawProps = useBlockProps(props, {
-        display: "inline-block",
-        verticalAlign: "top",
-        backgroundColor: "subtle"
-    });
+    const defaultStyles = useDefaultInputStyles(invalid);
 
-    const onChangeInner = useCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
-        if (onChange) onChange(event.target.value);
-    }, [onChange]);
-
-    return (
-        <textarea
-            name={ name }
-            value={ value }
-            onChange={ onChangeInner }
-            placeholder={ placeholder ? placeholder(t) : undefined }
-            { ...rawProps }
-        />
-    );
-};
-
-export const Select = <T extends string>({ 
-    value, name, options, onChange, ...props 
-}: BlockProps<HTMLSelectElement> & { 
-    value?: string, 
-    name?: string,
-    options: [T, I18nValueFn][],
-    onChange?: (value: string) => void 
-}) => {
-    const t = useI18n();
+    const triggerRef = useRef<HTMLDivElement>(null);
+    const [triggerWidth, setTriggerWidth] = useState(0);
 
     const rawProps = useBlockProps(props, {
-        display: "inline-block",
-        verticalAlign: "top",
-        backgroundColor: "subtle"
-    });
+        ...defaultStyles,
+        width: "100%",
+        cursor: "pointer",
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center"
+    }, [invalid]);
 
-    const onChangeInner = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
-        if (onChange) onChange(event.target.value);
-    }, [onChange]);
+    const selectedOption = useMemo(() => (
+        options.find(([key]) => key == value)
+    ), [value, options]);
 
-    return (
-        <select
-            name={ name }
-            value={ value }
-            onChange={ onChangeInner }
-            { ...rawProps }
+    const onOpen = useCallback(() => {
+        if (!triggerRef.current) return;
+
+        setTriggerWidth(triggerRef.current.getBoundingClientRect().width);
+    }, []);
+
+    return <>
+        <input type="hidden" name={ name } value={ value }/>
+        <Popover
+            width="100%"
+            onOpen={ onOpen }
+            panelStyles={ {
+                width: `${ triggerWidth }px`,
+                paddingX: 0
+            } }
+            trigger={ () => (
+                <div
+                    { ...rawProps }
+                    ref={ triggerRef }
+                >
+                    { selectedOption ? selectedOption[1](t) : (
+                        placeholder ? placeholder(t) : t("Select one...")
+                    ) }
+                    <Spacer/>
+                    <Icon name="down"/>
+                </div>
+            ) }
         >
             { options.map(([key, label]) => (
-                <option key={ key } value={ key }>
+                <Button
+                    key={ key }
+                    ghost width="100%" justifyContent="flex-start"
+                    active={ key == value }
+                    borderRadius={ 0 }
+                    borderLeft="thick"
+                    borderLeftColor={ key == value ? "primary" : undefined }
+                    onClick={ onChange && (() => onChange(key)) }
+                >
                     { label(t) }
-                </option>
+                </Button>
             )) }
-        </select>
-    );
+        </Popover>
+    </>;
 };

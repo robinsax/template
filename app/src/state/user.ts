@@ -35,6 +35,12 @@ export const queryCurrentUser = async (
     return await context.api.users.id(authState.userId).get();
 };
 
+export const queryNoCurrentUser = async (context: QueryContext): Promise<boolean> => {
+    const user = await context.query(queryCurrentUser);
+
+    return !user;
+};
+
 export const mutateLogIn = async (
     context: MutationContext, creds: Omit<AuthParams, "restriction">
 ) => {
@@ -73,9 +79,8 @@ export const mutateRequestPasswordReset = async (
 };
 
 export const mutateResetPassword = async (
-    context: MutationContext, { userId, token, password }: UserPasswordSetParams & {
-        userId: string
-    }
+    context: MutationContext,
+    { userId, token, password }: UserPasswordSetParams & { userId: string }
 ) => {
     await context.api.users.id(userId).password.put({ token, password });
 };
@@ -88,9 +93,10 @@ export const mutateConfirmUserAndLogIn = async (
     await mutateLogIn(context, { email: user.email, password });
 };
 
-export const queryNotifications = async (context: QueryContext, { includeSeen }: {
-    includeSeen: boolean
-}) => {
+export const queryNotifications = async (
+    context: QueryContext,
+    { includeSeen }: { includeSeen: boolean }
+) => {
     const user = await context.query(queryCurrentUser);
     if (!user) return [];
 
@@ -99,9 +105,10 @@ export const queryNotifications = async (context: QueryContext, { includeSeen }:
     });
 };
 
-export const mutateClearNotifications = async (context: MutationContext, { ids }: {
-    ids: string[]
-}) => {
+export const mutateClearNotifications = async (
+    context: MutationContext,
+    { ids }: { ids: string[] }
+) => {
     const user = await context.query(queryCurrentUser);
     if (!user) throw new Error("No user");
 

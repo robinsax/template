@@ -15,7 +15,7 @@ const sidesRuleNames = (prefix: string, suffix: string = "") => [
     `${prefix}Bottom${suffix}`, `${prefix}Left${suffix}`
 ] as const;
 
-type BlockStylesColor = Theme["color"] | "transparent" | "inherit";
+export type BlockStyleColor = Theme["color"] | "transparent" | "inherit";
 
 export type BlockStyles = {
     // Special rules.
@@ -26,9 +26,9 @@ export type BlockStyles = {
     marginX?: number | string,
     marginY?: number | string,
     // True rules.
-    color?: BlockStylesColor,
-    backgroundColor?: BlockStylesColor,
-    borderColor?: BlockStylesColor,
+    color?: BlockStyleColor,
+    backgroundColor?: BlockStyleColor,
+    borderColor?: BlockStyleColor,
     boxShadow?: Theme["shadow"] | "none",
     fontFamily?: Theme["font"] | "inherit",
     borderRadius?: number | string,
@@ -72,7 +72,7 @@ export type BlockStyles = {
     zIndex?: number,
     animation?: string
 } & (
-    SidesRuleStyles<"border", "Color", BlockStylesColor> &
+    SidesRuleStyles<"border", "Color", BlockStyleColor> &
     SidesRuleStyles<"border", "", Theme["border"] | "none"> &
     SidesRuleStyles<"margin", "", string | number> &
     SidesRuleStyles<"padding", "", string | number>

@@ -38,7 +38,7 @@ export default () => {
                     <Text color="subtle">
                         { t("Already have an account?") }
                     </Text>
-                    <Link href="login">
+                    <Link route="login">
                         <Button icon="login">
                             { t("Log in") }
                         </Button>

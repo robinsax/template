@@ -146,3 +146,22 @@ def check_role_assign_authz(user: User, realm: Realm | None, assign_role: Role) 
         is_role_more_permissive_than(assign_role, role.role)
         for role in user.get_roles_containing_realm(realm)
     )
+
+def can_user_manage_user(user: User, target_user: User) -> bool:
+    """
+    Return whether `user` is able to manage `target_user`.
+
+    To return true, a role on a realm that contains all of `target_user`'s realms
+    must exist and have the IAM permission.
+    """
+    for role in user.roles:
+        if Permission.IAM not in PERMISSIONS_MATRIX[role.role]:
+            continue
+
+        for target_role in target_user.roles:
+            if not role.realm.contains_realm(target_role.realm):
+                break
+
+        return True
+
+    return False

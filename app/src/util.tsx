@@ -25,6 +25,13 @@ export const reroute = (href: RouteKey) => {
     return <Navigate to={ routes[href] } />;
 };
 
+export const log = (...args: unknown[]) => {
+    if (config.devMode) {
+        // eslint-disable-next-line no-console
+        console.log(...args);
+    }
+};
+
 /**
 *   Returns a callback that invokes each of the returned callback in sequence.
 */
@@ -199,7 +206,10 @@ export const formatByteSize = (size: number) => {
 /**
 *   Returns a minimal, human-friendly date string for the given `date`.
 */
-export const smartDateFormat = (date: Date, truncateLongMonths: boolean = false) => {
+export const smartDateFormat = (date: Date, { withTime, truncateLongMonths }: {
+    truncateLongMonths?: boolean,
+    withTime?: boolean
+} = {}) => {
     const now = new Date();
 
     let month = format(date, "MMMM");
@@ -207,11 +217,16 @@ export const smartDateFormat = (date: Date, truncateLongMonths: boolean = false)
         month = month.slice(0, 3);
     }
 
-    if (date.getFullYear() == now.getFullYear()) {
-        return month + " " + format(date, "do");
+    let repr = month + " " + format(date, "do");
+    if (date.getFullYear() !== now.getFullYear()) {
+        repr += ", " + format(date, "yyyy");
     }
 
-    return month + " " + format(date, "do, yyyy");
+    if (withTime) {
+        repr = format(date, "h:mmaaa") + ", " + repr;
+    }
+
+    return repr;
 };
 
 // Error handling.

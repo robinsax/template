@@ -1,7 +1,7 @@
 import { useI18n, useMutation, useQuery } from "@/hooks";
 import { mutateLogOut, queryCurrentUser } from "@/state";
 import {
-    Box, Button, Icon, Popover, Stack, Spacer, Text, BlockStyles
+    Box, Button, Icon, Popover, Stack, Spacer, Text, BlockStyles, Heading
 } from "@/components/base";
 
 export const ActiveUserMenu = ({ small = false, buttonStyles, ...props }: BlockStyles & {
@@ -18,30 +18,19 @@ export const ActiveUserMenu = ({ small = false, buttonStyles, ...props }: BlockS
         <Popover
             { ...props }
             trigger={ open => (
-                <Button
-                    ghost active={ open }
-                    borderBottom="default"
-                    borderBottomLeftRadius={ 0 }
-                    borderBottomRightRadius={ 0 }
-                    borderBottomColor="primary"
-                    { ...buttonStyles }
-                    hover={ {
-                        ...(buttonStyles && buttonStyles.hover || {}),
-                        borderBottomColor: "primary"
-                    } }
-                >
+                <Button active={ open } { ...buttonStyles }>
                     <Icon name="user" marginRight={ small ? 0 : 0.5 }/>
                     { !small && (
-                        <Text>
+                        <Heading fontSize="md">
                             { !user ? "\u00A0" : user.name.split(' ')[0] }
-                        </Text>
+                        </Heading>
                     ) }
                 </Button>
             ) }
         >{ user && (
             <Stack width={ 15 }>
                 <Box>
-                    <Text>{ user.name }</Text>
+                    <Heading fontSize="md">{ user.name }</Heading>
                     <Text fontSize="sm" color="subtle">{ user.email }</Text>
                 </Box>
                 <Stack horizontal width="100%">

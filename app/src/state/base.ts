@@ -1,5 +1,5 @@
 import config from "@/config";
-import { deepEqual } from "@/util";
+import { deepEqual, log } from "@/util";
 import { APIClient } from "@/api-client";
 
 type QueryState<R, P = null> = {
@@ -7,6 +7,7 @@ type QueryState<R, P = null> = {
     dependents: QueryState<unknown, unknown>[],
     param: P,
     loading: boolean,
+    initial: boolean,
     listeners: (() => void)[],
     waiters: (() => void)[],
     data: R | null,
@@ -19,6 +20,9 @@ export type ImmediateQueryExecFn = <R, P = null>(
 
 export type QueryContext = {
     api: APIClient,
+    dependOn: <P = null>(
+        queryFn: QueryFn<unknown, P>, ...args: P extends null ? [] : [param: P]
+    ) => void,
     query: ImmediateQueryExecFn
 };
 
@@ -26,7 +30,7 @@ export type QueryFn<R, P = null> = (
     (context: QueryContext, param: P) => Promise<R> | R
 );
 
-export type MutationContext = QueryContext & {
+export type MutationContext = Omit<QueryContext, "dependOn"> & {
     invalidate: <P = null>(
         queryFn: QueryFn<unknown, P>,
         matchParam?: (param: P) => boolean
@@ -72,6 +76,7 @@ export const createStateEngine = (api: APIClient): StateEngine => {
             dependents: [],
             param: param,
             loading: false,
+            initial: false,
             listeners: [],
             waiters: [],
             data: null,
@@ -106,6 +111,8 @@ export const createStateEngine = (api: APIClient): StateEngine => {
             }
         }
 
+        log("Invalidate", queryFn, "firing", toFire.map(entry => entry.fn));
+
         (async () => {
             for (const refireEntry of toFire) {
                 await runQuery(refireEntry);
@@ -126,18 +133,27 @@ export const createStateEngine = (api: APIClient): StateEngine => {
         state.loading = true;
         state.listeners.forEach(listener => listener());
 
+        const dependOn = <P>(
+            queryFn: QueryFn<unknown, P>, ...args: P extends null ? [] : [param: P]
+        ) => {
+            const param = args[0] as P;
+            const dependencyState = getQueryState(queryFn, param);
+            const uncastState = state as QueryState<unknown, unknown>;
+
+            if (!dependencyState.dependents.includes(uncastState)) {
+                dependencyState.dependents.push(uncastState);
+            }
+        };
+
         const query = async <R, P = null>(
             fn: QueryFn<R, P>, ...args: P extends null ? [] : [param: P]
         ) => {
-            const param = args[0] as P;
-            const dependencyState = getQueryState(fn, param);
-
-            dependencyState.dependents.push(state as QueryState<unknown, unknown>);
+            dependOn(fn, ...args);
 
             return await queryOnce(fn, ...args);
         };
 
-        const context: QueryContext = { api, query };
+        const context: QueryContext = { api, query, dependOn };
 
         try {
             const result = await state.fn(context, state.param);
@@ -148,6 +164,7 @@ export const createStateEngine = (api: APIClient): StateEngine => {
             state.error = err instanceof Error ? err : new Error(String(err));
         } finally {
             state.loading = false;
+            state.initial = true;
             state.listeners.forEach(listener => listener());
             state.waiters.forEach(waiter => waiter());
             state.waiters = [];
@@ -160,14 +177,14 @@ export const createStateEngine = (api: APIClient): StateEngine => {
         const param = args[0] as P;
         const state = getQueryState(fn, param);
 
-        if (!state.data && !state.error) {
+        if (!state.initial) {
             const done = new Promise<void>(resolve => state.waiters.push(resolve));
             if (!state.loading) runQuery(state);
             await done;
         }
 
-        if (state.data) return state.data;
-        throw state.error;
+        if (state.error) throw state.error;
+        return state.data as R;
     };
 
     const queryListen = (<R, P = null>(
@@ -178,11 +195,11 @@ export const createStateEngine = (api: APIClient): StateEngine => {
         const state = getQueryState(fn, args[0] as P);
 
         const innerListener = () => {
-            listener(state.data, state.error, state.loading);
+            listener(state.data as R, state.error, state.loading);
         };
         state.listeners.push(innerListener);
 
-        if (!state.data && !state.error && !state.loading) {
+        if (!state.initial && !state.loading) {
             runQuery(state);
         } else {
             innerListener();

@@ -5,10 +5,11 @@ import { useWindowListener } from "@/hooks";
 import { Card } from "./layout";
 
 export const Popover = ({
-    children, trigger, placement = "auto", triggerStyles, panelStyles, ...props
+    children, trigger, placement = "auto", triggerStyles, panelStyles, onOpen, ...props
 }: BlockProps & {
     children: ReactNode,
     trigger: (open: boolean) => ReactNode,
+    onOpen?: () => void,
     triggerStyles?: BlockStyles,
     placement?: (
         "auto" | "topLeftward" | "bottomLeftward" | "bottomRightward" | "topRightward"
@@ -27,7 +28,8 @@ export const Popover = ({
         event.stopPropagation();
 
         setOpen(!open);
-    }, [open]);
+        if (!open && onOpen) onOpen();
+    }, [open, onOpen]);
 
     useWindowListener("click", () => {
         setOpen(false);

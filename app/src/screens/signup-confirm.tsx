@@ -1,6 +1,6 @@
-import { useI18n, useSearchParam } from "@/hooks";
+import { useI18n, useQuery, useSearchParam } from "@/hooks";
 import { reroute } from "@/util";
-import { mutateConfirmUserAndLogIn } from "@/state";
+import { mutateConfirmUserAndLogIn, queryCurrentUser } from "@/state";
 import { Card, Stack, Alert } from "@/components/base";
 import { Brand, SplashScreen } from "@/components/global";
 import { PasswordSetForm } from "@/components/users";
@@ -8,9 +8,11 @@ import { PasswordSetForm } from "@/components/users";
 export default () => {
     const t = useI18n();
 
+    const [user] = useQuery(queryCurrentUser);
     const confirmToken = useSearchParam("confirm");
 
     if (!confirmToken) return reroute("login");
+    if (user) return reroute("userHome");
     return (
         <SplashScreen>
             <Stack height="100%" align="center" gap={ 2 }>

@@ -3,7 +3,7 @@ import { jsx } from "@emotion/react";
 
 import { I18nValueFn, useI18n } from "@/hooks";
 
-import { BlockProps, BlockStyles, useBlockProps } from "./base";
+import { BlockProps, BlockStyleColor, BlockStyles, useBlockProps } from "./base";
 import { Icon, IconName } from "./icons";
 
 export const Box = ({ children, ...props }: BlockProps & {
@@ -83,16 +83,19 @@ export const Spacer = () => {
     );
 };
 
-export const Badge = ({ children, ...props }: BlockProps & {
-    children?: ReactNode
+export const Badge = ({ children, badgeColor = "primary", ...props }: BlockProps & {
+    children?: ReactNode,
+    badgeColor?: BlockStyleColor
 }) => {
     const rawProps = useBlockProps(props, {
         display: "inline-block",
         verticalAlign: "top",
-        backgroundColor: "primary",
+        backgroundColor: "offset",
+        borderLeft: "thick",
+        borderLeftColor: badgeColor,
         padding: 0.25,
         borderRadius: 0.25
-    });
+    }, [badgeColor]);
 
     return (
         <div { ...rawProps }>

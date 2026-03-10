@@ -59,7 +59,8 @@ def user_create(
     """
     user = User(
         name=name,
-        email=email
+        email=email,
+        locale="en_US"
     )
     user.set_password(password)
 

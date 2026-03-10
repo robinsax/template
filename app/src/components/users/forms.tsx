@@ -3,11 +3,13 @@
 */
 import { ReactNode, useEffect, useMemo, useState } from "react";
 
-import { I18nValueFn, useForm, useI18n } from "@/hooks";
+import { I18nValueFn, localesList, useForm, useI18n } from "@/hooks";
+import { UserModel } from "@/model";
 import {
-    MutationFn, mutateLogIn, mutateCreateUser, mutateRequestPasswordReset
+    MutationFn, mutateLogIn, mutateCreateUser, mutateRequestPasswordReset,
+    mutateUserDetails
 } from "@/state";
-import { Alert, Button, Input, Stack, Field, Box } from "@/components/base";
+import { Alert, Button, Input, Stack, Field, Box, Select } from "@/components/base";
 
 // Validation errors corresponding to API.
 const passwordValidationErrors: Record<string, I18nValueFn> = {
@@ -23,6 +25,67 @@ const nameValidationErrors: Record<string, I18nValueFn> = {
 const emailValidationErrors: Record<string, I18nValueFn> = {
     invalid_email: t => t("Invalid email."),
     email_too_long: t => t("Email is too long.")
+};
+
+export const UserEditForm = ({ user, onSuccess }: {
+    user: UserModel,
+    onSuccess?: () => void
+}) => {
+    const t = useI18n();
+
+    const [form, working, error] = useForm(mutateUserDetails, {
+        userId: user.id,
+        name: user.name,
+        locale: user.locale,
+    }, {
+        ...nameValidationErrors
+    }, onSuccess);
+
+    const [nameError, globalError] = useMemo(() => {
+        if (!error) return [null, null];
+
+        if (error.key in nameValidationErrors) {
+            return [error.message, null];
+        }
+        return [null, error.message];
+    }, [error]);
+
+    return (
+        <Stack width="100%" gap={ 2 }>
+            { globalError && (
+                <Alert type="error">
+                    { globalError(t) }
+                </Alert>
+            ) }
+            <Field
+                required name="name" label={ t => t("Name") }
+                icon="user"
+                error={ nameError}
+            >
+                <Input
+                    type="text" placeholder={ t => t("Jane Smith") }
+                    { ...form.getFieldProps("name") }
+                />
+            </Field>
+            <Field
+                required name="locale" label={ t => t("Locale") }
+                icon="globe"
+            >
+                <Select
+                    options={ localesList.map(locale => (
+                        [locale.key, t => t(locale.label)]
+                    )) }
+                    { ...form.getFieldProps("locale") }
+                />
+            </Field>
+            <Button
+                width="100%" icon="edit"
+                working={ working } onClick={ form.onSubmit }
+            >
+                { t("Update") }
+            </Button>
+        </Stack>
+    );
 };
 
 export const RequestPasswordResetForm = ({ initialEmail, onSuccess }: {

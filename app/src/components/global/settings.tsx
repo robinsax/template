@@ -1,7 +1,7 @@
 /**
 *   Settings control components. 
 */
-import { useQuery, useMutation, useI18n, supportedLocales } from "@/hooks";
+import { useQuery, useMutation, useI18n, localesList } from "@/hooks";
 import { queryLocalSettings, mutateLocalSettings } from "@/state";
 import { Icon, Popover, Stack, Switch, Button, Text } from "@/components/base";
 
@@ -49,7 +49,7 @@ export const LocaleSelect = () => {
                 <Text fontSize="xs" color="subtle">
                     { t("Select a language") }
                 </Text>
-                { supportedLocales.map(locale => (
+                { localesList.map(locale => (
                     <Button ghost
                         key={ locale.key }
                         active={

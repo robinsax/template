@@ -11,14 +11,15 @@ const locales = {
 
 export type I18nLocaleKey = keyof typeof locales;
 
-export const supportedLocales = Object.keys(locales).map(key => ({
+export type LocaleEntry = {
+    key: I18nLocaleKey,
+    label: string
+};
+
+export const localesList = Object.keys(locales).map(key => ({
     key: key as I18nLocaleKey,
     label: locales[key as I18nLocaleKey].label
-}));
-
-export const supportedLocaleKeys: I18nLocaleKey[] = Object.keys(locales).map(key => (
-    key as I18nLocaleKey
-));
+}) as LocaleEntry);
 
 /**
 *   The set of supported locale keys.

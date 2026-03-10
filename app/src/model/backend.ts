@@ -2,7 +2,7 @@
 /* eslint-disable max-len */
 export type AuditModel = {
     id: string,
-    user: UserModel,
+    user: AuditUserModel,
     target_type: string,
     target_id: string,
     occurred_at: Date,
@@ -10,20 +10,17 @@ export type AuditModel = {
     params: (Record<string, unknown> | null)
 };
 
-export type AuditStandaloneModel = {
-    id: string,
-    user: UserModel,
-    occurred_at: Date,
-    event: string,
-    target_type: string,
-    target_summary: unknown
-};
-
 export type AuditSummaryModel = {
     created_by: (UserModel | string),
     created_at: Date,
     last_updated_at: Date,
     last_updated_by: (UserModel | string)
+};
+
+export type AuditUserModel = {
+    id: string,
+    email: string,
+    name: string
 };
 
 export type AuthKeyModel = {
@@ -93,12 +90,18 @@ export type UploadType = ("default");
 
 export const uploadTypes: UploadType[] = ["default"];
 
+export type UserAuditEvent = ("create" | "update_password" | "update_details" | "confirm" | "deactivate" | "reactivate");
+
+export const userAuditEvents: UserAuditEvent[] = ["create", "update_password", "update_details", "confirm", "deactivate", "reactivate"];
+
 export type UserModel = {
     id: string,
     name: string,
     email: string,
     roles: UserRoleModel[],
-    locale: string
+    locale: string,
+    is_confirmed: boolean,
+    is_inactive: boolean
 };
 
 export type UserRoleModel = {

@@ -1,4 +1,4 @@
-import React, {
+import {
     createContext, useEffect, useState, useMemo, ReactNode, useContext
 } from "react";
 
@@ -42,22 +42,22 @@ export const useQuery = <R, P = null>(
     const engine = useContext(stateEngineContext);
 
     const [data, setData] = useState<R | null>(() => engine.queryImmediate(fn, ...args));
-    const [loading, setLoading] = useState(true);
+    const [working, setWorking] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
     useEffect(() => {
         const listener = (
-            newData: R | null, newError: Error | null, newLoading: boolean
+            newData: R | null, newError: Error | null, newWorking: boolean
         ) => {
             setData(newData);
             setError(newError);
-            setLoading(newLoading);
+            setWorking(newWorking);
         };
 
         return engine.queryListen(fn as QueryFn<R, P | undefined>, listener, args[0]);
-    }, []);
+    }, [...args]);
 
-    return [data, loading, error];
+    return [data, working, error];
 };
 
 export type WrappedMutationFn<P> = (
